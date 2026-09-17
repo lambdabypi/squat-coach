@@ -212,8 +212,8 @@ export default function Home() {
             })}
           </ul>
           <p className="faint" style={{ marginTop: 10, marginBottom: 0 }}>
-            Pose tracking runs at roughly 7&times; the clip length on CPU, so an 8-second video
-            takes about a minute.
+            Tracking runs on the CPU at roughly 7&times; the clip length, and writing the
+            assessment adds about half a minute. An 8-second video takes around 90 seconds.
           </p>
         </div>
       )}
