@@ -65,10 +65,18 @@ the block-1 overrun; the pipeline now reads strictly sequentially.
 receives an evidence JSON plus the relevant skill rules and returns findings through a tool
 schema validated by Pydantic.
 
-It may move a verdict **toward** `cannot_assess` and never away from it. A model that talks itself
-into confidence is precisely the failure this application exists to avoid, so that guard is
-enforced in code, not in the prompt — `assess.py` compares the returned verdict against the rule
-engine's and discards any increase in confidence, recording the attempt in `agent_note`.
+**It may only abstain.** The agent can move a verdict to `cannot_assess` and do nothing else: it
+cannot upgrade an abstention into a verdict, and it cannot flip *meets* to *does not meet* or back.
+Those two come from arithmetic on a measurement and a declared threshold, and the model has no
+information the rule engine lacks — letting it disagree there would be a language model overruling
+a comparison it cannot see better than the code that made it.
+
+The guard is enforced in code, not in the prompt (`merge_verdict` in `assess.py`), and every
+rejected attempt is recorded in `agent_note`. It is covered by
+`scripts/test_confidence_guard.py`, which exists because on a clean run the guard never fires —
+meaning it would otherwise be untested exactly when it matters. Writing that test is what caught
+the flip case: the original implementation ranked `meets` and `does_not_meet` as equally
+confident and so allowed the agent to swap them.
 
 On schema failure: one repair round-trip, then the deterministic verdicts ship with a note saying
 the wording is plainer. The system degrades to something true rather than something fluent.
@@ -82,16 +90,32 @@ Measured on the common sample (1080×1920, 30fps, 7.9s, 236 frames), CPU only, n
 | Probe | <0.1s |
 | Pose + bar detection | ~60s (≈7.5× clip duration) |
 | Reps, quality, rules | <0.5s |
-| Agent | ~5–8s |
-| **Total** | **~65s for an 8-second clip** |
+| Agent | ~33s |
+| **Total** | **93s with the agent, 60s without** |
 
 Pose inference is ~15fps on its own; adding per-frame Hough detection drops it to ~4fps. That is
 the obvious optimisation target — run Hough every N frames and interpolate, or seed a CSRT tracker
 between detections — and it was not worth the remaining budget.
 
-**Per-video LLM cost:** roughly 8–12k input tokens (the skill block is cached across videos) and
-2–4k output, so a few cents at `claude-sonnet-5` pricing — comfortably under $0.05. The exact
-figure is measured per run and reported in `report.cost`, not estimated.
+**Per-video LLM cost, measured on the common sample:**
+
+```
+input 11,938 · cache write 4,436 · cache read 0 · output 3,755  ->  $0.1088
+```
+
+Two corrections to what I estimated before measuring, both in the same direction: I predicted
+5–8s for the agent and it took **33s**, and I predicted "comfortably under $0.05" and it was
+**$0.1088** — about double. The output is larger than I assumed because the agent writes an
+explanation and an uncertainty note for all 22 findings, not just the interesting ones.
+
+Cache read is 0 on a first run; the skill block (~4.4k tokens) is cached thereafter, so subsequent
+videos in the same session cost roughly $0.09. Cost scales with repetition count, since findings
+are per rep × criterion — a 5-rep set would be around $0.25.
+
+At consumer volume that is the dominant unit cost and would need attention: batching reps into one
+finding per criterion, or dropping narration for `cannot_assess` findings where the rule engine's
+wording is already adequate, would cut it by more than half. The figure is measured per run and
+reported in `report.cost`, never estimated.
 
 ## What I verified
 
@@ -106,6 +130,15 @@ figure is measured per run and reported in `report.cost`, not estimated.
   overlay → byte-range video streaming, all against the running API.
 - **Overlay JSON is browser-safe** — NaN and Infinity are valid Python floats and would silently
   break `JSON.parse`, so this is asserted in the e2e test.
+- **The agent stage**, against the live API: all 22 findings narrated, verdicts **identical** to
+  the rule engine's, feedback paraphrasing the document's own coaching language, and measured cost
+  recorded above.
+- **The confidence guard**, all 9 transitions (`scripts/test_confidence_guard.py`).
+- **That editing the skill changes the assessment** (`scripts/test_skill_edit.py`): back-angle
+  tolerance 15 → 5 flips both repetitions from *meets* to *does not meet*, and the loader rejects a
+  tolerance that claims `document_stated` provenance.
+- **The agent failure path, under a genuine failure** rather than a simulated one — see
+  `AI_USAGE.md`.
 
 ## Correctness problems I found and fixed
 

@@ -87,6 +87,22 @@ class AgentOutput(BaseModel):
 _CONFIDENCE_RANK = {UNKNOWN: 0, MEETS: 1, FAILS: 1}
 
 
+def merge_verdict(rule_verdict: str, agent_verdict: str) -> tuple[str, bool]:
+    """Decide the final verdict. Returns (verdict, was_the_agent_overridden).
+
+    The agent may abstain — move a verdict to `cannot_assess` — and nothing else. It may not
+    upgrade an abstention into a verdict, and it may not flip meets <-> does-not-meet: those
+    two come from arithmetic on a measurement and a declared threshold, and the model has no
+    information the rule engine lacks. Letting it disagree there would mean a language model
+    overruling a comparison it cannot see better than the code that made it.
+    """
+    if agent_verdict == rule_verdict:
+        return rule_verdict, False
+    if agent_verdict == UNKNOWN:
+        return UNKNOWN, False          # more caution is always allowed
+    return rule_verdict, True          # anything else is discarded
+
+
 def _candidate_dict(c: Candidate) -> dict[str, Any]:
     return {
         **c.to_dict(),
@@ -168,18 +184,16 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
             findings.append(base)
             continue
 
-        verdict = af.verdict
-        # The one-way guard: more caution is allowed, more confidence is not.
-        if _CONFIDENCE_RANK.get(verdict, 1) > _CONFIDENCE_RANK.get(c.verdict, 1):
+        verdict, was_overridden = merge_verdict(c.verdict, af.verdict)
+        if was_overridden:
             overrides.append(
-                f"rep {c.rep_index}/{c.criterion_id}: model proposed '{verdict}' where the rule "
-                f"engine said '{c.verdict}'; kept the rule engine's verdict."
+                f"rep {c.rep_index}/{c.criterion_id}: model proposed '{af.verdict}' where the "
+                f"rule engine said '{c.verdict}'; kept the rule engine's verdict."
             )
-            verdict = c.verdict
         elif verdict != c.verdict:
             overrides.append(
-                f"rep {c.rep_index}/{c.criterion_id}: model reduced '{c.verdict}' to "
-                f"'{verdict}' on the evidence; accepted."
+                f"rep {c.rep_index}/{c.criterion_id}: model abstained from '{c.verdict}' on the "
+                "evidence; accepted."
             )
 
         findings.append({
