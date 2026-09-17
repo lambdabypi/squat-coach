@@ -104,7 +104,12 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
 
     from anthropic import Anthropic
 
-    client = Anthropic()
+    # An organisation-scoped key must name the workspace it is acting for; a workspace-scoped
+    # key must not. Send the header only when one is configured.
+    workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID")
+    client = Anthropic(
+        default_headers={"anthropic-workspace-id": workspace} if workspace else None
+    )
     messages = [{
         "role": "user",
         "content": [

@@ -81,6 +81,24 @@ bars, cluttered racks, poor light — the system falls back to a shoulder-offset
 on the finding, rather than presenting an inferred bar path with the same confidence as a tracked
 one.
 
+## The fallback path, verified by accident
+
+Worth recording because it was not a drill. The first run with a real API key failed:
+
+```
+BadRequestError: 400 — This API key is not scoped to a workspace, so this request must
+include the anthropic-workspace-id header with the ID of the workspace to use.
+```
+
+The application did what it was built to do. It caught the error, shipped the deterministic
+verdicts and measurements unchanged, and wrote the exact error text into `agent_note` so the
+report says why the wording is plainer than usual. Nothing was silently dropped, and no finding
+changed.
+
+That is the behaviour the design is for: the agent improves phrasing and writes the summary, so
+losing it costs polish, not correctness. It also meant the degradation path was verified under a
+genuine failure rather than a simulated one.
+
 ## Corrections still open
 
 - Pose gives a hip *centre*, not the hip *crease* the document's depth standard refers to. This is a
