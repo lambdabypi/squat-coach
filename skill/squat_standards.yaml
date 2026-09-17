@@ -1,0 +1,433 @@
+# Squat assessment skill — derived from the supplied reference document.
+#
+# Source: "The Squat", Starting Strength (reference pages 1-35 = combined PDF pages 4-38).
+# Every `quote` below is verbatim from that document and was checked against the PDF by hand.
+#
+# THE PROVENANCE RULE, which is the whole point of this file:
+#   Each threshold carries `provenance`, one of:
+#     document_stated       - the document states this, in words or geometry. Citable as a requirement.
+#     engineering_tolerance - OUR margin, for landmark noise or measurement limits. NOT a document
+#                             requirement, must never be presented to a user as one.
+#   The document states almost no numbers. Where it gives geometry rather than a figure
+#   ("hips below the top of the patella"), the rule is geometric and the tolerance is separate.
+#
+# COORDINATES: image space, origin top-left, y increases DOWNWARD. So "hip below knee" is hip.y > knee.y.
+# UNITS: distances normalised by shin length (ankle->knee) unless stated. Angles in degrees.
+
+meta:
+  document_title: "The Squat"
+  document_source: "Starting Strength, reference pages 1-35 (combined PDF pages 4-38)"
+  page_offset_note: "reference page N = combined PDF page N+3"
+  skill_version: "1.0.0"
+  coordinate_convention: "image space, y increases downward"
+  checklist_origin:
+    pages: [35]
+    note: >
+      The document closes with its own checklist, "The Important Things You're Going to Do
+      Wrong": Depth, Knee position, Stance, Eye gaze, Back angle, Hip drive, Bar placement,
+      Rack height. Those eight are the backbone of this skill. Three of them cannot be
+      assessed from a side view at all; see `assessable_from_side_view: none` below.
+
+# ---------------------------------------------------------------------------
+# FULLY ASSESSABLE FROM A SIDE VIEW
+# ---------------------------------------------------------------------------
+
+criteria:
+
+  - id: depth
+    name: Squat depth
+    checklist_heading: Depth
+    assessable_from_side_view: full
+    source:
+      pages: [2, 16, 18, 22, 33]
+      figures: ["2-1", "2-10"]
+      quote: >
+        Correctly is deep, with hips dropping below level with the top of the patellas.
+        Correctly is therefore full range of motion.
+      supporting_quote: >
+        The top of the patella (A) and the hip joint, as identified by the apex in the crease
+        of the shorts (B). The B side of the plane formed by these two points must drop below
+        parallel with the ground.
+    requires_landmarks: [hip, knee]
+    measure:
+      id: hip_minus_knee_y_at_bottom
+      description: >
+        Signed vertical offset of the hip landmark below the top of the patella at the bottom
+        frame, normalised by shin length. Positive means the hip is lower than the knee.
+      unit: shin_lengths
+    rule:
+      meets_when: "hip_y > knee_y"
+      provenance: document_stated
+      note: >
+        The document defines this geometrically, not numerically. There is no degree value and
+        no percentage to cite. Do not invent one.
+    tolerance:
+      value: 0.03
+      unit: shin_lengths
+      provenance: engineering_tolerance
+      rationale: >
+        MediaPipe hip and knee centres jitter by a few pixels. Within this band we return
+        borderline rather than a confident verdict. This margin is ours, not the document's.
+    systematic_bias:
+      description: >
+        The document's landmark is the hip CREASE (apex of the crease of the shorts). Pose
+        estimation gives a hip JOINT CENTRE, which sits higher. This biases us toward reporting
+        "not deep enough". Reported, not silently corrected away.
+    feedback_on_fail:
+      pages: [18, 33]
+      text: >
+        Any squat that is not deep is a partial squat. If you are high, check that your stance
+        is wide enough but not too wide, that your toes are out enough, and that your knees are
+        tracking parallel to your feet - most people who squat high do not shove their knees out
+        enough.
+    uncertainty:
+      cannot_assess_when:
+        - "min visibility of hip or knee at the bottom frame < 0.6"
+        - "camera is not in the sagittal plane"
+        - "the bottom frame could not be identified for this repetition"
+
+  - id: back_angle
+    name: Back angle
+    checklist_heading: Back angle
+    assessable_from_side_view: full
+    source:
+      pages: [9, 11, 23, 32, 35]
+      figures: ["2-5", "2-13", "2-22"]
+      quote: >
+        The back angle is formed by the plane of the torso and the floor, which is assumed to be
+        horizontal (meaning level, perpendicular to the force of gravity).
+      supporting_quote: >
+        your back is inclined at about a 45-degree angle, not at all vertical
+      failure_quote: >
+        Your back will (usually) be too vertical, due to a faulty mental picture of what your hips
+        do when you squat or due to the incorrect placement of the bar on your back, or your back
+        will be too horizontal, due to your failure to keep your chest up. Either error will
+        adversely affect hip drive and depth.
+    requires_landmarks: [shoulder, hip]
+    measure:
+      id: torso_angle_from_horizontal_at_bottom
+      description: "Angle between the shoulder->hip vector and the horizontal, at the bottom frame."
+      unit: degrees
+    rule:
+      reference_value: 45
+      provenance: document_stated
+      note: >
+        The document says "about a 45-degree angle". "About" is the document's own word - this is
+        a reference posture, not a pass/fail threshold, and must be presented that way.
+    tolerance:
+      value: 15
+      unit: degrees
+      provenance: engineering_tolerance
+      rationale: >
+        Our band around the document's "about 45". Individual anthropometry legitimately shifts
+        the correct back angle, and the document explicitly ties it to bar position rather than
+        prescribing a number. Flag only clear departures - too vertical (>60 deg from horizontal)
+        or too horizontal (<30 deg).
+    feedback_on_fail:
+      pages: [32, 33]
+      text: >
+        Most people have a picture in their minds of a vertical torso during the squat. The back
+        angle will not be vertical at all; sit back, lean forward, and shove your knees out.
+        Balance problems usually indicate a back angle that is too vertical.
+
+  - id: bar_path_over_midfoot
+    name: Bar path over the midfoot
+    checklist_heading: Bar placement / balance
+    assessable_from_side_view: full
+    source:
+      pages: [6, 8, 9, 11, 12]
+      figures: ["2-5", "2-7"]
+      quote: >
+        So not only is a straight line the shortest distance between two points, but a straight
+        vertical line is also the most efficient bar path for a barbell moving through space in a
+        gravitational framework.
+      supporting_quote: >
+        "good technique" in barbell training is easily and understandably defined as the ability
+        of the lifter to keep the bar vertically aligned with the balance point.
+      midfoot_definition_quote: >
+        the midfoot is exactly halfway between either end of the sole of the shoe.
+    requires_landmarks: [heel, foot_index, bar]
+    measure:
+      id: max_bar_horizontal_deviation_from_midfoot
+      description: >
+        Maximum absolute horizontal distance between the tracked bar centre and the midfoot x
+        across the repetition, normalised by shin length.
+      unit: shin_lengths
+    rule:
+      meets_when: "max_deviation <= tolerance"
+      provenance: document_stated
+      note: >
+        The requirement (bar stays over the midfoot, path is vertical) is document_stated. The
+        numeric size of an acceptable deviation is NOT in the document - see tolerance.
+    tolerance:
+      value: 0.15
+      unit: shin_lengths
+      provenance: engineering_tolerance
+      rationale: >
+        The document gives zero numeric allowance; it says deviation tolerance approaches zero as
+        load approaches 1RM. We cannot know the load from video, so this band reflects our own
+        tracking error plus a practical allowance. Ours, not the document's.
+    feedback_on_fail:
+      pages: [11, 12]
+      text: >
+        When the bar is off-balance, the added energy you must expend due to the leverage of the
+        off-balance load makes the weight harder to lift. Keep the bar travelling in a vertical
+        line over the middle of the foot through the complete range of motion.
+    uncertainty:
+      cannot_assess_when:
+        - "the bar could not be tracked in pixels for this repetition (basis would be 'estimated')"
+        - "the feet are out of frame"
+      degraded_when:
+        - "bar position is a shoulder-offset estimate rather than an observed plate detection"
+
+  - id: hip_drive
+    name: Hip drive out of the bottom
+    checklist_heading: Hip drive
+    assessable_from_side_view: full
+    source:
+      pages: [1, 23, 24, 35]
+      figures: ["2-14"]
+      quote: >
+        come up out of the bottom by driving your butt straight up in the air. Up, not forward.
+      failure_quote: >
+        You will lift your chest instead of driving your hips up. This will kill your power out of
+        the bottom by making your back angle too vertical.
+    requires_landmarks: [hip, shoulder]
+    measure:
+      id: hip_vs_shoulder_rise_ratio_early_ascent
+      description: >
+        Ratio of hip vertical rise to shoulder vertical rise over the first 150 ms of the ascent.
+        A value >= 1 means the hips led. Below 1 means the chest rose first.
+      unit: ratio
+    rule:
+      meets_when: "ratio >= 1.0"
+      provenance: document_stated
+      note: >
+        "Hips first, not chest first" is document_stated as a direction of movement. The ratio is
+        our operationalisation of it.
+    tolerance:
+      value: 0.15
+      unit: ratio
+      provenance: engineering_tolerance
+      rationale: "Landmark noise over a 150 ms window. Ratios within 1.0 +/- 0.15 are borderline."
+    feedback_on_fail:
+      pages: [24]
+      text: >
+        Think about a chain hooked to your hips, pulling you straight up out of the bottom. Do not
+        think about your knees straightening out, do not think about your feet pushing against the
+        floor. Just drive your hips up out of the bottom.
+
+  - id: knee_forward_of_toes
+    name: Knee position at the bottom (sagittal)
+    checklist_heading: Knee position (sagittal component only)
+    assessable_from_side_view: full
+    source:
+      pages: [23]
+      figures: ["2-13"]
+      quote: >
+        the hips are back, the knees are just a little forward of the toes, and the back is at an
+        angle (about 45 degrees) that will place the bar over the middle of the foot.
+    requires_landmarks: [knee, foot_index]
+    measure:
+      id: knee_x_minus_toe_x_at_bottom
+      description: "Horizontal offset of the knee ahead of the toe at the bottom, normalised by shin length."
+      unit: shin_lengths
+    rule:
+      meets_when: "0 <= offset <= 0.5"
+      provenance: document_stated
+      note: >
+        "just a little forward of the toes" is the document's wording. The bracket below is our
+        reading of "a little" - the document gives no number.
+    tolerance:
+      value: 0.5
+      unit: shin_lengths
+      provenance: engineering_tolerance
+      rationale: "Our quantification of 'just a little'. Not a document requirement."
+    important_scope_note: >
+      This covers ONLY the front-back component of knee position. The document's actual "Knee
+      position" failure is knees not being shoved OUT, which is a frontal-plane property and is
+      unassessable here. See criterion `knees_out`.
+
+# ---------------------------------------------------------------------------
+# PARTIALLY ASSESSABLE - report with reduced confidence and say why
+# ---------------------------------------------------------------------------
+
+  - id: heels_flat
+    name: Heels flat on the floor
+    assessable_from_side_view: partial
+    source:
+      pages: [23]
+      figures: ["2-13"]
+      quote: >
+        The femurs are parallel to the feet, the feet are flat on the ground at the correct angle
+      supporting_quote: >
+        Assume the bottom position with knees out, toes out, and heels down.
+    requires_landmarks: [heel, foot_index, ankle]
+    measure:
+      id: heel_vertical_displacement
+      description: "Heel landmark rise relative to its standing position, normalised by shin length."
+      unit: shin_lengths
+    rule:
+      meets_when: "heel_rise <= tolerance"
+      provenance: document_stated
+    tolerance:
+      value: 0.08
+      unit: shin_lengths
+      provenance: engineering_tolerance
+    partial_reason: >
+      Heel landmarks are frequently occluded by the far leg and by footwear, and a few pixels of
+      rise is within noise. Reported at reduced confidence, and `cannot_assess` when the foot is
+      occluded.
+    confidence_cap: medium
+
+  - id: bar_placement_low_bar
+    name: Bar placement on the back
+    checklist_heading: Bar placement
+    assessable_from_side_view: partial
+    source:
+      pages: [13, 30, 31, 35]
+      figures: ["2-19"]
+      quote: >
+        The bar should therefore be in the lowest secure position it can occupy on the back, right
+        below the spine of the scapula
+      failure_quote: >
+        You will place the bar too high on your back. This will adversely affect your back angle
+        and your hip drive.
+    requires_landmarks: [shoulder, bar]
+    measure:
+      id: bar_y_relative_to_shoulder
+      description: "Vertical offset of the tracked bar centre from the shoulder landmark, normalised by shin length."
+      unit: shin_lengths
+    rule:
+      meets_when: null
+      provenance: document_stated
+      note: >
+        The document's standard is anatomical - below the spine of the scapula. Pose estimation
+        provides no scapular-spine landmark, and the difference between correct and incorrect is
+        roughly two centimetres on the real athlete.
+    partial_reason: >
+      We can distinguish grossly high bar placement from plausible placement, and nothing finer.
+      Never returns a confident "meets standard"; at best "consistent with low-bar placement".
+    confidence_cap: low
+
+  - id: eye_gaze
+    name: Eye gaze direction
+    checklist_heading: Eye gaze
+    assessable_from_side_view: partial
+    source:
+      pages: [24, 25, 27, 35]
+      figures: ["2-15", "2-16"]
+      quote: >
+        fix your eyes on a position on the floor 4 or 5 feet in front of you
+      failure_quote: >
+        You will fail to look down. This will kill your hip drive.
+    requires_landmarks: [nose, ear, shoulder]
+    measure:
+      id: head_pitch_proxy
+      description: >
+        Angle of the ear->nose vector relative to horizontal, as a proxy for gaze direction.
+      unit: degrees
+    rule:
+      meets_when: "pitch indicates a downward-directed head"
+      provenance: document_stated
+    tolerance:
+      value: 0
+      unit: degrees
+      provenance: engineering_tolerance
+      rationale: "Head pitch is a proxy for gaze. We cannot see the eyes."
+    partial_reason: >
+      Gaze is not observable; head orientation is. The head is also routinely occluded by the
+      plate in a side view - it is in the common sample. Reports only a clear upward-directed
+      head, otherwise `cannot_assess`.
+    confidence_cap: low
+
+# ---------------------------------------------------------------------------
+# NOT ASSESSABLE FROM A SIDE VIEW - always return cannot_assess, with the reason
+# ---------------------------------------------------------------------------
+
+  - id: knees_out
+    name: Knees shoved out
+    checklist_heading: Knee position
+    assessable_from_side_view: none
+    source:
+      pages: [14, 22, 33, 35]
+      quote: >
+        You will fail to shove your knees out as you start down. This will make correct depth hard
+        to attain and will kill your hip drive.
+      supporting_quote: >
+        Most people who have problems with the squat - at this rank novice level as well as later
+        on - do not shove their knees out enough.
+    unassessable_reason: >
+      Knees-out is displacement in the frontal plane, perpendicular to the camera. A sagittal view
+      contains no information about it. Requires a front or 45-degree camera.
+    what_would_be_needed: "A front-facing or 45-degree camera angle."
+    note_for_user: >
+      This is the document's single most-emphasised fault and we cannot see it. Worth telling the
+      user directly rather than omitting the criterion.
+
+  - id: stance
+    name: Stance width and toe angle
+    checklist_heading: Stance
+    assessable_from_side_view: none
+    source:
+      pages: [14, 20, 21, 32, 35]
+      figures: ["2-12"]
+      quote: >
+        We will use a fairly neutral foot placement, with the heels about shoulder width apart and
+        the toes pointed out at about 30 degrees.
+      failure_quote: >
+        Your stance will be either too narrow or too wide, with your toes usually pointed too
+        forward. This will result in a squat that is not below parallel.
+    unassessable_reason: >
+      Stance width is a frontal-plane measurement and toe angle is a transverse-plane measurement.
+      Neither is recoverable from a single sagittal view. The document's own illustration of the
+      standard (Figure 2-12) is an overhead view.
+    what_would_be_needed: "A front or overhead camera angle."
+
+  - id: rack_height
+    name: Rack height and unracking procedure
+    checklist_heading: Rack height
+    assessable_from_side_view: none
+    source:
+      pages: [28, 31, 35]
+      quote: >
+        Set the rack height so that the bar in the rack is at about the level of your mid-sternum.
+      failure_quote: >
+        You will set the bar in the rack in a position that is too high. This will make the
+        preferred position on the back difficult to attain.
+    unassessable_reason: >
+      A property of the setup before the set, not of a repetition. The rack and the unracking are
+      typically outside the frame of an uploaded squat clip, and our analysis is rep-scoped.
+    what_would_be_needed: "Footage of the unrack, with the rack uprights and the lifter both in frame."
+
+# ---------------------------------------------------------------------------
+# Global gates. If these fail, individual criteria are not evaluated at all.
+# ---------------------------------------------------------------------------
+
+global_gates:
+  - id: sagittal_view
+    description: >
+      The camera must be roughly in the sagittal plane. Checked via the horizontal separation of
+      left/right shoulder and hip landmarks relative to torso length - a true side view collapses
+      them.
+    on_fail: "All criteria return cannot_assess with reason 'camera is not side-on'."
+    provenance: engineering_tolerance
+    document_basis:
+      pages: [2]
+      quote: "Three views of the squat. Profile view, Depth landmarks for the full squat."
+      note: "The document's own depth standard is defined on the profile view."
+
+  - id: landmark_visibility
+    description: "Per-criterion required landmarks must exceed the visibility floor at the frame of interest."
+    threshold: 0.6
+    provenance: engineering_tolerance
+    on_fail: "That criterion returns cannot_assess with the occluded landmark named."
+
+  - id: rep_detected
+    description: "At least one bottom position must be identified."
+    on_fail: "Report returns no per-rep findings and explains that no complete repetition was found."
+
+  - id: framing
+    description: "Feet and bar must both be within frame for bar-path and depth criteria."
+    provenance: engineering_tolerance
+    on_fail: "Affected criteria return cannot_assess with reason 'subject not fully in frame'."

@@ -1,0 +1,258 @@
+"""Pipeline orchestration: video in, report and overlay out.
+
+Stages, in order, with the progress fractions the UI shows:
+    probe -> pose+bar (one decode pass) -> reps -> quality -> rules -> agent -> overlay
+
+The agent stage is optional and degrades cleanly: if it is unavailable, misconfigured or
+returns something that fails validation, the deterministic verdicts ship with a note. The
+system's job is to say something true, not something fluent.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Callable
+
+import numpy as np
+
+from .skill.loader import load_skill
+from .skill.rules import evaluate_all
+from .vision.bar import BarDetector
+from .vision.metrics import Measurement
+from .vision.pose import extract_pose
+from .vision.probe import probe
+from .vision.quality import assess_quality
+from .vision.reps import segment_reps
+from .vision.smoothing import interpolate_gaps, smooth
+
+Progress = Callable[[str, float], None]
+
+# Weights for the progress bar, roughly proportional to wall time.
+STAGES = {
+    "Checking the video": (0.00, 0.03),
+    "Tracking the movement": (0.03, 0.72),
+    "Finding repetitions": (0.72, 0.78),
+    "Checking evidence quality": (0.78, 0.82),
+    "Measuring against the standards": (0.82, 0.88),
+    "Writing the assessment": (0.88, 0.99),
+}
+
+OVERLAY_JOINTS = ["shoulder", "hip", "knee", "ankle", "heel", "toe", "nose", "ear"]
+SKELETON = [("shoulder", "hip"), ("hip", "knee"), ("knee", "ankle"), ("ankle", "toe"), ("ankle", "heel")]
+
+
+def _p(progress: Progress | None, stage: str, frac: float = 1.0) -> None:
+    if progress is None:
+        return
+    lo, hi = STAGES.get(stage, (0.0, 1.0))
+    progress(stage, lo + (hi - lo) * max(0.0, min(1.0, frac)))
+
+
+def _clean(v) -> float | None:
+    """NaN and infinity are not valid JSON."""
+    return None if v is None or not np.isfinite(v) else round(float(v), 2)
+
+
+def build_overlay(track, bar, seg, info) -> dict:
+    """Per-frame drawing data for the canvas overlay, in video pixel coordinates.
+
+    The frontend synchronises this to <video>.currentTime rather than re-encoding an
+    annotated file — instant to produce, and scrubbable.
+    """
+    smoothed = {j: smooth(interpolate_gaps(track.joint(j)), track.fps) for j in OVERLAY_JOINTS}
+    frames = []
+    for i in range(track.n):
+        joints = {}
+        for j in OVERLAY_JOINTS:
+            x, y = smoothed[j][i]
+            joints[j] = {
+                "x": _clean(x), "y": _clean(y),
+                "v": round(float(track.vis[j][i]), 2),
+                "visible": bool(track.vis[j][i] > 0.6),
+            }
+        frames.append({
+            "frame": i,
+            "t": round(i / track.fps, 3),
+            "joints": joints,
+            "bar": {
+                "x": _clean(bar.x[i]) if bar else None,
+                "y": _clean(bar.y[i]) if bar else None,
+                "observed": bool(bar.basis_observed[i]) if bar else False,
+            },
+        })
+
+    bar_path = [
+        {"t": round(i / track.fps, 3), "x": _clean(bar.x[i]), "y": _clean(bar.y[i]),
+         "observed": bool(bar.basis_observed[i])}
+        for i in range(track.n)
+        if bar is not None and np.isfinite(bar.x[i])
+    ]
+
+    return {
+        "width": track.width,
+        "height": track.height,
+        "fps": track.fps,
+        "duration_s": info.duration_s,
+        "side": track.side,
+        "skeleton": SKELETON,
+        "frames": frames,
+        "bar_path": bar_path,
+        "reps": [r.to_dict() for r in seg.reps],
+    }
+
+
+def analyse(
+    video_path: str | Path,
+    use_agent: bool = True,
+    progress: Progress | None = None,
+) -> dict:
+    video_path = Path(video_path)
+    skill = load_skill()
+
+    # 1. Probe -------------------------------------------------------------
+    _p(progress, "Checking the video", 0.0)
+    info = probe(video_path)
+    _p(progress, "Checking the video", 1.0)
+
+    # 2. Pose + bar, in a single decode pass --------------------------------
+    detector = BarDetector()
+    track = extract_pose(
+        video_path, info.fps,
+        progress=lambda f: _p(progress, "Tracking the movement", f),
+        frame_sink=detector.feed,
+    )
+    bar = detector.finalise()
+
+    # 3. Reps ---------------------------------------------------------------
+    _p(progress, "Finding repetitions", 0.0)
+    seg = segment_reps(track)
+    _p(progress, "Finding repetitions", 1.0)
+
+    # 4. Quality gates -------------------------------------------------------
+    _p(progress, "Checking evidence quality", 0.0)
+    quality = assess_quality(track, seg, bar)
+    _p(progress, "Checking evidence quality", 1.0)
+
+    # 5. Deterministic rules --------------------------------------------------
+    _p(progress, "Measuring against the standards", 0.0)
+    candidates = evaluate_all(skill, track, seg.reps, bar, quality)
+    _p(progress, "Measuring against the standards", 1.0)
+
+    # 6. Agent ----------------------------------------------------------------
+    summary = None
+    cost = None
+    agent_note = None
+
+    # A blocked analysis must say so in words, not present an empty findings list. This is the
+    # "not enough information" path the brief asks us to describe: we state what was wrong, what
+    # it prevents, and what to change about the recording.
+    if not quality.is_assessable:
+        reasons = [g.detail for g in quality.blocking]
+        summary = (
+            "This video could not be assessed. "
+            + " ".join(reasons)
+            + " No repetition was judged against the reference standards, because doing so would "
+              "mean reporting conclusions the footage does not support."
+        )
+        return {
+            "report": {
+                "video": {
+                    "filename": video_path.name,
+                    "width": info.width, "height": info.height,
+                    "fps": info.fps, "duration_s": info.duration_s,
+                    "frame_count": info.frame_count, "codec": info.codec,
+                },
+                "skill": {
+                    "version": skill.meta.skill_version,
+                    "document": skill.meta.document_title,
+                    "source": skill.meta.document_source,
+                },
+                "pose": {
+                    "side": track.side,
+                    "side_confidence": round(track.side_confidence, 3),
+                    "shin_length_px": round(track.shin_length_px(), 1),
+                    "detection_fraction": round(float(track.detected.mean()), 3),
+                },
+                "bar": {
+                    "observed_fraction": round(bar.observed_fraction, 3),
+                    "median_radius_px": _clean(bar.median_radius),
+                    "note": bar.note,
+                },
+                "quality": quality.to_dict(),
+                "reps": [r.to_dict() for r in seg.reps],
+                "rep_note": seg.note,
+                "coverage": skill.coverage_rows(),
+                "findings": [],
+                "summary": summary,
+                "blocked": True,
+                "agent_note": None,
+                "cost": None,
+            },
+            "overlay": build_overlay(track, bar, seg, info),
+        }
+
+    findings = [
+        {
+            **c.to_dict(),
+            "explanation": c.reason,
+            "feedback": c.feedback_source if c.verdict == "does_not_meet_standard" else None,
+            "timestamp_s": (c.measurement.t if c.measurement and c.measurement.t is not None
+                            else next((r.bottom_t for r in seg.reps if r.index == c.rep_index), None)),
+            "frame_index": (c.measurement.frame if c.measurement else None),
+            "narrated_by": "rules",
+        }
+        for c in candidates
+    ]
+
+    if use_agent and candidates:
+        _p(progress, "Writing the assessment", 0.0)
+        try:
+            from .agent.assess import assess_with_agent
+            agent_out = assess_with_agent(skill, candidates, seg.reps, quality, info)
+            findings = agent_out["findings"]
+            summary = agent_out["summary"]
+            cost = agent_out["cost"]
+            agent_note = agent_out.get("note")
+        except Exception as exc:  # noqa: BLE001 - degrade, never fail the run
+            agent_note = (f"The language model stage was unavailable ({type(exc).__name__}: {exc}). "
+                          "Verdicts and measurements below come from the deterministic rule "
+                          "engine and are unaffected; only the wording is plainer.")
+        _p(progress, "Writing the assessment", 1.0)
+    elif not use_agent:
+        agent_note = "Run with --no-agent: deterministic rule engine only, no language model involved."
+
+    report = {
+        "video": {
+            "filename": video_path.name,
+            "width": info.width, "height": info.height,
+            "fps": info.fps, "duration_s": info.duration_s,
+            "frame_count": info.frame_count, "codec": info.codec,
+        },
+        "skill": {
+            "version": skill.meta.skill_version,
+            "document": skill.meta.document_title,
+            "source": skill.meta.document_source,
+        },
+        "pose": {
+            "side": track.side,
+            "side_confidence": round(track.side_confidence, 3),
+            "shin_length_px": round(track.shin_length_px(), 1),
+            "detection_fraction": round(float(track.detected.mean()), 3),
+        },
+        "bar": {
+            "observed_fraction": round(bar.observed_fraction, 3),
+            "median_radius_px": _clean(bar.median_radius),
+            "note": bar.note,
+        },
+        "quality": quality.to_dict(),
+        "reps": [r.to_dict() for r in seg.reps],
+        "rep_note": seg.note,
+        "coverage": skill.coverage_rows(),
+        "findings": findings,
+        "summary": summary,
+        "blocked": False,
+        "agent_note": agent_note,
+        "cost": cost,
+    }
+
+    return {"report": report, "overlay": build_overlay(track, bar, seg, info)}

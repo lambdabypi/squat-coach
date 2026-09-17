@@ -1,0 +1,202 @@
+{
+  "video": {
+    "filename": "hard_degraded.mp4",
+    "width": 608,
+    "height": 670,
+    "fps": 30.0,
+    "duration_s": 7.866667,
+    "frame_count": 236,
+    "codec": "h264"
+  },
+  "skill": {
+    "version": "1.0.0",
+    "document": "The Squat",
+    "source": "Starting Strength, reference pages 1-35 (combined PDF pages 4-38)"
+  },
+  "pose": {
+    "side": "right",
+    "side_confidence": 0.007,
+    "shin_length_px": NaN,
+    "detection_fraction": 0.208
+  },
+  "bar": {
+    "observed_fraction": 0.0,
+    "median_radius_px": null,
+    "note": "The barbell plate was never detected; bar position is estimated from the shoulder landmark throughout and the bar path should be treated as indicative only."
+  },
+  "quality": {
+    "gates": [
+      {
+        "id": "sagittal_view",
+        "passed": false,
+        "severity": "blocking",
+        "detail": "This does not appear to be a side view. The reference document defines squat depth on the profile view, so no criterion can be assessed from this angle. Re-record with the camera directly to one side.",
+        "value": 0.7463
+      },
+      {
+        "id": "person_detected",
+        "passed": false,
+        "severity": "blocking",
+        "detail": "A person was detected in only 21% of frames. The subject may be too small in frame, too dark, or obscured.",
+        "value": 0.2076
+      },
+      {
+        "id": "rep_detected",
+        "passed": true,
+        "severity": "ok",
+        "detail": "3 repetition(s) identified.",
+        "value": 3.0
+      },
+      {
+        "id": "feet_in_frame",
+        "passed": false,
+        "severity": "degraded",
+        "detail": "The feet leave the frame in 79% of frames. Bar-path and knee-position criteria depend on the foot landmarks and will abstain where they are missing.",
+        "value": 0.2076
+      },
+      {
+        "id": "bar_tracked",
+        "passed": false,
+        "severity": "degraded",
+        "detail": "The barbell plate was detected in only 0% of frames. Bar position is estimated from the shoulder for the rest, so bar-path findings are indicative rather than measured.",
+        "value": 0.0
+      }
+    ],
+    "view_ratio": 0.7463,
+    "detection_fraction": 0.208,
+    "feet_in_frame": false,
+    "bar_in_frame": false,
+    "is_assessable": false,
+    "blocking_reasons": [
+      "This does not appear to be a side view. The reference document defines squat depth on the profile view, so no criterion can be assessed from this angle. Re-record with the camera directly to one side.",
+      "A person was detected in only 21% of frames. The subject may be too small in frame, too dark, or obscured."
+    ]
+  },
+  "reps": [
+    {
+      "index": 1,
+      "start_frame": 0,
+      "bottom_frame": 28,
+      "end_frame": 36,
+      "start_t": 0.0,
+      "bottom_t": 0.933,
+      "end_t": 1.2,
+      "confidence": "low"
+    },
+    {
+      "index": 2,
+      "start_frame": 74,
+      "bottom_frame": 98,
+      "end_frame": 164,
+      "start_t": 2.467,
+      "bottom_t": 3.267,
+      "end_t": 5.467,
+      "confidence": "high"
+    },
+    {
+      "index": 3,
+      "start_frame": 164,
+      "bottom_frame": 222,
+      "end_frame": 235,
+      "start_t": 5.467,
+      "bottom_t": 7.4,
+      "end_t": 7.833,
+      "confidence": "medium"
+    }
+  ],
+  "rep_note": null,
+  "coverage": [
+    {
+      "id": "depth",
+      "name": "Squat depth",
+      "assessable": "full",
+      "citation": "ref p. 2, 16, 18, 22, 33 \u00b7 Fig 2-1, 2-10",
+      "reason": null,
+      "needed": null
+    },
+    {
+      "id": "back_angle",
+      "name": "Back angle",
+      "assessable": "full",
+      "citation": "ref p. 9, 11, 23, 32, 35 \u00b7 Fig 2-5, 2-13, 2-22",
+      "reason": null,
+      "needed": null
+    },
+    {
+      "id": "bar_path_over_midfoot",
+      "name": "Bar path over the midfoot",
+      "assessable": "full",
+      "citation": "ref p. 6, 8, 9, 11, 12 \u00b7 Fig 2-5, 2-7",
+      "reason": null,
+      "needed": null
+    },
+    {
+      "id": "hip_drive",
+      "name": "Hip drive out of the bottom",
+      "assessable": "full",
+      "citation": "ref p. 1, 23, 24, 35 \u00b7 Fig 2-14",
+      "reason": null,
+      "needed": null
+    },
+    {
+      "id": "knee_forward_of_toes",
+      "name": "Knee position at the bottom (sagittal)",
+      "assessable": "full",
+      "citation": "ref p. 23 \u00b7 Fig 2-13",
+      "reason": null,
+      "needed": null
+    },
+    {
+      "id": "heels_flat",
+      "name": "Heels flat on the floor",
+      "assessable": "partial",
+      "citation": "ref p. 23 \u00b7 Fig 2-13",
+      "reason": "Heel landmarks are frequently occluded by the far leg and by footwear, and a few pixels of rise is within noise. Reported at reduced confidence, and `cannot_assess` when the foot is occluded.\n",
+      "needed": null
+    },
+    {
+      "id": "bar_placement_low_bar",
+      "name": "Bar placement on the back",
+      "assessable": "partial",
+      "citation": "ref p. 13, 30, 31, 35 \u00b7 Fig 2-19",
+      "reason": "We can distinguish grossly high bar placement from plausible placement, and nothing finer. Never returns a confident \"meets standard\"; at best \"consistent with low-bar placement\".\n",
+      "needed": null
+    },
+    {
+      "id": "eye_gaze",
+      "name": "Eye gaze direction",
+      "assessable": "partial",
+      "citation": "ref p. 24, 25, 27, 35 \u00b7 Fig 2-15, 2-16",
+      "reason": "Gaze is not observable; head orientation is. The head is also routinely occluded by the plate in a side view - it is in the common sample. Reports only a clear upward-directed head, otherwise `cannot_assess`.\n",
+      "needed": null
+    },
+    {
+      "id": "knees_out",
+      "name": "Knees shoved out",
+      "assessable": "none",
+      "citation": "ref p. 14, 22, 33, 35",
+      "reason": "Knees-out is displacement in the frontal plane, perpendicular to the camera. A sagittal view contains no information about it. Requires a front or 45-degree camera.\n",
+      "needed": "A front-facing or 45-degree camera angle."
+    },
+    {
+      "id": "stance",
+      "name": "Stance width and toe angle",
+      "assessable": "none",
+      "citation": "ref p. 14, 20, 21, 32, 35 \u00b7 Fig 2-12",
+      "reason": "Stance width is a frontal-plane measurement and toe angle is a transverse-plane measurement. Neither is recoverable from a single sagittal view. The document's own illustration of the standard (Figure 2-12) is an overhead view.\n",
+      "needed": "A front or overhead camera angle."
+    },
+    {
+      "id": "rack_height",
+      "name": "Rack height and unracking procedure",
+      "assessable": "none",
+      "citation": "ref p. 28, 31, 35",
+      "reason": "A property of the setup before the set, not of a repetition. The rack and the unracking are typically outside the frame of an uploaded squat clip, and our analysis is rep-scoped.\n",
+      "needed": "Footage of the unrack, with the rack uprights and the lifter both in frame."
+    }
+  ],
+  "findings": [],
+  "summary": null,
+  "agent_note": "Run with --no-agent: deterministic rule engine only, no language model involved.",
+  "cost": null
+}
