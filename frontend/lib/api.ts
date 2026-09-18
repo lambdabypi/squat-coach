@@ -1,7 +1,10 @@
 import type { JobStatus, Overlay, Report, Requirements } from "./types";
 
-export const API =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
+// `??` only falls back on null/undefined, so a present-but-empty NEXT_PUBLIC_API_URL (which is
+// exactly what an unfilled `.env` line produces) would survive it and leave every request
+// pointing at a relative path. Treat empty as unset.
+const CONFIGURED_API = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/$/, "");
+export const API = CONFIGURED_API || "http://localhost:8000";
 
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {

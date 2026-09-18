@@ -12,18 +12,18 @@ avoid.
 from __future__ import annotations
 
 import json
-import os
 from typing import Any
 
 from pydantic import BaseModel, Field, ValidationError
 
+from ..config import env
 from ..skill.rules import FAILS, MEETS, UNKNOWN, Candidate
 from .prompts import SYSTEM, evidence_block, skill_block
 
 # Haiku 4.5 by default: this stage does constrained work — judge a supplied measurement against
 # a supplied rule, then write two sentences — so the cheapest current model is the right default.
 # Override with ANTHROPIC_MODEL to compare quality against a larger model.
-MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5")
+MODEL = env("ANTHROPIC_MODEL", "claude-haiku-4-5")
 MAX_TOKENS = 8000
 
 # Published per-million-token prices. Table-driven because an earlier hard-coded pair was wrong
@@ -124,14 +124,14 @@ def _candidate_dict(c: Candidate) -> dict[str, Any]:
 
 
 def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -> dict:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if not env("ANTHROPIC_API_KEY"):
         raise RuntimeError("ANTHROPIC_API_KEY is not set")
 
     from anthropic import Anthropic
 
     # An organisation-scoped key must name the workspace it is acting for; a workspace-scoped
     # key must not. Send the header only when one is configured.
-    workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID")
+    workspace = env("ANTHROPIC_WORKSPACE_ID")
     client = Anthropic(
         default_headers={"anthropic-workspace-id": workspace} if workspace else None
     )

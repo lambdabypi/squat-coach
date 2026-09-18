@@ -19,6 +19,7 @@ from fastapi.responses import FileResponse
 # exported by hand or pasted into a shell. The file is gitignored.
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
+from .config import env, env_list
 from .jobs import store
 from .skill.loader import load_skill
 from .vision.probe import (
@@ -32,10 +33,13 @@ STORAGE = Path(__file__).resolve().parents[1] / "storage" / "uploads"
 STORAGE.mkdir(parents=True, exist_ok=True)
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 
+DEFAULT_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
+ALLOWED_ORIGINS = env_list("ALLOWED_ORIGINS", DEFAULT_ORIGINS)
+
 app = FastAPI(title="Squat Coach API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(","),
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -48,7 +52,7 @@ def health() -> dict:
         "ok": True,
         "skill_version": skill.meta.skill_version,
         "criteria": len(skill.criteria),
-        "agent_configured": bool(os.environ.get("ANTHROPIC_API_KEY")),
+        "agent_configured": bool(env("ANTHROPIC_API_KEY")),
     }
 
 
@@ -113,7 +117,7 @@ async def upload_video(file: UploadFile = File(...)) -> dict:
         raise HTTPException(status_code=400, detail="The uploaded file was empty.")
 
     job = store.create(file.filename or job_id_path.name, job_id_path)
-    store.submit(job, use_agent=bool(os.environ.get("ANTHROPIC_API_KEY")))
+    store.submit(job, use_agent=bool(env("ANTHROPIC_API_KEY")))
     return job.public()
 
 
@@ -159,6 +163,7 @@ def _validate_skill_at_startup() -> None:
     skill = load_skill()
     print(f"[skill] v{skill.meta.skill_version}: {len(skill.criteria)} criteria "
           f"({len(skill.assessable)} assessable, {len(skill.unassessable)} not from a side view)")
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    print(f"[cors]  allowed origins: {', '.join(ALLOWED_ORIGINS)}")
+    if not env("ANTHROPIC_API_KEY"):
         print("[agent] ANTHROPIC_API_KEY is not set — running with the deterministic rule "
               "engine only. Findings and measurements are unaffected; wording is plainer.")
