@@ -23,7 +23,25 @@ from .reps import Rep
 from .smoothing import angle_from_horizontal, interpolate_gaps, smooth
 
 HIP_DRIVE_WINDOW_S = 0.15   # engineering choice; the document says "out of the bottom"
-MIN_RISE_SHIN = 0.02        # minimum shoulder rise for a hip-drive ratio to mean anything
+# Minimum shoulder rise for a hip-drive ratio to mean anything, in shin-lengths. Guarding at
+# 1e-6 px let noise through and produced a ratio of -8.96 on the common sample, reported as a
+# confident failure, so the floor is a fraction of the athlete's own shin length.
+#
+# Raising this to 0.06 was tried, to explain why the browser publishes a hip-drive failure on
+# repetition 2 where native MediaPipe abstains. It changed nothing: the browser's ratio stayed
+# 0.4074 to the digit, so its shoulder rise is above 0.06 while native's is below 0.02. That is a
+# threefold difference in the measured rise, not a borderline threshold, and the real cause is
+# elsewhere. Reverted rather than kept, because a threshold change whose stated justification has
+# been disproved is just fitting the code to a failing test.
+MIN_RISE_SHIN = 0.02
+
+# How far the bottom frame could plausibly be wrong, in frames. Not a guess: on the common sample
+# native MediaPipe and the browser's WASM build put repetition 1's bottom at frames 65 and 66, and
+# repetition 2's at 188 and 190, from identical footage.
+HIP_DRIVE_BOTTOM_UNCERTAINTY = 2
+# How much the ratio may vary across those frames and still be published, as a fraction of the
+# largest value. engineering_tolerance.
+HIP_DRIVE_MAX_SPREAD = 0.35
 
 
 @dataclass
@@ -106,6 +124,46 @@ def torso_angle_from_horizontal_at_bottom(track: PoseTrack, rep: Rep, bar: BarTr
 
 # ------------------------------------------------------------------------ hip drive
 
+def _rises_over(track: PoseTrack, lo: int, hi: int) -> tuple[float, float]:
+    """Hip and shoulder rise, in pixels, over one window. y decreases upward."""
+    hip_y = smooth(interpolate_gaps(track.y("hip")), track.fps)
+    sh_y = smooth(interpolate_gaps(track.y("shoulder")), track.fps)
+    return float(hip_y[lo] - hip_y[hi]), float(sh_y[lo] - sh_y[hi])
+
+
+def _hip_drive_stability(track: PoseTrack, rep: Rep, shin: float) -> tuple[float, float] | None:
+    """Spread of the hip-drive ratio across plausible bottom-frame positions.
+
+    The bottom of a squat is the peak of a nearly flat curve, so the exact frame chosen for it is
+    weakly determined - measured at +/-2 frames between native MediaPipe and the browser's WASM
+    build on the same clip. This metric then reads the first 150 ms *from that frame*, and the
+    shoulder is accelerating hard there, so a two-frame shift lands on a very different part of
+    the curve. On the common sample's repetition 2 that moved the shoulder rise from under 0.02
+    shin-lengths (abstain) to 0.186 (a confident failure at ratio 0.41) purely by changing which
+    pose backend ran.
+
+    So the ratio is recomputed across the frames the bottom could plausibly be. Returns
+    (min, max) ratio, or None if any of those windows is unmeasurable.
+    """
+    ratios: list[float] = []
+    for off in range(-HIP_DRIVE_BOTTOM_UNCERTAINTY, HIP_DRIVE_BOTTOM_UNCERTAINTY + 1):
+        b = rep.bottom_frame + off
+        if b < rep.start_frame or b >= rep.end_frame:
+            continue
+        hi = min(rep.end_frame, b + max(2, int(round(HIP_DRIVE_WINDOW_S * track.fps))))
+        if hi - b < 2:
+            continue
+        hip_rise, sh_rise = _rises_over(track, b, hi)
+        if not np.isfinite(hip_rise) or not np.isfinite(sh_rise):
+            return None
+        if sh_rise < MIN_RISE_SHIN * shin:
+            return None          # one plausible bottom frame makes this unmeasurable
+        ratios.append(max(0.0, hip_rise) / sh_rise)
+    if len(ratios) < 2:
+        return None
+    return min(ratios), max(ratios)
+
+
 def hip_vs_shoulder_rise_ratio_early_ascent(track: PoseTrack, rep: Rep, bar: BarTrack | None) -> Measurement:
     mid = "hip_vs_shoulder_rise_ratio_early_ascent"
     lo, hi = rep.ascent_window(HIP_DRIVE_WINDOW_S)
@@ -142,12 +200,34 @@ def hip_vs_shoulder_rise_ratio_early_ascent(track: PoseTrack, rep: Rep, bar: Bar
         )
 
     ratio = hip_rise / sh_rise
+
+    # Refuse a verdict the frame choice decides. See _hip_drive_stability.
+    spread = _hip_drive_stability(track, rep, shin)
+    if spread is None:
+        return _unavailable(
+            mid, "ratio",
+            ("the bottom of this repetition cannot be pinned down to the frame, and shifting it "
+             f"by up to {HIP_DRIVE_BOTTOM_UNCERTAINTY} frames leaves too little shoulder movement "
+             "to compare hip and shoulder rise"),
+            lo,
+        )
+    lo_r, hi_r = spread
+    if hi_r > 0 and (hi_r - lo_r) / hi_r > HIP_DRIVE_MAX_SPREAD:
+        return _unavailable(
+            mid, "ratio",
+            (f"the hip-drive ratio ranges from {lo_r:.2f} to {hi_r:.2f} depending on which frame "
+             f"is taken as the bottom, and the bottom of a squat is a flat turning point that "
+             f"cannot be located to the frame. That spread is too wide to call"),
+            lo,
+        )
+
     return Measurement(
         mid, ratio, "ratio", "observed", lo, lo / track.fps, True, "medium",
         detail={
             "window_s": HIP_DRIVE_WINDOW_S,
             "hip_rise_shin": round(hip_rise / shin, 4),
             "shoulder_rise_shin": round(sh_rise / shin, 4),
+            "ratio_range_over_bottom_frame": [round(lo_r, 3), round(hi_r, 3)],
             "note": "Ratio >= 1 means the hips rose at least as fast as the shoulders.",
         },
     )

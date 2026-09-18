@@ -421,7 +421,63 @@ drawn from the shoulder fallback. The proximity cutoff added in `bar.py` on the 
 first hypothesis is defensible physics and is kept, but it changed this clip's outcome by 0.001
 shin-lengths and there is no case on hand where it changes a verdict.
 
-A seventh, worth recording for what it says about the verification rather than about the code: the
+A seventh, and the one I am least comfortable about, because it had been shipping as a confident
+verdict and two of my own diagnoses were wrong before the data settled it.
+
+The first real run of the browser test failed: the browser published
+`does_not_meet_standard` on repetition 2's hip drive, ratio 0.41, where native MediaPipe abstained.
+
+**Wrong diagnosis one.** The hip-drive guard requires the shoulders to rise at least 0.02
+shin-lengths before a ratio means anything, which on this clip is 5.2 px. I decided a few pixels of
+landmark noise were deciding between "cannot say" and "you did this wrong", argued the floor should
+be set by noise (the ratio's relative error is about sigma/shoulder_rise, so the rise should clear
+roughly ten times landmark jitter), and raised it to 0.06. The next run returned ratio 0.4074,
+identical to the digit. The fix had done nothing, which disproved the reasoning behind it: the
+browser's shoulder rise was above 0.06 while native's was below 0.02, a threefold difference rather
+than a borderline one. Reverted, because a threshold change whose justification has been refuted is
+just fitting the code to a failing test.
+
+**Wrong diagnosis two.** Before that, on seeing the bar-path trail wander onto the gym's rack in an
+exported frame, I had blamed background plates outscoring the real one, and then a bystander
+standing in shot. Measurement refuted both.
+
+**What it actually was.** Dumping the browser's own report and diffing it against the baseline:
+
+| | browser | native |
+|---|---|---|
+| repetition 1 bottom frame | 66 | 65 |
+| repetition 2 bottom frame | 190 | 188 |
+| repetition 2 shoulder rise | 0.186 shin | under 0.02 shin |
+| shin length | 172.4 px | 259.2 px |
+
+The shin difference is expected and harmless - the browser tracks a 720-wide downscale, and
+259.2/172.4 is 1.503, exactly the scale factor, which is why every shin-normalised measurement
+agrees. The real cause is that **the bottom of a squat is the peak of a nearly flat curve, so its
+frame index is only determined to within a frame or two**, and hip drive read a fixed 150 ms window
+starting from that frame - the stretch where the shoulder is accelerating hardest. A two-frame
+shift moved the shoulder rise from below the abstention floor to nine times it.
+
+So the metric now measures its own stability: it recomputes the ratio across the frames the bottom
+could plausibly be (plus or minus two, taken from the disagreement above, not guessed) and refuses
+to publish a verdict that the frame choice decides.
+
+**That is what makes this the uncomfortable one.** Repetition 1's hip-drive ratio ranges from
+**0.36 to 1.85** across those frames, straddling the pass/fail threshold of 1.0 - and it had been
+reported all along as a confident `does_not_meet_standard` at 0.696. It was never a verdict. Both
+repetitions now abstain, the counts move from 13/6/3 to **14/6/2**, and the browser and server
+paths agree on all 22.
+
+The better fix is to anchor the window by hip *displacement* rather than a fixed time from an
+uncertain frame, which would make the criterion stable enough to report again rather than merely
+honest about being unreportable. That is a metric redesign needing full re-verification and is
+listed under Known limitations instead of half-done.
+
+The general lesson is worse than the specific bug: **nothing in this project checked whether a
+verdict was stable under the uncertainty of its own inputs.** Hip drive is simply the criterion
+where a short window anchored at an ill-determined frame made that fragility large enough for a
+second pose backend to expose. The same question is unasked for every other criterion.
+
+An eighth, worth recording for what it says about the verification rather than about the code: the
 live tracking view streamed landmarks back correctly and never painted
 them. A React effect guarded on refs that are null while the component renders `null`, with a
 dependency list that never changed, so the render loop never started. TypeScript passed. The
@@ -465,6 +521,16 @@ Stated precisely, so it can be held against us:
   systematic bias on the criterion rather than absorbed into a tolerance - which is why both
   repetitions of the common sample return `cannot_assess` for depth at ±0.02 shin-lengths.
 - Bar detection assumes a visible plate.
+- **Verdict stability is only checked for hip drive.** That criterion now recomputes its ratio
+  across the frames the bottom could plausibly be and abstains when the frame choice decides the
+  answer. No other criterion asks that question of itself, and the reason hip drive does is that a
+  second pose backend happened to expose it. Depth, back angle and knee position are all read at
+  `bottom_frame` too; they are far less sensitive because they are positions rather than rates
+  measured over a short window, but "less sensitive" is an argument, not a measurement.
+- **Hip drive now abstains on both repetitions of the common sample**, so the criterion reports
+  nothing there. Anchoring its window by hip displacement instead of a fixed 150 ms from an
+  uncertain frame should make it stable enough to report again. Not attempted: it is a redesign of
+  a measurement, and doing it without re-verifying both paths would be worse than the abstention.
 - Rep segmentation assumes a continuous set in frame. Walk-outs and re-racks can still produce
   phantom repetitions; the boundary contamination described below is fixed, the phantom-rep case
   is not.
@@ -494,7 +560,26 @@ Stated precisely, so it can be held against us:
 
 **The browser-tracking path**
 
-- **The equivalence test simulates the browser rather than using it.**
+- **This gap is now closed, and closing it found a defect.** `frontend/tests/browser-path.spec.ts`
+  starts both services, opens real Chromium, uploads the clip, lets the browser run MediaPipe WASM
+  itself, and compares all 22 verdicts against the committed `EVIDENCE` baseline. It passes, with
+  no diverging verdicts.
+
+  On its first real run it failed, and the failure was genuine: the browser published
+  `does_not_meet_standard` on repetition 2's hip drive where native MediaPipe abstained. Two wrong
+  diagnoses came first. The full account is under "Correctness problems", but the short version is
+  that the bottom of a squat is the peak of a nearly flat curve, so its frame index is only
+  determined to within a frame or two - measured at 65 vs 66 and 188 vs 190 between the two
+  backends on identical footage - and hip drive read a fixed 150 ms window starting from it.
+
+  The test costs about eight minutes per run, because headless Chromium has no GPU delegate and
+  runs the WASM build entirely on the CPU. That is too slow for an edit-run loop; treat it as a
+  pre-demo or CI check. It dumps the browser's own report to
+  `frontend/test-results/browser-report.json` on every run, pass or fail, because the job is gone
+  from the server's in-memory map the moment the run ends and a failure that prints only the moved
+  verdict otherwise costs a full run per follow-up question.
+
+- **The older equivalence test simulates the browser rather than using it.**
   `scripts/test_client_path.py` proves the client path reproduces the server path's verdicts
   exactly, but it generates the landmarks with *native Python MediaPipe*. The real browser runs
   the same model compiled to WASM, possibly on the GPU delegate. Those are not bit-identical,

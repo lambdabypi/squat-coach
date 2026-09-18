@@ -328,28 +328,23 @@
       "rep_index": 1,
       "criterion_id": "hip_drive",
       "criterion_name": "Hip drive out of the bottom",
-      "verdict": "does_not_meet_standard",
+      "verdict": "cannot_assess",
       "measurement": {
         "measure_id": "hip_vs_shoulder_rise_ratio_early_ascent",
-        "value": 0.6964,
+        "value": null,
         "unit": "ratio",
         "basis": "observed",
         "frame": 65,
-        "t": 2.166,
-        "available": true,
-        "confidence": "medium",
-        "reason": null,
-        "detail": {
-          "window_s": 0.15,
-          "hip_rise_shin": 0.1203,
-          "shoulder_rise_shin": 0.1727,
-          "note": "Ratio >= 1 means the hips rose at least as fast as the shoulders."
-        }
+        "t": null,
+        "available": false,
+        "confidence": "low",
+        "reason": "the hip-drive ratio ranges from 0.36 to 1.85 depending on which frame is taken as the bottom, and the bottom of a squat is a flat turning point that cannot be located to the frame. That spread is too wide to call",
+        "detail": null
       },
       "threshold_value": 0.15,
       "threshold_provenance": "engineering_tolerance",
-      "confidence": "medium",
-      "reason": "The shoulders rose faster than the hips out of the bottom (ratio 0.70), which is lifting the chest rather than driving the hips.",
+      "confidence": "high",
+      "reason": "This could not be measured because the hip-drive ratio ranges from 0.36 to 1.85 depending on which frame is taken as the bottom, and the bottom of a squat is a flat turning point that cannot be located to the frame. That spread is too wide to call.",
       "citation": "ref p. 1, 23, 24, 35 \u00b7 Fig 2-14",
       "source_pages": [
         1,
@@ -359,9 +354,9 @@
       ],
       "quote": "come up out of the bottom by driving your butt straight up in the air. Up, not forward.",
       "feedback_source": "Think about a chain hooked to your hips, pulling you straight up out of the bottom. Do not think about your knees straightening out, do not think about your feet pushing against the floor. Just drive your hips up out of the bottom.",
-      "uncertainty": null,
-      "explanation": "The shoulders rose faster than the hips out of the bottom (ratio 0.70), which is lifting the chest rather than driving the hips.",
-      "feedback": "Think about a chain hooked to your hips, pulling you straight up out of the bottom. Do not think about your knees straightening out, do not think about your feet pushing against the floor. Just drive your hips up out of the bottom.",
+      "uncertainty": "the hip-drive ratio ranges from 0.36 to 1.85 depending on which frame is taken as the bottom, and the bottom of a squat is a flat turning point that cannot be located to the frame. That spread is too wide to call",
+      "explanation": "This could not be measured because the hip-drive ratio ranges from 0.36 to 1.85 depending on which frame is taken as the bottom, and the bottom of a squat is a flat turning point that cannot be located to the frame. That spread is too wide to call.",
+      "feedback": null,
       "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
       "narrated_by": "rules"
@@ -998,7 +993,7 @@
       "narrated_by": "rules"
     }
   ],
-  "summary": "Your back angle, knee position at the bottom (sagittal) and heels flat on the floor met the standard on both repetitions. The main thing to fix is bar path over the midfoot, which did not meet the standard on both repetitions (ref p. 6, 8, 9, 11, 12 \u00b7 Fig 2-5, 2-7). Also short: hip drive out of the bottom. Your squat depth and bar placement on the back landed inside our measurement tolerance, so it was too close to call either way - that is a limit of the measurement, not of the camera angle. We could not measure eye gaze direction in this clip - the evidence was not visible in the frames we needed. Hip drive out of the bottom could not be measured on one repetition, so that verdict covers only part of the set. A side view cannot judge knees shoved out; stance width and toe angle; rack height and unracking procedure at all; those need a different camera angle.",
+  "summary": "Your back angle, knee position at the bottom (sagittal) and heels flat on the floor met the standard on both repetitions. The main thing to fix is bar path over the midfoot, which did not meet the standard on both repetitions (ref p. 6, 8, 9, 11, 12 \u00b7 Fig 2-5, 2-7). Your squat depth and bar placement on the back landed inside our measurement tolerance, so it was too close to call either way - that is a limit of the measurement, not of the camera angle. We could not measure hip drive out of the bottom and eye gaze direction in this clip - the evidence was not visible in the frames we needed. A side view cannot judge knees shoved out; stance width and toe angle; rack height and unracking procedure at all; those need a different camera angle.",
   "blocked": false,
   "agent_note": "Run with --no-agent: deterministic rule engine only, no language model involved.",
   "cost": null

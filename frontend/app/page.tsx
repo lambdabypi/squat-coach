@@ -107,14 +107,19 @@ export default function Home() {
   return (
     <main className="wrap narrow">
       <div className="hero">
-        <h2>Is your squat actually deep enough?</h2>
+        {/* This used to ask "Is your squat actually deep enough?". Depth is the one criterion most
+            likely to land inside the measurement tolerance and return "too close to call" - it
+            does on both repetitions of the reference clip - so the headline was promising the
+            single answer the tool is least able to guarantee. */}
+        <h2>Your squat, checked against the book</h2>
         <p>
           Upload a side-view video of a set. Squat&nbsp;Coach tracks your hips, knees, ankles and
           the barbell, then assesses every repetition against a strength-training reference text -
           citing the page behind each verdict.
         </p>
         <p className="faint">
-          It also tells you plainly what a side view <em>cannot</em> judge, instead of guessing.
+          Where the footage cannot settle something, it shows you the measurement and says so,
+          instead of guessing.
         </p>
       </div>
 

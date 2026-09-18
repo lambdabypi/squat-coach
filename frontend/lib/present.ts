@@ -1,4 +1,4 @@
-import type { Finding, Report } from "./types";
+import type { CoverageRow, Finding, Report } from "./types";
 
 /**
  * Turning measurements into something a lifter reads.
@@ -72,21 +72,56 @@ export function headline(findings: Finding[]): string {
 }
 
 export interface Grouped {
-  fix: Finding[];        // does not meet the standard
-  good: Finding[];       // meets the standard
-  borderline: Finding[]; // measured, inside tolerance
-  unseen: Finding[];     // no measurement available at all
+  fix: Finding[];         // does not meet the standard
+  good: Finding[];        // meets the standard
+  borderline: Finding[];  // measured, inside tolerance
+  notMeasured: Finding[]; // a side view could judge this, but not in this clip
+  outOfScope: Finding[];  // no side view can ever judge this
 }
 
-export function groupFindings(findings: Finding[]): Grouped {
+/**
+ * Split the unmeasured findings by *why*, which the flat count hid.
+ *
+ * On the common sample 13 of 22 verdicts are `cannot_assess`, and presented as one number that
+ * reads like the product failing. Three of the document's criteria - knees-out, stance width, rack
+ * height - are frontal or transverse plane measurements that NO side view can recover. They are a
+ * property of the assignment's chosen camera, identical on every upload, and lumping them in with
+ * "we could not measure this one" overstates how much this particular clip defeated us.
+ *
+ * `coverage[].assessable === "none"` is the skill's own declaration of that, so the split is
+ * driven by the document-derived skill rather than a hardcoded list here.
+ */
+export function groupFindings(findings: Finding[], coverage: CoverageRow[] = []): Grouped {
+  const structural = new Set(
+    coverage.filter((c) => c.assessable === "none").map((c) => c.id),
+  );
+  const unseen = findings.filter(
+    (f) => f.verdict === "cannot_assess" && !f.measurement?.available,
+  );
   return {
     fix: findings.filter((f) => f.verdict === "does_not_meet_standard"),
     good: findings.filter((f) => f.verdict === "meets_standard"),
     borderline: findings.filter(
       (f) => f.verdict === "cannot_assess" && !!f.measurement?.available,
     ),
-    unseen: findings.filter(
-      (f) => f.verdict === "cannot_assess" && !f.measurement?.available,
-    ),
+    notMeasured: unseen.filter((f) => !structural.has(f.criterion_id)),
+    outOfScope: unseen.filter((f) => structural.has(f.criterion_id)),
   };
+}
+
+/**
+ * One line of scope, so the reader knows the denominator before reading any verdict.
+ *
+ * Without it the report opens on a set of verdicts with no indication that some criteria were
+ * never in play, which makes an honest abstention look like a gap in the product.
+ */
+export function scopeLine(coverage: CoverageRow[]): string | null {
+  if (!coverage.length) return null;
+  const outside = coverage.filter((c) => c.assessable === "none").length;
+  const inside = coverage.length - outside;
+  if (!outside) return null;
+  return (
+    `${inside} of the document's ${coverage.length} criteria can be judged from a side view. ` +
+    `The other ${outside} need a different camera angle and are listed below rather than guessed at.`
+  );
 }

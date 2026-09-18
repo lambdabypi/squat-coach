@@ -6,7 +6,8 @@ import PoseCompare from "@/components/PoseCompare";
 import VideoWithOverlay, { type PlayerHandle } from "@/components/VideoWithOverlay";
 import { getOverlay, getReport, videoUrl } from "@/lib/api";
 import { localVideoUrl } from "@/lib/localVideo";
-import { groupFindings, headline, presentMeasurement } from "@/lib/present";
+import { cacheReport, cachedReport } from "@/lib/reportCache";
+import { groupFindings, headline, presentMeasurement, scopeLine } from "@/lib/present";
 import type { Finding, Overlay, Report } from "@/lib/types";
 
 export default function ReportPage({ params }: { params: Promise<{ jobId: string }> }) {
@@ -14,25 +15,47 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
   const [report, setReport] = useState<Report | null>(null);
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fromCache, setFromCache] = useState(false);
   const [activeRep, setActiveRep] = useState(1);
   const [highlight, setHighlight] = useState<number | null>(null);
   const player = useRef<PlayerHandle>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const show = (r: Report, o: Overlay, cached: boolean) => {
+      if (cancelled) return;
+      setReport(r);
+      setOverlay(o);
+      setFromCache(cached);
+      if (r.reps.length) setActiveRep(r.reps[0].index);
+    };
+
     Promise.all([getReport(jobId), getOverlay(jobId)])
       .then(([r, o]) => {
-        setReport(r);
-        setOverlay(o);
-        if (r.reps.length) setActiveRep(r.reps[0].index);
+        cacheReport(jobId, r, o);
+        show(r, o, false);
       })
-      .catch((e) => setError((e as Error).message));
+      .catch((e) => {
+        // The server forgets a job when its instance goes away, so a reload of a report the user
+        // has already seen would otherwise show only an error. Fall back to their own copy.
+        const hit = cachedReport(jobId);
+        if (hit) show(hit.report, hit.overlay, true);
+        else if (!cancelled) setError((e as Error).message);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [jobId]);
 
   const findings = useMemo(
     () => report?.findings.filter((f) => f.rep_index === activeRep) ?? [],
     [report, activeRep],
   );
-  const groups = useMemo(() => groupFindings(findings), [findings]);
+  const groups = useMemo(
+    () => groupFindings(findings, report?.coverage ?? []),
+    [findings, report],
+  );
 
   const jump = (t: number | null, frame: number | null) => {
     if (t != null) player.current?.seek(t);
@@ -106,6 +129,17 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
         <span className="faint" style={{ marginLeft: "auto" }}>{rep.video.filename}</span>
       </div>
 
+      {/* Say that this is a saved copy rather than letting it pass as a live one. The analysis is
+          unchanged - it is the same report this browser was given - but the video and the link are
+          not durable, and a user who assumes otherwise will lose it. */}
+      {fromCache && (
+        <div className="notice warn">
+          Showing the copy saved in this browser. The analysis service no longer holds this job, so
+          the clip cannot be replayed and this link will not open anywhere else. Re-upload the
+          video to get a fresh report with the annotated playback.
+        </div>
+      )}
+
       {rep.blocked ? (
         <div className="notice bad" style={{ padding: "18px 20px" }}>
           <h3 style={{ marginTop: 0 }}>This video could not be assessed</h3>
@@ -120,6 +154,11 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
       ) : (
         <>
           <h2 className="hero-line">{headline(findings)}</h2>
+
+          {/* State the denominator before any verdict is read. */}
+          {scopeLine(rep.coverage) && (
+            <p className="faint" style={{ marginTop: -6 }}>{scopeLine(rep.coverage)}</p>
+          )}
 
           {topFix && (
             <section className="fixfirst">
@@ -192,13 +231,26 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
                 {groups.borderline.map(card)}
               </Group>
 
+              {/* Two different kinds of "we cannot say", kept apart. One is about this clip and
+                  might be fixed by re-recording; the other is true of every side-on video ever
+                  uploaded and is not a shortcoming of this one. A single merged count read as the
+                  product failing on 13 of 22 criteria, which is not what the number means. */}
               <Group
-                title={`${groups.unseen.length} we could not judge`}
+                title={`${groups.notMeasured.length} not measurable in this clip`}
                 tone="unknown"
-                count={groups.unseen.length}
-                blurb="A side-on camera cannot see some of these at all, and others were hidden in the frames we needed. We would rather say so than guess."
+                count={groups.notMeasured.length}
+                blurb="A side view can judge these in principle. Here the evidence was either not visible in the frames we needed, or the measurement was not stable enough to call. Each one says which. Re-recording may fix it."
               >
-                {groups.unseen.map(card)}
+                {groups.notMeasured.map(card)}
+              </Group>
+
+              <Group
+                title={`${groups.outOfScope.length} need a different camera angle`}
+                tone="unknown"
+                count={groups.outOfScope.length}
+                blurb="These are side-to-side or rotational measurements, so no side-on camera can see them. This is the same on every video and is not a problem with yours."
+              >
+                {groups.outOfScope.map(card)}
               </Group>
             </>
           )}

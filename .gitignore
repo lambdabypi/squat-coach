@@ -20,6 +20,12 @@ node_modules/
 .next/
 next-env.d.ts
 
+# playwright run artifacts: traces and screencasts of a failed run, useful locally, large and
+# meaningless in the repository. The test itself is committed.
+frontend/test-results/
+frontend/playwright-report/
+frontend/.playwright/
+
 # evidence: keep the reports and notes, not the source video files
 EVIDENCE/**/*.mp4
 EVIDENCE/**/*.webm
