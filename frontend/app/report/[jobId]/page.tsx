@@ -5,7 +5,7 @@ import FindingCard from "@/components/FindingCard";
 import PoseCompare from "@/components/PoseCompare";
 import VideoWithOverlay, { type PlayerHandle } from "@/components/VideoWithOverlay";
 import { getOverlay, getReport, videoUrl } from "@/lib/api";
-import { localVideoUrl } from "@/lib/localVideo";
+import { localVideoUrl, restoreLocalVideo } from "@/lib/localVideo";
 import { cacheReport, cachedReport } from "@/lib/reportCache";
 import { groupFindings, headline, presentMeasurement, scopeLine } from "@/lib/present";
 import type { Finding, Overlay, Report } from "@/lib/types";
@@ -16,6 +16,8 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  // undefined = still resolving, null = confirmed gone, string = playable.
+  const [videoSrc, setVideoSrc] = useState<string | null | undefined>(undefined);
   const [activeRep, setActiveRep] = useState(1);
   const [highlight, setHighlight] = useState<number | null>(null);
   const player = useRef<PlayerHandle>(null);
@@ -43,6 +45,37 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
         else if (!cancelled) setError((e as Error).message);
       });
 
+    return () => {
+      cancelled = true;
+    };
+  }, [jobId]);
+
+  // Resolve the video separately from the report: the in-memory object URL if this session still
+  // has it, then IndexedDB after a reload, then the server for the upload path, which is the only
+  // path that actually has a copy there.
+  useEffect(() => {
+    let cancelled = false;
+    const inMemory = localVideoUrl(jobId);
+    if (inMemory) {
+      setVideoSrc(inMemory);
+      return;
+    }
+    restoreLocalVideo(jobId)
+      .then(async (url) => {
+        if (cancelled) return;
+        if (url) return setVideoSrc(url);
+        // No local copy. The upload path streams from the server; the browser path never sent
+        // the file, so check before handing the player a source.
+        try {
+          const probe = await fetch(videoUrl(jobId), { method: "HEAD" });
+          setVideoSrc(probe.ok ? videoUrl(jobId) : null);
+        } catch {
+          setVideoSrc(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setVideoSrc(null);
+      });
     return () => {
       cancelled = true;
     };
@@ -188,13 +221,29 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
 
       <div className="grid">
         <div className="sticky-col">
-          <VideoWithOverlay
-            ref={player}
-            src={localVideoUrl(jobId) ?? videoUrl(jobId)}
-            overlay={ov}
-            highlightFrame={highlight}
-            activeRep={activeRep}
-          />
+          {/* videoSrc resolves asynchronously: on a reload the blob comes back from IndexedDB
+              rather than from the module map, and on the browser-tracking path there is no
+              server copy to fall back on. Until it resolves, render nothing rather than pointing
+              the player at a URL that 404s. */}
+          {videoSrc ? (
+            <VideoWithOverlay
+              ref={player}
+              src={videoSrc}
+              overlay={ov}
+              highlightFrame={highlight}
+              activeRep={activeRep}
+            />
+          ) : videoSrc === null ? (
+            <div className="notice warn">
+              <strong>The video is no longer available to play.</strong>
+              <p style={{ marginBottom: 0 }}>
+                It was analysed in your browser and never uploaded, so there is no copy on the
+                server, and this browser no longer has it. Every measurement below still stands,
+                including the frame and timestamp behind each one. Re-upload the same clip to get
+                the annotated playback back.
+              </p>
+            </div>
+          ) : null}
         </div>
 
         <aside>

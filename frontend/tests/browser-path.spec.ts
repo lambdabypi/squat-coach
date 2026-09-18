@@ -133,4 +133,29 @@ test("the browser tracks the movement and reproduces the verified verdicts", asy
       `This is the divergence scripts/test_client_path.py cannot detect, because it uses\n` +
       `native MediaPipe rather than the WASM build.\n\n${moved.join("\n")}`,
   ).toEqual([]);
+
+  // The report has to survive a reload, which is a separate question from producing it.
+  //
+  // On this path the video is never uploaded, so a reload cannot fall back to the server: the
+  // object URL held in a module-level map is gone and the blob has to come back from IndexedDB.
+  // This was reported from real use and no scripted test could have caught it, because it needs a
+  // browser, a real file, and an actual page reload.
+  await page.reload();
+
+  await expect(page.locator(".verdict-badge").first()).toBeVisible();
+  const video = page.locator("video");
+  await expect(video).toHaveCount(1);
+  const src = await video.getAttribute("src");
+  expect(
+    src?.startsWith("blob:"),
+    `After reload the player's source should be a blob restored from IndexedDB, got: ${src}`,
+  ).toBe(true);
+
+  // And the verdicts must still be the same ones, whether they came from the network or from the
+  // browser's own cached copy of the report.
+  const afterReload = await page.request.get(`${API}/jobs/${jobId}/report`);
+  if (afterReload.ok()) {
+    const again = await afterReload.json();
+    expect(verdictMap(again.findings)).toEqual(liveV);
+  }
 });
