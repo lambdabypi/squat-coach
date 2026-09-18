@@ -23,7 +23,7 @@ from .vision.pose import extract_pose
 from .vision.probe import probe
 from .vision.quality import assess_quality
 from .vision.reps import segment_reps
-from .vision.smoothing import interpolate_gaps, smooth
+from .vision.smoothing import angle_from_horizontal, interpolate_gaps, smooth
 
 Progress = Callable[[str, float], None]
 
@@ -53,13 +53,57 @@ def _clean(v) -> float | None:
     return None if v is None or not np.isfinite(v) else round(float(v), 2)
 
 
-def build_overlay(track, bar, seg, info) -> dict:
+def _joint_angle(a: np.ndarray, vertex: np.ndarray, b: np.ndarray) -> float | None:
+    """Interior angle at `vertex` between rays to `a` and `b`, in degrees."""
+    v1, v2 = a - vertex, b - vertex
+    n1, n2 = np.linalg.norm(v1), np.linalg.norm(v2)
+    if not np.isfinite(n1) or not np.isfinite(n2) or n1 < 1e-6 or n2 < 1e-6:
+        return None
+    cos = float(np.clip(np.dot(v1, v2) / (n1 * n2), -1.0, 1.0))
+    return float(np.degrees(np.arccos(cos)))
+
+
+def _per_frame_angles(smoothed: dict, bar, shin_px: float, i: int) -> dict:
+    """The measurements the assessment uses, exposed per frame so the player can show the
+    system's reading of the movement as it happens rather than only at the bottom."""
+    sh, hip = smoothed["shoulder"][i], smoothed["hip"][i]
+    knee, ankle = smoothed["knee"][i], smoothed["ankle"][i]
+    heel, toe = smoothed["heel"][i], smoothed["toe"][i]
+
+    def ok(*pts) -> bool:
+        return all(np.all(np.isfinite(p)) for p in pts)
+
+    back = None
+    if ok(sh, hip):
+        back = float(angle_from_horizontal(hip, sh))
+
+    bar_dev = None
+    if bar is not None and ok(heel, toe) and np.isfinite(bar.x[i]) and shin_px > 0:
+        midfoot_x = (heel[0] + toe[0]) / 2.0
+        facing = np.sign(toe[0] - heel[0]) or 1.0
+        bar_dev = float((bar.x[i] - midfoot_x) * facing / shin_px)
+
+    return {
+        "back": None if back is None else round(back, 1),
+        "knee": None if not ok(hip, knee, ankle) else _r(_joint_angle(hip, knee, ankle)),
+        "hip": None if not ok(sh, hip, knee) else _r(_joint_angle(sh, hip, knee)),
+        "bar_dev": None if bar_dev is None else round(bar_dev, 3),
+        "midfoot_x": None if not ok(heel, toe) else round(float((heel[0] + toe[0]) / 2.0), 1),
+    }
+
+
+def _r(v: float | None) -> float | None:
+    return None if v is None else round(v, 1)
+
+
+def build_overlay(track, bar, seg, info, skill) -> dict:
     """Per-frame drawing data for the canvas overlay, in video pixel coordinates.
 
     The frontend synchronises this to <video>.currentTime rather than re-encoding an
     annotated file — instant to produce, and scrubbable.
     """
     smoothed = {j: smooth(interpolate_gaps(track.joint(j)), track.fps) for j in OVERLAY_JOINTS}
+    shin_px = track.shin_length_px()
     frames = []
     for i in range(track.n):
         joints = {}
@@ -74,6 +118,7 @@ def build_overlay(track, bar, seg, info) -> dict:
             "frame": i,
             "t": round(i / track.fps, 3),
             "joints": joints,
+            "angles": _per_frame_angles(smoothed, bar, shin_px, i),
             "bar": {
                 "x": _clean(bar.x[i]) if bar else None,
                 "y": _clean(bar.y[i]) if bar else None,
@@ -94,11 +139,33 @@ def build_overlay(track, bar, seg, info) -> dict:
         "fps": track.fps,
         "duration_s": info.duration_s,
         "side": track.side,
+        "shin_length_px": round(shin_px, 1) if np.isfinite(shin_px) else None,
         "skeleton": SKELETON,
         "frames": frames,
         "bar_path": bar_path,
         "reps": [r.to_dict() for r in seg.reps],
+        # Reference values read from the skill, so the live display shows the same standard the
+        # assessment uses. Each carries its provenance: the UI must not present our measurement
+        # tolerance as something the document requires.
+        "targets": _targets(skill),
     }
+
+
+def _targets(skill) -> dict:
+    out: dict = {}
+    for cid, key in (("back_angle", "back"), ("bar_path_over_midfoot", "bar_dev")):
+        try:
+            c = skill.by_id(cid)
+        except KeyError:
+            continue
+        out[key] = {
+            "reference": c.rule.reference_value if c.rule else None,
+            "tolerance": c.tolerance.value if c.tolerance else None,
+            "tolerance_provenance": c.tolerance.provenance.value if c.tolerance else None,
+            "unit": c.measure.unit if c.measure else None,
+            "citation": c.source.citation(),
+        }
+    return out
 
 
 def analyse(
@@ -188,7 +255,7 @@ def analyse(
                 "agent_note": None,
                 "cost": None,
             },
-            "overlay": build_overlay(track, bar, seg, info),
+            "overlay": build_overlay(track, bar, seg, info, skill),
         }
 
     findings = [
@@ -255,4 +322,4 @@ def analyse(
         "cost": cost,
     }
 
-    return {"report": report, "overlay": build_overlay(track, bar, seg, info)}
+    return {"report": report, "overlay": build_overlay(track, bar, seg, info, skill)}

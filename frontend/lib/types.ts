@@ -108,10 +108,27 @@ export interface Joint {
   visible: boolean;
 }
 
+export interface FrameAngles {
+  back: number | null;      // torso to horizontal, degrees
+  knee: number | null;      // femur-tibia interior angle, degrees
+  hip: number | null;       // torso-femur interior angle, degrees
+  bar_dev: number | null;   // signed bar offset from midfoot, shin-lengths
+  midfoot_x: number | null; // pixels
+}
+
+export interface Target {
+  reference: number | null;
+  tolerance: number | null;
+  tolerance_provenance: string | null;
+  unit: string | null;
+  citation: string;
+}
+
 export interface OverlayFrame {
   frame: number;
   t: number;
   joints: Record<string, Joint>;
+  angles: FrameAngles;
   bar: { x: number | null; y: number | null; observed: boolean };
 }
 
@@ -121,10 +138,12 @@ export interface Overlay {
   fps: number;
   duration_s: number;
   side: string;
+  shin_length_px: number | null;
   skeleton: [string, string][];
   frames: OverlayFrame[];
   bar_path: { t: number; x: number | null; y: number | null; observed: boolean }[];
   reps: Rep[];
+  targets: { back?: Target; bar_dev?: Target };
 }
 
 export interface JobStatus {

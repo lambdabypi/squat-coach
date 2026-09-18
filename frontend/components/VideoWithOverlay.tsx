@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import type { Overlay } from "@/lib/types";
+import type { Overlay, OverlayFrame } from "@/lib/types";
 
 export interface PlayerHandle {
   seek: (t: number) => void;
@@ -21,7 +21,30 @@ const COL = {
   barEst: "#8b949e",
   path: "rgba(255,209,102,.85)",
   pathEst: "rgba(139,148,158,.6)",
+  angle: "#c792ea",
+  angle2: "#7fd1e8",
+  hipLine: "rgba(199,146,234,.5)",
+  kneeLine: "rgba(127,209,232,.5)",
 };
+
+/** Text with a dark outline so it stays readable over any footage. */
+function label(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  scale: number,
+  colour: string,
+) {
+  ctx.save();
+  ctx.font = `600 ${Math.round(26 * scale)}px ui-monospace, Menlo, monospace`;
+  ctx.lineWidth = 5 * scale;
+  ctx.strokeStyle = "rgba(0,0,0,.85)";
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = colour;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
 
 /**
  * Canvas overlay synchronised to <video>.currentTime.
@@ -39,7 +62,9 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
   const rafRef = useRef<number>(0);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [showBarPath, setShowBarPath] = useState(true);
+  const [showAngles, setShowAngles] = useState(true);
   const [t, setT] = useState(0);
+  const [live, setLive] = useState<OverlayFrame["angles"] | null>(null);
 
   useImperativeHandle(ref, () => ({
     seek: (time: number) => {
@@ -69,8 +94,70 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
       );
       const f = overlay.frames[i];
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setLive(f?.angles ?? null);
 
       if (f) {
+        if (showAngles) {
+          const S = overlay.width / 1080; // scale annotation weight with resolution
+          const j = f.joints;
+
+          // Plumb line through the midfoot: the document's balance reference. The bar should
+          // travel along this line (ref p.8-9).
+          if (f.angles.midfoot_x != null) {
+            ctx.save();
+            ctx.strokeStyle = "rgba(88,166,255,.55)";
+            ctx.lineWidth = 2 * S;
+            ctx.setLineDash([10 * S, 8 * S]);
+            ctx.beginPath();
+            ctx.moveTo(f.angles.midfoot_x, 0);
+            ctx.lineTo(f.angles.midfoot_x, canvas.height);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Back angle: arc from horizontal up to the torso, drawn at the hip.
+          if (f.angles.back != null && j.hip?.x != null && j.shoulder?.x != null) {
+            const hx = j.hip.x!;
+            const hy = j.hip.y!;
+            const r = 70 * S;
+            const toShoulder = Math.atan2(j.shoulder.y! - hy, j.shoulder.x! - hx);
+            const facing = j.shoulder.x! < hx ? Math.PI : 0;
+            ctx.save();
+            ctx.strokeStyle = COL.angle;
+            ctx.lineWidth = 3 * S;
+            ctx.beginPath();
+            ctx.moveTo(hx, hy);
+            ctx.lineTo(hx + Math.cos(facing) * r, hy);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(hx, hy, r, Math.min(facing, toShoulder), Math.max(facing, toShoulder));
+            ctx.stroke();
+            ctx.restore();
+            label(ctx, `${f.angles.back.toFixed(0)}°`, hx + Math.cos(facing) * r * 1.25, hy - 12 * S, S, COL.angle);
+          }
+
+          // Knee angle.
+          if (f.angles.knee != null && j.knee?.x != null) {
+            label(ctx, `${f.angles.knee.toFixed(0)}°`, j.knee.x! + 22 * S, j.knee.y! + 6 * S, S, COL.angle2);
+          }
+
+          // Depth cue: horizontal guides at hip and knee height make the document's depth
+          // standard (hip below top of patella) legible frame by frame.
+          if (j.hip?.y != null && j.knee?.y != null) {
+            ctx.save();
+            ctx.lineWidth = 2 * S;
+            ctx.setLineDash([6 * S, 6 * S]);
+            for (const [y, c] of [[j.hip.y!, COL.hipLine], [j.knee.y!, COL.kneeLine]] as const) {
+              ctx.strokeStyle = c;
+              ctx.beginPath();
+              ctx.moveTo(0, y);
+              ctx.lineTo(canvas.width, y);
+              ctx.stroke();
+            }
+            ctx.restore();
+          }
+        }
+
         if (showSkeleton) {
           // Bones first, joints on top.
           ctx.lineWidth = Math.max(3, overlay.width * 0.005);
@@ -148,7 +235,7 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
 
     rafRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [overlay, showSkeleton, showBarPath, highlightFrame]);
+  }, [overlay, showSkeleton, showBarPath, showAngles, highlightFrame]);
 
   const rep = overlay.reps.find((r) => t >= r.start_t && t <= r.end_t);
 
@@ -172,6 +259,12 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
         >
           Bar path
         </button>
+        <button
+          className={`chip${showAngles ? " on" : ""}`}
+          onClick={() => setShowAngles((v) => !v)}
+        >
+          Angles
+        </button>
         {overlay.reps.map((r) => (
           <button
             key={r.index}
@@ -191,6 +284,60 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
           {t.toFixed(2)}s
         </span>
       </div>
+
+      {showAngles && live && (
+        <div className="readout">
+          <Readout
+            name="Back angle"
+            value={live.back == null ? null : `${live.back.toFixed(0)}°`}
+            target={
+              overlay.targets.back?.reference != null
+                ? `target ~${overlay.targets.back.reference}°`
+                : null
+            }
+            note={
+              overlay.targets.back?.tolerance != null
+                ? `±${overlay.targets.back.tolerance}° ${
+                    overlay.targets.back.tolerance_provenance === "document_stated"
+                      ? "per document"
+                      : "our tolerance"
+                  }`
+                : null
+            }
+            ok={
+              live.back != null &&
+              overlay.targets.back?.reference != null &&
+              overlay.targets.back?.tolerance != null &&
+              Math.abs(live.back - overlay.targets.back.reference) <=
+                overlay.targets.back.tolerance
+            }
+            colour={COL.angle}
+          />
+          <Readout
+            name="Knee angle"
+            value={live.knee == null ? null : `${live.knee.toFixed(0)}°`}
+            target={null}
+            note="observed, no document standard"
+            colour={COL.angle2}
+          />
+          <Readout
+            name="Bar vs midfoot"
+            value={live.bar_dev == null ? null : `${live.bar_dev >= 0 ? "+" : ""}${live.bar_dev.toFixed(2)} shin`}
+            target="target 0.00"
+            note={
+              overlay.targets.bar_dev?.tolerance != null
+                ? `±${overlay.targets.bar_dev.tolerance} our tolerance`
+                : null
+            }
+            ok={
+              live.bar_dev != null &&
+              overlay.targets.bar_dev?.tolerance != null &&
+              Math.abs(live.bar_dev) <= overlay.targets.bar_dev.tolerance
+            }
+            colour={COL.bar}
+          />
+        </div>
+      )}
 
       <div className="legend">
         <span>
@@ -212,5 +359,35 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
     </div>
   );
 });
+
+function Readout({
+  name,
+  value,
+  target,
+  note,
+  ok,
+  colour,
+}: {
+  name: string;
+  value: string | null;
+  target: string | null;
+  note: string | null;
+  ok?: boolean;
+  colour: string;
+}) {
+  return (
+    <div className="readout-cell">
+      <div className="readout-name">{name}</div>
+      <div
+        className="readout-value"
+        style={{ color: value == null ? "var(--faint)" : ok === false ? "var(--fail)" : colour }}
+      >
+        {value ?? "—"}
+      </div>
+      {target && <div className="readout-target">{target}</div>}
+      {note && <div className="readout-note">{note}</div>}
+    </div>
+  );
+}
 
 export default VideoWithOverlay;

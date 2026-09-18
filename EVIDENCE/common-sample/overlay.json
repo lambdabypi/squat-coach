@@ -4,6 +4,7 @@
   "fps": 30.002542588354945,
   "duration_s": 7.918005,
   "side": "left",
+  "shin_length_px": 259.2,
   "skeleton": [
     [
       "shoulder",
@@ -80,6 +81,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 81.7,
+        "knee": 170.2,
+        "hip": 178.7,
+        "bar_dev": -0.062,
+        "midfoot_x": 651.9
+      },
       "bar": {
         "x": 668.0,
         "y": 768.0,
@@ -138,6 +146,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 82.4,
+        "knee": 170.7,
+        "hip": 178.8,
+        "bar_dev": -0.031,
+        "midfoot_x": 651.9
       },
       "bar": {
         "x": 660.0,
@@ -198,6 +213,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 82.9,
+        "knee": 171.4,
+        "hip": 178.6,
+        "bar_dev": -0.035,
+        "midfoot_x": 652.0
+      },
       "bar": {
         "x": 661.0,
         "y": 769.0,
@@ -256,6 +278,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 83.2,
+        "knee": 172.2,
+        "hip": 178.1,
+        "bar_dev": -0.026,
+        "midfoot_x": 652.2
       },
       "bar": {
         "x": 659.0,
@@ -316,6 +345,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 83.3,
+        "knee": 173.2,
+        "hip": 177.3,
+        "bar_dev": -0.02,
+        "midfoot_x": 652.7
+      },
       "bar": {
         "x": 658.0,
         "y": 769.0,
@@ -374,6 +410,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 83.1,
+        "knee": 174.4,
+        "hip": 176.1,
+        "bar_dev": -0.015,
+        "midfoot_x": 653.2
       },
       "bar": {
         "x": 657.0,
@@ -434,6 +477,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 82.6,
+        "knee": 175.5,
+        "hip": 174.8,
+        "bar_dev": -0.018,
+        "midfoot_x": 653.4
+      },
       "bar": {
         "x": 658.0,
         "y": 770.0,
@@ -492,6 +542,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 82.1,
+        "knee": 176.4,
+        "hip": 173.6,
+        "bar_dev": -0.097,
+        "midfoot_x": 653.5
       },
       "bar": {
         "x": 678.71,
@@ -552,6 +609,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 81.4,
+        "knee": 178.0,
+        "hip": 172.0,
+        "bar_dev": -0.103,
+        "midfoot_x": 653.6
+      },
       "bar": {
         "x": 680.23,
         "y": 796.94,
@@ -610,6 +674,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 80.9,
+        "knee": 179.9,
+        "hip": 170.4,
+        "bar_dev": -0.013,
+        "midfoot_x": 653.6
       },
       "bar": {
         "x": 657.0,
@@ -670,6 +741,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 80.3,
+        "knee": 177.2,
+        "hip": 168.2,
+        "bar_dev": -0.105,
+        "midfoot_x": 653.7
+      },
       "bar": {
         "x": 680.84,
         "y": 792.82,
@@ -728,6 +806,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 79.4,
+        "knee": 174.5,
+        "hip": 165.7,
+        "bar_dev": -0.005,
+        "midfoot_x": 653.7
       },
       "bar": {
         "x": 655.0,
@@ -788,6 +873,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 78.4,
+        "knee": 171.8,
+        "hip": 162.8,
+        "bar_dev": -0.099,
+        "midfoot_x": 653.6
+      },
       "bar": {
         "x": 679.32,
         "y": 801.47,
@@ -846,6 +938,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 77.8,
+        "knee": 169.7,
+        "hip": 160.4,
+        "bar_dev": 0.036,
+        "midfoot_x": 653.2
       },
       "bar": {
         "x": 644.0,
@@ -906,6 +1005,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 77.0,
+        "knee": 167.4,
+        "hip": 157.9,
+        "bar_dev": -0.1,
+        "midfoot_x": 652.7
+      },
       "bar": {
         "x": 678.69,
         "y": 806.17,
@@ -964,6 +1070,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 76.4,
+        "knee": 164.4,
+        "hip": 155.2,
+        "bar_dev": 0.032,
+        "midfoot_x": 652.3
       },
       "bar": {
         "x": 644.0,
@@ -1024,6 +1137,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 75.7,
+        "knee": 160.1,
+        "hip": 151.6,
+        "bar_dev": -0.103,
+        "midfoot_x": 652.1
+      },
       "bar": {
         "x": 678.7,
         "y": 815.46,
@@ -1082,6 +1202,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 75.1,
+        "knee": 154.9,
+        "hip": 147.4,
+        "bar_dev": 0.058,
+        "midfoot_x": 652.0
       },
       "bar": {
         "x": 637.0,
@@ -1142,6 +1269,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 74.3,
+        "knee": 148.9,
+        "hip": 142.5,
+        "bar_dev": 0.067,
+        "midfoot_x": 652.3
+      },
       "bar": {
         "x": 635.0,
         "y": 828.0,
@@ -1200,6 +1334,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 73.9,
+        "knee": 143.8,
+        "hip": 138.5,
+        "bar_dev": 0.085,
+        "midfoot_x": 652.9
       },
       "bar": {
         "x": 631.0,
@@ -1260,6 +1401,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 73.2,
+        "knee": 139.4,
+        "hip": 135.0,
+        "bar_dev": 0.08,
+        "midfoot_x": 653.7
+      },
       "bar": {
         "x": 633.0,
         "y": 854.0,
@@ -1318,6 +1466,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 72.5,
+        "knee": 135.4,
+        "hip": 131.7,
+        "bar_dev": 0.094,
+        "midfoot_x": 654.4
       },
       "bar": {
         "x": 630.0,
@@ -1378,6 +1533,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 71.9,
+        "knee": 131.2,
+        "hip": 128.2,
+        "bar_dev": -0.051,
+        "midfoot_x": 655.0
+      },
       "bar": {
         "x": 668.27,
         "y": 875.22,
@@ -1436,6 +1598,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 71.4,
+        "knee": 126.6,
+        "hip": 124.7,
+        "bar_dev": -0.055,
+        "midfoot_x": 654.7
       },
       "bar": {
         "x": 669.03,
@@ -1496,6 +1665,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 70.9,
+        "knee": 122.1,
+        "hip": 121.0,
+        "bar_dev": -0.052,
+        "midfoot_x": 654.3
+      },
       "bar": {
         "x": 667.94,
         "y": 902.53,
@@ -1554,6 +1730,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 70.3,
+        "knee": 118.0,
+        "hip": 117.5,
+        "bar_dev": -0.052,
+        "midfoot_x": 653.5
       },
       "bar": {
         "x": 666.94,
@@ -1614,6 +1797,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 69.4,
+        "knee": 114.4,
+        "hip": 114.0,
+        "bar_dev": -0.053,
+        "midfoot_x": 652.6
+      },
       "bar": {
         "x": 666.42,
         "y": 917.04,
@@ -1672,6 +1862,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 68.1,
+        "knee": 111.7,
+        "hip": 110.6,
+        "bar_dev": -0.031,
+        "midfoot_x": 651.8
       },
       "bar": {
         "x": 659.89,
@@ -1732,6 +1929,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 66.5,
+        "knee": 109.2,
+        "hip": 107.1,
+        "bar_dev": -0.032,
+        "midfoot_x": 651.6
+      },
       "bar": {
         "x": 659.97,
         "y": 951.94,
@@ -1790,6 +1994,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 65.1,
+        "knee": 106.9,
+        "hip": 104.2,
+        "bar_dev": 0.11,
+        "midfoot_x": 651.5
       },
       "bar": {
         "x": 623.0,
@@ -1850,6 +2061,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.0,
+        "knee": 104.9,
+        "hip": 101.8,
+        "bar_dev": 0.121,
+        "midfoot_x": 651.4
+      },
       "bar": {
         "x": 620.0,
         "y": 980.0,
@@ -1908,6 +2126,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.2,
+        "knee": 102.7,
+        "hip": 99.6,
+        "bar_dev": -0.025,
+        "midfoot_x": 651.2
       },
       "bar": {
         "x": 657.62,
@@ -1968,6 +2193,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 62.1,
+        "knee": 100.7,
+        "hip": 97.1,
+        "bar_dev": 0.131,
+        "midfoot_x": 650.9
+      },
       "bar": {
         "x": 617.0,
         "y": 1010.0,
@@ -2026,6 +2258,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.4,
+        "knee": 99.0,
+        "hip": 95.2,
+        "bar_dev": 0.141,
+        "midfoot_x": 650.7
       },
       "bar": {
         "x": 614.0,
@@ -2086,6 +2325,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 60.9,
+        "knee": 97.8,
+        "hip": 94.0,
+        "bar_dev": -0.049,
+        "midfoot_x": 650.7
+      },
       "bar": {
         "x": 663.55,
         "y": 1015.22,
@@ -2144,6 +2390,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.0,
+        "knee": 96.2,
+        "hip": 93.1,
+        "bar_dev": 0.158,
+        "midfoot_x": 650.8
       },
       "bar": {
         "x": 610.0,
@@ -2204,6 +2457,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.5,
+        "knee": 94.0,
+        "hip": 92.1,
+        "bar_dev": 0.166,
+        "midfoot_x": 651.0
+      },
       "bar": {
         "x": 608.0,
         "y": 1060.0,
@@ -2262,6 +2522,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.8,
+        "knee": 91.5,
+        "hip": 90.6,
+        "bar_dev": 0.175,
+        "midfoot_x": 651.2
       },
       "bar": {
         "x": 606.0,
@@ -2322,6 +2589,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.7,
+        "knee": 88.9,
+        "hip": 88.6,
+        "bar_dev": 0.179,
+        "midfoot_x": 651.4
+      },
       "bar": {
         "x": 605.0,
         "y": 1083.0,
@@ -2380,6 +2654,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 62.2,
+        "knee": 86.8,
+        "hip": 87.7,
+        "bar_dev": 0.183,
+        "midfoot_x": 651.5
       },
       "bar": {
         "x": 604.0,
@@ -2440,6 +2721,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 62.8,
+        "knee": 85.4,
+        "hip": 87.4,
+        "bar_dev": 0.191,
+        "midfoot_x": 651.5
+      },
       "bar": {
         "x": 602.0,
         "y": 1104.0,
@@ -2498,6 +2786,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.3,
+        "knee": 84.0,
+        "hip": 87.0,
+        "bar_dev": 0.203,
+        "midfoot_x": 651.6
       },
       "bar": {
         "x": 599.0,
@@ -2558,6 +2853,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 63.3,
+        "knee": 82.3,
+        "hip": 85.8,
+        "bar_dev": 0.211,
+        "midfoot_x": 651.6
+      },
       "bar": {
         "x": 597.0,
         "y": 1126.0,
@@ -2616,6 +2918,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 62.6,
+        "knee": 80.5,
+        "hip": 83.9,
+        "bar_dev": 0.21,
+        "midfoot_x": 651.4
       },
       "bar": {
         "x": 597.0,
@@ -2676,6 +2985,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 62.2,
+        "knee": 78.4,
+        "hip": 82.0,
+        "bar_dev": 0.225,
+        "midfoot_x": 651.2
+      },
       "bar": {
         "x": 593.0,
         "y": 1142.0,
@@ -2734,6 +3050,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.9,
+        "knee": 76.3,
+        "hip": 80.2,
+        "bar_dev": 0.216,
+        "midfoot_x": 651.0
       },
       "bar": {
         "x": 595.0,
@@ -2794,6 +3117,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.9,
+        "knee": 74.6,
+        "hip": 78.9,
+        "bar_dev": 0.231,
+        "midfoot_x": 650.8
+      },
       "bar": {
         "x": 591.0,
         "y": 1159.0,
@@ -2852,6 +3182,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.7,
+        "knee": 73.4,
+        "hip": 77.8,
+        "bar_dev": 0.227,
+        "midfoot_x": 650.8
       },
       "bar": {
         "x": 592.0,
@@ -2912,6 +3249,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.0,
+        "knee": 72.4,
+        "hip": 76.4,
+        "bar_dev": -0.024,
+        "midfoot_x": 650.9
+      },
       "bar": {
         "x": 657.27,
         "y": 1155.04,
@@ -2970,6 +3314,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 60.3,
+        "knee": 71.5,
+        "hip": 75.2,
+        "bar_dev": 0.232,
+        "midfoot_x": 651.2
       },
       "bar": {
         "x": 591.0,
@@ -3030,6 +3381,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 59.4,
+        "knee": 70.2,
+        "hip": 73.6,
+        "bar_dev": 0.251,
+        "midfoot_x": 652.0
+      },
       "bar": {
         "x": 587.0,
         "y": 1189.0,
@@ -3088,6 +3446,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.7,
+        "knee": 68.5,
+        "hip": 71.9,
+        "bar_dev": 0.243,
+        "midfoot_x": 653.0
       },
       "bar": {
         "x": 590.0,
@@ -3148,6 +3513,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 58.1,
+        "knee": 66.2,
+        "hip": 69.6,
+        "bar_dev": 0.254,
+        "midfoot_x": 653.8
+      },
       "bar": {
         "x": 588.0,
         "y": 1204.0,
@@ -3206,6 +3578,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.1,
+        "knee": 64.0,
+        "hip": 68.0,
+        "bar_dev": 0.264,
+        "midfoot_x": 654.3
       },
       "bar": {
         "x": 586.0,
@@ -3266,6 +3645,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 58.0,
+        "knee": 61.7,
+        "hip": 66.2,
+        "bar_dev": 0.264,
+        "midfoot_x": 654.4
+      },
       "bar": {
         "x": 586.0,
         "y": 1221.0,
@@ -3324,6 +3710,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 57.9,
+        "knee": 59.3,
+        "hip": 64.4,
+        "bar_dev": 0.247,
+        "midfoot_x": 653.9
       },
       "bar": {
         "x": 590.0,
@@ -3384,6 +3777,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 57.9,
+        "knee": 57.2,
+        "hip": 63.1,
+        "bar_dev": 0.249,
+        "midfoot_x": 653.5
+      },
       "bar": {
         "x": 589.0,
         "y": 1239.0,
@@ -3442,6 +3842,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.2,
+        "knee": 55.4,
+        "hip": 62.4,
+        "bar_dev": 0.247,
+        "midfoot_x": 653.0
       },
       "bar": {
         "x": 589.0,
@@ -3502,6 +3909,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 58.2,
+        "knee": 53.8,
+        "hip": 61.2,
+        "bar_dev": 0.254,
+        "midfoot_x": 652.8
+      },
       "bar": {
         "x": 587.0,
         "y": 1257.0,
@@ -3560,6 +3974,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.4,
+        "knee": 52.9,
+        "hip": 60.7,
+        "bar_dev": 0.25,
+        "midfoot_x": 652.8
       },
       "bar": {
         "x": 588.0,
@@ -3620,6 +4041,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 58.4,
+        "knee": 52.1,
+        "hip": 59.9,
+        "bar_dev": 0.264,
+        "midfoot_x": 652.4
+      },
       "bar": {
         "x": 584.0,
         "y": 1271.0,
@@ -3678,6 +4106,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 57.6,
+        "knee": 51.6,
+        "hip": 58.4,
+        "bar_dev": 0.239,
+        "midfoot_x": 652.0
       },
       "bar": {
         "x": 590.0,
@@ -3738,6 +4173,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 57.0,
+        "knee": 51.1,
+        "hip": 56.9,
+        "bar_dev": 0.249,
+        "midfoot_x": 651.6
+      },
       "bar": {
         "x": 587.0,
         "y": 1283.0,
@@ -3796,6 +4238,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 57.0,
+        "knee": 50.5,
+        "hip": 56.1,
+        "bar_dev": 0.252,
+        "midfoot_x": 651.4
       },
       "bar": {
         "x": 586.0,
@@ -3856,6 +4305,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 57.7,
+        "knee": 50.2,
+        "hip": 56.6,
+        "bar_dev": 0.253,
+        "midfoot_x": 651.6
+      },
       "bar": {
         "x": 586.0,
         "y": 1288.0,
@@ -3914,6 +4370,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.2,
+        "knee": 50.1,
+        "hip": 57.8,
+        "bar_dev": 0.246,
+        "midfoot_x": 651.7
       },
       "bar": {
         "x": 588.0,
@@ -3974,6 +4437,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 60.7,
+        "knee": 50.2,
+        "hip": 59.4,
+        "bar_dev": 0.256,
+        "midfoot_x": 651.3
+      },
       "bar": {
         "x": 585.0,
         "y": 1282.0,
@@ -4032,6 +4502,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.4,
+        "knee": 51.0,
+        "hip": 60.8,
+        "bar_dev": 0.243,
+        "midfoot_x": 651.0
       },
       "bar": {
         "x": 588.0,
@@ -4092,6 +4569,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 60.8,
+        "knee": 52.4,
+        "hip": 61.4,
+        "bar_dev": 0.254,
+        "midfoot_x": 650.7
+      },
       "bar": {
         "x": 585.0,
         "y": 1264.0,
@@ -4150,6 +4634,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 60.0,
+        "knee": 54.7,
+        "hip": 62.7,
+        "bar_dev": 0.257,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 584.0,
@@ -4210,6 +4701,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 59.3,
+        "knee": 57.7,
+        "hip": 64.9,
+        "bar_dev": 0.257,
+        "midfoot_x": 650.7
+      },
       "bar": {
         "x": 584.0,
         "y": 1235.0,
@@ -4268,6 +4766,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.5,
+        "knee": 60.7,
+        "hip": 67.0,
+        "bar_dev": 0.255,
+        "midfoot_x": 651.0
       },
       "bar": {
         "x": 585.0,
@@ -4328,6 +4833,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 58.0,
+        "knee": 64.6,
+        "hip": 69.7,
+        "bar_dev": 0.03,
+        "midfoot_x": 651.3
+      },
       "bar": {
         "x": 643.47,
         "y": 1233.42,
@@ -4386,6 +4898,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.4,
+        "knee": 68.6,
+        "hip": 73.1,
+        "bar_dev": 0.023,
+        "midfoot_x": 651.4
       },
       "bar": {
         "x": 645.5,
@@ -4446,6 +4965,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 59.1,
+        "knee": 72.2,
+        "hip": 75.8,
+        "bar_dev": 0.024,
+        "midfoot_x": 651.4
+      },
       "bar": {
         "x": 645.18,
         "y": 1215.2,
@@ -4504,6 +5030,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.4,
+        "knee": 75.6,
+        "hip": 77.7,
+        "bar_dev": 0.039,
+        "midfoot_x": 651.0
       },
       "bar": {
         "x": 640.77,
@@ -4564,6 +5097,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 59.5,
+        "knee": 78.3,
+        "hip": 79.1,
+        "bar_dev": 0.216,
+        "midfoot_x": 650.1
+      },
       "bar": {
         "x": 594.0,
         "y": 1151.0,
@@ -4622,6 +5162,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.9,
+        "knee": 80.6,
+        "hip": 80.8,
+        "bar_dev": 0.21,
+        "midfoot_x": 649.4
       },
       "bar": {
         "x": 595.0,
@@ -4682,6 +5229,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.0,
+        "knee": 83.2,
+        "hip": 83.7,
+        "bar_dev": 0.208,
+        "midfoot_x": 649.0
+      },
       "bar": {
         "x": 595.0,
         "y": 1121.0,
@@ -4740,6 +5294,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 62.9,
+        "knee": 85.3,
+        "hip": 87.6,
+        "bar_dev": 0.208,
+        "midfoot_x": 649.0
       },
       "bar": {
         "x": 595.0,
@@ -4800,6 +5361,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.6,
+        "knee": 87.1,
+        "hip": 91.0,
+        "bar_dev": 0.206,
+        "midfoot_x": 649.5
+      },
       "bar": {
         "x": 596.0,
         "y": 1094.0,
@@ -4858,6 +5426,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 65.7,
+        "knee": 88.8,
+        "hip": 93.5,
+        "bar_dev": 0.197,
+        "midfoot_x": 649.9
       },
       "bar": {
         "x": 599.0,
@@ -4918,6 +5493,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 65.8,
+        "knee": 90.0,
+        "hip": 94.6,
+        "bar_dev": 0.185,
+        "midfoot_x": 650.0
+      },
       "bar": {
         "x": 602.0,
         "y": 1063.0,
@@ -4976,6 +5558,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 66.1,
+        "knee": 91.5,
+        "hip": 95.8,
+        "bar_dev": 0.173,
+        "midfoot_x": 649.8
       },
       "bar": {
         "x": 605.0,
@@ -5036,6 +5625,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 65.4,
+        "knee": 93.2,
+        "hip": 96.3,
+        "bar_dev": 0.172,
+        "midfoot_x": 649.6
+      },
       "bar": {
         "x": 605.0,
         "y": 1036.0,
@@ -5094,6 +5690,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 64.6,
+        "knee": 95.4,
+        "hip": 97.4,
+        "bar_dev": -0.03,
+        "midfoot_x": 649.4
       },
       "bar": {
         "x": 657.18,
@@ -5154,6 +5757,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 63.9,
+        "knee": 98.0,
+        "hip": 98.9,
+        "bar_dev": -0.004,
+        "midfoot_x": 649.3
+      },
       "bar": {
         "x": 650.42,
         "y": 990.28,
@@ -5212,6 +5822,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.9,
+        "knee": 100.3,
+        "hip": 100.8,
+        "bar_dev": -0.024,
+        "midfoot_x": 649.2
       },
       "bar": {
         "x": 655.35,
@@ -5272,6 +5889,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.4,
+        "knee": 102.7,
+        "hip": 103.2,
+        "bar_dev": 0.128,
+        "midfoot_x": 649.1
+      },
       "bar": {
         "x": 616.0,
         "y": 979.0,
@@ -5330,6 +5954,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 65.8,
+        "knee": 104.9,
+        "hip": 106.1,
+        "bar_dev": -0.013,
+        "midfoot_x": 649.0
       },
       "bar": {
         "x": 652.28,
@@ -5390,6 +6021,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 67.0,
+        "knee": 107.1,
+        "hip": 108.7,
+        "bar_dev": -0.023,
+        "midfoot_x": 648.8
+      },
       "bar": {
         "x": 654.64,
         "y": 935.68,
@@ -5448,6 +6086,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 68.1,
+        "knee": 110.3,
+        "hip": 112.1,
+        "bar_dev": -0.025,
+        "midfoot_x": 648.9
       },
       "bar": {
         "x": 655.44,
@@ -5508,6 +6153,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 69.2,
+        "knee": 113.1,
+        "hip": 115.5,
+        "bar_dev": -0.033,
+        "midfoot_x": 649.5
+      },
       "bar": {
         "x": 657.9,
         "y": 918.14,
@@ -5566,6 +6218,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 70.7,
+        "knee": 115.7,
+        "hip": 118.9,
+        "bar_dev": 0.082,
+        "midfoot_x": 650.1
       },
       "bar": {
         "x": 629.0,
@@ -5626,6 +6285,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 72.2,
+        "knee": 119.0,
+        "hip": 123.0,
+        "bar_dev": 0.073,
+        "midfoot_x": 650.8
+      },
       "bar": {
         "x": 632.0,
         "y": 890.0,
@@ -5684,6 +6350,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 73.6,
+        "knee": 122.0,
+        "hip": 126.6,
+        "bar_dev": -0.039,
+        "midfoot_x": 651.5
       },
       "bar": {
         "x": 661.49,
@@ -5744,6 +6417,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 74.8,
+        "knee": 125.4,
+        "hip": 130.1,
+        "bar_dev": 0.053,
+        "midfoot_x": 651.7
+      },
       "bar": {
         "x": 638.0,
         "y": 858.0,
@@ -5802,6 +6482,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 75.8,
+        "knee": 130.0,
+        "hip": 134.1,
+        "bar_dev": 0.054,
+        "midfoot_x": 651.9
       },
       "bar": {
         "x": 638.0,
@@ -5862,6 +6549,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 76.9,
+        "knee": 135.2,
+        "hip": 138.6,
+        "bar_dev": 0.027,
+        "midfoot_x": 651.9
+      },
       "bar": {
         "x": 645.0,
         "y": 836.0,
@@ -5920,6 +6614,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 78.0,
+        "knee": 140.7,
+        "hip": 143.0,
+        "bar_dev": 0.015,
+        "midfoot_x": 651.9
       },
       "bar": {
         "x": 648.0,
@@ -5980,6 +6681,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 79.1,
+        "knee": 146.4,
+        "hip": 147.6,
+        "bar_dev": 0.019,
+        "midfoot_x": 651.8
+      },
       "bar": {
         "x": 647.0,
         "y": 804.0,
@@ -6038,6 +6746,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 80.1,
+        "knee": 151.4,
+        "hip": 151.9,
+        "bar_dev": -0.087,
+        "midfoot_x": 652.2
       },
       "bar": {
         "x": 674.67,
@@ -6098,6 +6813,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 81.1,
+        "knee": 157.2,
+        "hip": 157.5,
+        "bar_dev": -0.085,
+        "midfoot_x": 652.9
+      },
       "bar": {
         "x": 674.89,
         "y": 807.11,
@@ -6156,6 +6878,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 81.9,
+        "knee": 162.4,
+        "hip": 162.5,
+        "bar_dev": -0.081,
+        "midfoot_x": 653.6
       },
       "bar": {
         "x": 674.5,
@@ -6216,6 +6945,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 82.6,
+        "knee": 168.0,
+        "hip": 167.4,
+        "bar_dev": -0.012,
+        "midfoot_x": 653.9
+      },
       "bar": {
         "x": 657.0,
         "y": 756.0,
@@ -6274,6 +7010,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 83.4,
+        "knee": 173.1,
+        "hip": 171.6,
+        "bar_dev": -0.027,
+        "midfoot_x": 654.0
       },
       "bar": {
         "x": 661.0,
@@ -6334,6 +7077,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 84.0,
+        "knee": 177.6,
+        "hip": 174.7,
+        "bar_dev": -0.04,
+        "midfoot_x": 653.7
+      },
       "bar": {
         "x": 664.0,
         "y": 754.0,
@@ -6392,6 +7142,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 84.6,
+        "knee": 179.2,
+        "hip": 176.8,
+        "bar_dev": -0.067,
+        "midfoot_x": 653.6
       },
       "bar": {
         "x": 671.0,
@@ -6452,6 +7209,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 85.3,
+        "knee": 176.4,
+        "hip": 178.9,
+        "bar_dev": -0.056,
+        "midfoot_x": 653.5
+      },
       "bar": {
         "x": 668.0,
         "y": 757.0,
@@ -6510,6 +7274,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 85.4,
+        "knee": 175.3,
+        "hip": 179.7,
+        "bar_dev": -0.052,
+        "midfoot_x": 653.5
       },
       "bar": {
         "x": 667.0,
@@ -6570,6 +7341,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 85.2,
+        "knee": 173.8,
+        "hip": 179.6,
+        "bar_dev": -0.057,
+        "midfoot_x": 653.4
+      },
       "bar": {
         "x": 668.0,
         "y": 758.0,
@@ -6628,6 +7406,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 84.8,
+        "knee": 172.6,
+        "hip": 179.3,
+        "bar_dev": -0.08,
+        "midfoot_x": 653.2
       },
       "bar": {
         "x": 674.0,
@@ -6688,6 +7473,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 84.8,
+        "knee": 171.4,
+        "hip": 178.6,
+        "bar_dev": -0.073,
+        "midfoot_x": 653.1
+      },
       "bar": {
         "x": 672.0,
         "y": 766.0,
@@ -6746,6 +7538,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 85.2,
+        "knee": 170.6,
+        "hip": 177.9,
+        "bar_dev": -0.069,
+        "midfoot_x": 653.1
       },
       "bar": {
         "x": 671.0,
@@ -6806,6 +7605,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 85.7,
+        "knee": 170.5,
+        "hip": 177.5,
+        "bar_dev": -0.069,
+        "midfoot_x": 653.2
+      },
       "bar": {
         "x": 671.0,
         "y": 766.0,
@@ -6864,6 +7670,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 85.9,
+        "knee": 170.8,
+        "hip": 177.5,
+        "bar_dev": -0.068,
+        "midfoot_x": 653.3
       },
       "bar": {
         "x": 671.0,
@@ -6924,6 +7737,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 85.7,
+        "knee": 171.1,
+        "hip": 177.8,
+        "bar_dev": -0.072,
+        "midfoot_x": 653.4
+      },
       "bar": {
         "x": 672.0,
         "y": 758.0,
@@ -6982,6 +7802,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 85.1,
+        "knee": 171.5,
+        "hip": 178.7,
+        "bar_dev": -0.045,
+        "midfoot_x": 653.5
       },
       "bar": {
         "x": 665.0,
@@ -7042,6 +7869,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 84.7,
+        "knee": 171.9,
+        "hip": 179.5,
+        "bar_dev": -0.04,
+        "midfoot_x": 653.6
+      },
       "bar": {
         "x": 664.0,
         "y": 758.0,
@@ -7100,6 +7934,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 84.3,
+        "knee": 172.2,
+        "hip": 179.9,
+        "bar_dev": -0.04,
+        "midfoot_x": 653.7
       },
       "bar": {
         "x": 664.0,
@@ -7160,6 +8001,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 84.1,
+        "knee": 172.5,
+        "hip": 179.5,
+        "bar_dev": -0.059,
+        "midfoot_x": 653.7
+      },
       "bar": {
         "x": 669.0,
         "y": 762.0,
@@ -7218,6 +8066,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 84.1,
+        "knee": 172.7,
+        "hip": 179.2,
+        "bar_dev": -0.059,
+        "midfoot_x": 653.7
       },
       "bar": {
         "x": 669.0,
@@ -7278,6 +8133,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 84.2,
+        "knee": 172.9,
+        "hip": 179.2,
+        "bar_dev": -0.059,
+        "midfoot_x": 653.6
+      },
       "bar": {
         "x": 669.0,
         "y": 766.0,
@@ -7336,6 +8198,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 84.4,
+        "knee": 173.1,
+        "hip": 179.2,
+        "bar_dev": -0.063,
+        "midfoot_x": 653.8
       },
       "bar": {
         "x": 670.0,
@@ -7396,6 +8265,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 84.3,
+        "knee": 173.1,
+        "hip": 179.1,
+        "bar_dev": -0.066,
+        "midfoot_x": 653.9
+      },
       "bar": {
         "x": 671.0,
         "y": 757.0,
@@ -7454,6 +8330,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 83.9,
+        "knee": 173.1,
+        "hip": 178.7,
+        "bar_dev": -0.096,
+        "midfoot_x": 653.9
       },
       "bar": {
         "x": 678.75,
@@ -7514,6 +8397,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 83.5,
+        "knee": 173.1,
+        "hip": 178.4,
+        "bar_dev": -0.062,
+        "midfoot_x": 654.0
+      },
       "bar": {
         "x": 670.0,
         "y": 756.0,
@@ -7572,6 +8462,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 83.4,
+        "knee": 173.1,
+        "hip": 178.3,
+        "bar_dev": -0.089,
+        "midfoot_x": 654.0
       },
       "bar": {
         "x": 677.15,
@@ -7632,6 +8529,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 83.1,
+        "knee": 173.2,
+        "hip": 178.0,
+        "bar_dev": -0.042,
+        "midfoot_x": 654.0
+      },
       "bar": {
         "x": 665.0,
         "y": 760.0,
@@ -7690,6 +8594,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 82.8,
+        "knee": 173.5,
+        "hip": 177.6,
+        "bar_dev": -0.027,
+        "midfoot_x": 654.1
       },
       "bar": {
         "x": 661.0,
@@ -7750,6 +8661,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 82.5,
+        "knee": 174.2,
+        "hip": 177.0,
+        "bar_dev": -0.042,
+        "midfoot_x": 654.2
+      },
       "bar": {
         "x": 665.0,
         "y": 770.0,
@@ -7808,6 +8726,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 82.1,
+        "knee": 175.7,
+        "hip": 175.8,
+        "bar_dev": -0.046,
+        "midfoot_x": 654.1
       },
       "bar": {
         "x": 666.0,
@@ -7868,6 +8793,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 81.8,
+        "knee": 178.3,
+        "hip": 174.3,
+        "bar_dev": -0.011,
+        "midfoot_x": 654.0
+      },
       "bar": {
         "x": 657.0,
         "y": 766.0,
@@ -7926,6 +8858,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 81.6,
+        "knee": 177.4,
+        "hip": 171.4,
+        "bar_dev": -0.024,
+        "midfoot_x": 653.7
       },
       "bar": {
         "x": 660.0,
@@ -7986,6 +8925,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 81.1,
+        "knee": 172.6,
+        "hip": 167.7,
+        "bar_dev": -0.014,
+        "midfoot_x": 653.3
+      },
       "bar": {
         "x": 657.0,
         "y": 787.0,
@@ -8044,6 +8990,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 79.9,
+        "knee": 167.5,
+        "hip": 162.6,
+        "bar_dev": -0.011,
+        "midfoot_x": 653.0
       },
       "bar": {
         "x": 656.0,
@@ -8104,6 +9057,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 78.3,
+        "knee": 162.6,
+        "hip": 157.1,
+        "bar_dev": -0.012,
+        "midfoot_x": 652.9
+      },
       "bar": {
         "x": 656.0,
         "y": 795.0,
@@ -8162,6 +9122,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 77.1,
+        "knee": 158.0,
+        "hip": 152.1,
+        "bar_dev": 0.003,
+        "midfoot_x": 652.9
       },
       "bar": {
         "x": 652.0,
@@ -8222,6 +9189,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 76.1,
+        "knee": 154.1,
+        "hip": 148.1,
+        "bar_dev": 0.019,
+        "midfoot_x": 652.9
+      },
       "bar": {
         "x": 648.0,
         "y": 818.0,
@@ -8280,6 +9254,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 75.5,
+        "knee": 149.2,
+        "hip": 144.0,
+        "bar_dev": 0.019,
+        "midfoot_x": 652.9
       },
       "bar": {
         "x": 648.0,
@@ -8340,6 +9321,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 75.3,
+        "knee": 144.4,
+        "hip": 140.7,
+        "bar_dev": 0.027,
+        "midfoot_x": 653.0
+      },
       "bar": {
         "x": 646.0,
         "y": 838.0,
@@ -8398,6 +9386,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 74.6,
+        "knee": 139.5,
+        "hip": 136.7,
+        "bar_dev": 0.059,
+        "midfoot_x": 653.2
       },
       "bar": {
         "x": 638.0,
@@ -8458,6 +9453,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 73.6,
+        "knee": 134.9,
+        "hip": 132.6,
+        "bar_dev": -0.093,
+        "midfoot_x": 653.4
+      },
       "bar": {
         "x": 677.61,
         "y": 864.58,
@@ -8516,6 +9518,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 72.8,
+        "knee": 131.1,
+        "hip": 129.1,
+        "bar_dev": 0.045,
+        "midfoot_x": 653.7
       },
       "bar": {
         "x": 642.0,
@@ -8576,6 +9585,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 72.2,
+        "knee": 127.7,
+        "hip": 126.0,
+        "bar_dev": 0.034,
+        "midfoot_x": 653.8
+      },
       "bar": {
         "x": 645.0,
         "y": 888.0,
@@ -8634,6 +9650,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 71.8,
+        "knee": 123.9,
+        "hip": 122.8,
+        "bar_dev": 0.037,
+        "midfoot_x": 653.7
       },
       "bar": {
         "x": 644.0,
@@ -8694,6 +9717,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 71.5,
+        "knee": 120.6,
+        "hip": 120.0,
+        "bar_dev": 0.036,
+        "midfoot_x": 653.2
+      },
       "bar": {
         "x": 644.0,
         "y": 910.0,
@@ -8752,6 +9782,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 71.2,
+        "knee": 117.4,
+        "hip": 117.3,
+        "bar_dev": 0.037,
+        "midfoot_x": 652.5
       },
       "bar": {
         "x": 643.0,
@@ -8812,6 +9849,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 70.5,
+        "knee": 114.8,
+        "hip": 114.9,
+        "bar_dev": 0.041,
+        "midfoot_x": 651.7
+      },
       "bar": {
         "x": 641.0,
         "y": 930.0,
@@ -8870,6 +9914,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 69.6,
+        "knee": 113.3,
+        "hip": 113.0,
+        "bar_dev": 0.044,
+        "midfoot_x": 651.3
       },
       "bar": {
         "x": 640.0,
@@ -8930,6 +9981,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 68.6,
+        "knee": 111.3,
+        "hip": 110.7,
+        "bar_dev": 0.051,
+        "midfoot_x": 651.1
+      },
       "bar": {
         "x": 638.0,
         "y": 948.0,
@@ -8988,6 +10046,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 67.7,
+        "knee": 109.0,
+        "hip": 108.2,
+        "bar_dev": 0.051,
+        "midfoot_x": 651.1
       },
       "bar": {
         "x": 638.0,
@@ -9048,6 +10113,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 66.8,
+        "knee": 106.4,
+        "hip": 105.2,
+        "bar_dev": 0.058,
+        "midfoot_x": 651.1
+      },
       "bar": {
         "x": 636.0,
         "y": 974.0,
@@ -9106,6 +10178,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 65.9,
+        "knee": 103.7,
+        "hip": 102.4,
+        "bar_dev": 0.065,
+        "midfoot_x": 650.9
       },
       "bar": {
         "x": 634.0,
@@ -9166,6 +10245,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.9,
+        "knee": 101.2,
+        "hip": 99.7,
+        "bar_dev": 0.071,
+        "midfoot_x": 650.4
+      },
       "bar": {
         "x": 632.0,
         "y": 995.0,
@@ -9224,6 +10310,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 64.0,
+        "knee": 99.6,
+        "hip": 97.8,
+        "bar_dev": 0.078,
+        "midfoot_x": 650.1
       },
       "bar": {
         "x": 630.0,
@@ -9284,6 +10377,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 63.4,
+        "knee": 98.1,
+        "hip": 96.0,
+        "bar_dev": 0.08,
+        "midfoot_x": 649.9
+      },
       "bar": {
         "x": 629.0,
         "y": 1018.0,
@@ -9342,6 +10442,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.1,
+        "knee": 96.5,
+        "hip": 94.8,
+        "bar_dev": 0.084,
+        "midfoot_x": 649.7
       },
       "bar": {
         "x": 628.0,
@@ -9402,6 +10509,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 63.6,
+        "knee": 94.3,
+        "hip": 93.9,
+        "bar_dev": 0.095,
+        "midfoot_x": 649.7
+      },
       "bar": {
         "x": 625.0,
         "y": 1039.0,
@@ -9460,6 +10574,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.8,
+        "knee": 92.0,
+        "hip": 92.6,
+        "bar_dev": 0.103,
+        "midfoot_x": 649.8
       },
       "bar": {
         "x": 623.0,
@@ -9520,6 +10641,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.5,
+        "knee": 89.6,
+        "hip": 91.7,
+        "bar_dev": 0.107,
+        "midfoot_x": 649.8
+      },
       "bar": {
         "x": 622.0,
         "y": 1063.0,
@@ -9578,6 +10706,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 65.4,
+        "knee": 87.6,
+        "hip": 91.1,
+        "bar_dev": 0.124,
+        "midfoot_x": 650.0
       },
       "bar": {
         "x": 618.0,
@@ -9638,6 +10773,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 66.1,
+        "knee": 85.7,
+        "hip": 90.5,
+        "bar_dev": 0.132,
+        "midfoot_x": 650.1
+      },
       "bar": {
         "x": 616.0,
         "y": 1086.0,
@@ -9696,6 +10838,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 66.5,
+        "knee": 84.2,
+        "hip": 89.9,
+        "bar_dev": 0.14,
+        "midfoot_x": 650.2
       },
       "bar": {
         "x": 614.0,
@@ -9756,6 +10905,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 66.9,
+        "knee": 82.4,
+        "hip": 89.2,
+        "bar_dev": 0.147,
+        "midfoot_x": 650.2
+      },
       "bar": {
         "x": 612.0,
         "y": 1104.0,
@@ -9814,6 +10970,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 66.3,
+        "knee": 80.3,
+        "hip": 87.4,
+        "bar_dev": 0.156,
+        "midfoot_x": 650.3
       },
       "bar": {
         "x": 610.0,
@@ -9874,6 +11037,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 65.7,
+        "knee": 78.3,
+        "hip": 85.5,
+        "bar_dev": 0.175,
+        "midfoot_x": 650.5
+      },
       "bar": {
         "x": 605.0,
         "y": 1126.0,
@@ -9932,6 +11102,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 64.7,
+        "knee": 76.5,
+        "hip": 83.6,
+        "bar_dev": 0.18,
+        "midfoot_x": 650.7
       },
       "bar": {
         "x": 604.0,
@@ -9992,6 +11169,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 63.6,
+        "knee": 75.1,
+        "hip": 81.9,
+        "bar_dev": 0.192,
+        "midfoot_x": 650.8
+      },
       "bar": {
         "x": 601.0,
         "y": 1141.0,
@@ -10050,6 +11234,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 62.6,
+        "knee": 74.0,
+        "hip": 80.3,
+        "bar_dev": 0.196,
+        "midfoot_x": 650.8
       },
       "bar": {
         "x": 600.0,
@@ -10110,6 +11301,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.9,
+        "knee": 72.8,
+        "hip": 78.6,
+        "bar_dev": 0.211,
+        "midfoot_x": 650.7
+      },
       "bar": {
         "x": 596.0,
         "y": 1161.0,
@@ -10168,6 +11366,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.4,
+        "knee": 71.5,
+        "hip": 76.9,
+        "bar_dev": 0.207,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 597.0,
@@ -10228,6 +11433,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.0,
+        "knee": 70.1,
+        "hip": 75.2,
+        "bar_dev": 0.206,
+        "midfoot_x": 650.5
+      },
       "bar": {
         "x": 597.0,
         "y": 1180.0,
@@ -10286,6 +11498,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 60.9,
+        "knee": 68.6,
+        "hip": 73.9,
+        "bar_dev": 0.219,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 594.0,
@@ -10346,6 +11565,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 60.4,
+        "knee": 66.8,
+        "hip": 72.0,
+        "bar_dev": 0.224,
+        "midfoot_x": 651.0
+      },
       "bar": {
         "x": 593.0,
         "y": 1198.0,
@@ -10404,6 +11630,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.8,
+        "knee": 64.9,
+        "hip": 70.2,
+        "bar_dev": 0.229,
+        "midfoot_x": 651.5
       },
       "bar": {
         "x": 592.0,
@@ -10464,6 +11697,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 59.3,
+        "knee": 63.0,
+        "hip": 68.5,
+        "bar_dev": 0.23,
+        "midfoot_x": 651.7
+      },
       "bar": {
         "x": 592.0,
         "y": 1211.0,
@@ -10522,6 +11762,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.9,
+        "knee": 61.7,
+        "hip": 67.2,
+        "bar_dev": 0.219,
+        "midfoot_x": 651.7
       },
       "bar": {
         "x": 595.0,
@@ -10582,6 +11829,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 59.0,
+        "knee": 60.6,
+        "hip": 66.8,
+        "bar_dev": 0.23,
+        "midfoot_x": 651.6
+      },
       "bar": {
         "x": 592.0,
         "y": 1230.0,
@@ -10640,6 +11894,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.9,
+        "knee": 59.4,
+        "hip": 66.9,
+        "bar_dev": 0.214,
+        "midfoot_x": 651.5
       },
       "bar": {
         "x": 596.0,
@@ -10700,6 +11961,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 60.0,
+        "knee": 57.5,
+        "hip": 65.8,
+        "bar_dev": 0.237,
+        "midfoot_x": 651.5
+      },
       "bar": {
         "x": 590.0,
         "y": 1245.0,
@@ -10758,6 +12026,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.6,
+        "knee": 55.4,
+        "hip": 64.0,
+        "bar_dev": 0.23,
+        "midfoot_x": 651.7
       },
       "bar": {
         "x": 592.0,
@@ -10818,6 +12093,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 59.0,
+        "knee": 53.4,
+        "hip": 62.0,
+        "bar_dev": 0.227,
+        "midfoot_x": 651.8
+      },
       "bar": {
         "x": 593.0,
         "y": 1265.0,
@@ -10876,6 +12158,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 58.2,
+        "knee": 52.0,
+        "hip": 60.1,
+        "bar_dev": 0.226,
+        "midfoot_x": 651.6
       },
       "bar": {
         "x": 593.0,
@@ -10936,6 +12225,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 57.3,
+        "knee": 51.5,
+        "hip": 58.7,
+        "bar_dev": 0.209,
+        "midfoot_x": 651.1
+      },
       "bar": {
         "x": 597.0,
         "y": 1277.0,
@@ -10994,6 +12290,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 56.0,
+        "knee": 51.2,
+        "hip": 56.9,
+        "bar_dev": 0.206,
+        "midfoot_x": 650.4
       },
       "bar": {
         "x": 597.0,
@@ -11054,6 +12357,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 56.3,
+        "knee": 51.2,
+        "hip": 57.0,
+        "bar_dev": 0.212,
+        "midfoot_x": 649.9
+      },
       "bar": {
         "x": 595.0,
         "y": 1290.0,
@@ -11112,6 +12422,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 57.0,
+        "knee": 51.3,
+        "hip": 57.4,
+        "bar_dev": 0.207,
+        "midfoot_x": 649.7
       },
       "bar": {
         "x": 596.0,
@@ -11172,6 +12489,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 58.5,
+        "knee": 51.6,
+        "hip": 58.9,
+        "bar_dev": 0.204,
+        "midfoot_x": 650.0
+      },
       "bar": {
         "x": 597.0,
         "y": 1293.0,
@@ -11230,6 +12554,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.3,
+        "knee": 51.8,
+        "hip": 59.7,
+        "bar_dev": 0.195,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 600.0,
@@ -11290,6 +12621,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 60.1,
+        "knee": 52.3,
+        "hip": 61.0,
+        "bar_dev": 0.207,
+        "midfoot_x": 650.8
+      },
       "bar": {
         "x": 597.0,
         "y": 1289.0,
@@ -11348,6 +12686,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 59.8,
+        "knee": 52.5,
+        "hip": 60.7,
+        "bar_dev": 0.211,
+        "midfoot_x": 650.8
       },
       "bar": {
         "x": 596.0,
@@ -11408,6 +12753,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 60.0,
+        "knee": 52.9,
+        "hip": 61.2,
+        "bar_dev": 0.207,
+        "midfoot_x": 650.6
+      },
       "bar": {
         "x": 597.0,
         "y": 1274.0,
@@ -11466,6 +12818,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 60.4,
+        "knee": 53.7,
+        "hip": 62.3,
+        "bar_dev": 0.186,
+        "midfoot_x": 650.3
       },
       "bar": {
         "x": 602.0,
@@ -11526,6 +12885,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.0,
+        "knee": 55.7,
+        "hip": 64.5,
+        "bar_dev": 0.201,
+        "midfoot_x": 650.2
+      },
       "bar": {
         "x": 598.0,
         "y": 1249.0,
@@ -11584,6 +12950,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.0,
+        "knee": 58.3,
+        "hip": 66.8,
+        "bar_dev": 0.186,
+        "midfoot_x": 650.2
       },
       "bar": {
         "x": 602.0,
@@ -11644,6 +13017,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 61.3,
+        "knee": 61.9,
+        "hip": 70.0,
+        "bar_dev": 0.17,
+        "midfoot_x": 650.0
+      },
       "bar": {
         "x": 606.0,
         "y": 1215.0,
@@ -11702,6 +13082,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 61.6,
+        "knee": 66.2,
+        "hip": 73.6,
+        "bar_dev": 0.198,
+        "midfoot_x": 650.2
       },
       "bar": {
         "x": 599.0,
@@ -11762,6 +13149,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 62.1,
+        "knee": 69.5,
+        "hip": 76.3,
+        "bar_dev": 0.176,
+        "midfoot_x": 650.7
+      },
       "bar": {
         "x": 605.0,
         "y": 1189.0,
@@ -11820,6 +13214,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.0,
+        "knee": 72.9,
+        "hip": 79.1,
+        "bar_dev": 0.178,
+        "midfoot_x": 651.2
       },
       "bar": {
         "x": 605.0,
@@ -11880,6 +13281,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 63.5,
+        "knee": 75.6,
+        "hip": 80.6,
+        "bar_dev": 0.168,
+        "midfoot_x": 651.4
+      },
       "bar": {
         "x": 608.0,
         "y": 1173.0,
@@ -11938,6 +13346,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.4,
+        "knee": 77.7,
+        "hip": 81.2,
+        "bar_dev": 0.186,
+        "midfoot_x": 651.3
       },
       "bar": {
         "x": 603.0,
@@ -11998,6 +13413,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 62.8,
+        "knee": 79.5,
+        "hip": 81.3,
+        "bar_dev": 0.15,
+        "midfoot_x": 650.8
+      },
       "bar": {
         "x": 612.0,
         "y": 1321.0,
@@ -12056,6 +13478,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.1,
+        "knee": 81.4,
+        "hip": 82.9,
+        "bar_dev": 0.149,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 612.0,
@@ -12116,6 +13545,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.4,
+        "knee": 83.2,
+        "hip": 85.6,
+        "bar_dev": 0.145,
+        "midfoot_x": 650.6
+      },
       "bar": {
         "x": 613.0,
         "y": 1118.0,
@@ -12174,6 +13610,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 66.0,
+        "knee": 85.7,
+        "hip": 89.4,
+        "bar_dev": 0.13,
+        "midfoot_x": 650.7
       },
       "bar": {
         "x": 617.0,
@@ -12234,6 +13677,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 67.6,
+        "knee": 87.8,
+        "hip": 92.9,
+        "bar_dev": 0.118,
+        "midfoot_x": 650.6
+      },
       "bar": {
         "x": 620.0,
         "y": 1084.0,
@@ -12292,6 +13742,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 68.2,
+        "knee": 89.9,
+        "hip": 95.3,
+        "bar_dev": 0.114,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 621.0,
@@ -12352,6 +13809,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 68.2,
+        "knee": 91.4,
+        "hip": 96.6,
+        "bar_dev": -0.059,
+        "midfoot_x": 650.5
+      },
       "bar": {
         "x": 665.71,
         "y": 1039.01,
@@ -12410,6 +13874,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 67.2,
+        "knee": 92.5,
+        "hip": 96.4,
+        "bar_dev": 0.103,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 624.0,
@@ -12470,6 +13941,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 66.0,
+        "knee": 93.7,
+        "hip": 96.2,
+        "bar_dev": 0.087,
+        "midfoot_x": 650.6
+      },
       "bar": {
         "x": 628.0,
         "y": 1034.0,
@@ -12528,6 +14006,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 65.0,
+        "knee": 95.1,
+        "hip": 96.3,
+        "bar_dev": -0.044,
+        "midfoot_x": 650.6
       },
       "bar": {
         "x": 661.98,
@@ -12588,6 +14073,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.1,
+        "knee": 96.6,
+        "hip": 96.8,
+        "bar_dev": 0.075,
+        "midfoot_x": 650.5
+      },
       "bar": {
         "x": 631.0,
         "y": 1012.0,
@@ -12646,6 +14138,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 63.8,
+        "knee": 98.4,
+        "hip": 98.0,
+        "bar_dev": 0.063,
+        "midfoot_x": 650.2
       },
       "bar": {
         "x": 634.0,
@@ -12706,6 +14205,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 64.2,
+        "knee": 100.4,
+        "hip": 100.3,
+        "bar_dev": -0.042,
+        "midfoot_x": 650.0
+      },
       "bar": {
         "x": 660.91,
         "y": 974.2,
@@ -12764,6 +14270,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 64.8,
+        "knee": 102.8,
+        "hip": 102.9,
+        "bar_dev": -0.046,
+        "midfoot_x": 650.0
       },
       "bar": {
         "x": 661.9,
@@ -12824,6 +14337,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 65.8,
+        "knee": 105.9,
+        "hip": 106.3,
+        "bar_dev": -0.04,
+        "midfoot_x": 650.2
+      },
       "bar": {
         "x": 660.63,
         "y": 947.94,
@@ -12882,6 +14402,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 67.0,
+        "knee": 109.2,
+        "hip": 110.0,
+        "bar_dev": -0.046,
+        "midfoot_x": 650.3
       },
       "bar": {
         "x": 662.14,
@@ -12942,6 +14469,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 68.5,
+        "knee": 112.7,
+        "hip": 114.2,
+        "bar_dev": -0.05,
+        "midfoot_x": 650.8
+      },
       "bar": {
         "x": 663.63,
         "y": 914.42,
@@ -13000,6 +14534,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 70.5,
+        "knee": 116.6,
+        "hip": 119.1,
+        "bar_dev": 0.017,
+        "midfoot_x": 651.3
       },
       "bar": {
         "x": 647.0,
@@ -13060,6 +14601,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 72.6,
+        "knee": 121.2,
+        "hip": 124.9,
+        "bar_dev": -0.055,
+        "midfoot_x": 652.0
+      },
       "bar": {
         "x": 666.27,
         "y": 877.52,
@@ -13118,6 +14666,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 74.7,
+        "knee": 126.2,
+        "hip": 131.0,
+        "bar_dev": -0.052,
+        "midfoot_x": 652.6
       },
       "bar": {
         "x": 665.96,
@@ -13178,6 +14733,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 76.3,
+        "knee": 132.3,
+        "hip": 137.0,
+        "bar_dev": -0.068,
+        "midfoot_x": 652.8
+      },
       "bar": {
         "x": 670.31,
         "y": 842.95,
@@ -13236,6 +14798,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 77.5,
+        "knee": 138.7,
+        "hip": 142.2,
+        "bar_dev": -0.01,
+        "midfoot_x": 652.5
       },
       "bar": {
         "x": 655.0,
@@ -13296,6 +14865,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 78.4,
+        "knee": 144.7,
+        "hip": 146.8,
+        "bar_dev": -0.044,
+        "midfoot_x": 652.7
+      },
       "bar": {
         "x": 664.0,
         "y": 801.0,
@@ -13354,6 +14930,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 79.0,
+        "knee": 150.5,
+        "hip": 150.9,
+        "bar_dev": -0.101,
+        "midfoot_x": 653.2
       },
       "bar": {
         "x": 679.31,
@@ -13414,6 +14997,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 79.0,
+        "knee": 156.7,
+        "hip": 155.2,
+        "bar_dev": -0.092,
+        "midfoot_x": 653.8
+      },
       "bar": {
         "x": 677.64,
         "y": 819.85,
@@ -13472,6 +15062,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 79.3,
+        "knee": 162.7,
+        "hip": 159.8,
+        "bar_dev": -0.037,
+        "midfoot_x": 654.5
       },
       "bar": {
         "x": 664.0,
@@ -13532,6 +15129,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 79.6,
+        "knee": 169.6,
+        "hip": 164.8,
+        "bar_dev": -0.024,
+        "midfoot_x": 654.9
+      },
       "bar": {
         "x": 661.0,
         "y": 761.0,
@@ -13590,6 +15194,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 80.1,
+        "knee": 176.8,
+        "hip": 170.1,
+        "bar_dev": -0.047,
+        "midfoot_x": 654.8
       },
       "bar": {
         "x": 667.0,
@@ -13650,6 +15261,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 80.7,
+        "knee": 177.3,
+        "hip": 174.5,
+        "bar_dev": -0.033,
+        "midfoot_x": 654.5
+      },
       "bar": {
         "x": 663.0,
         "y": 751.0,
@@ -13708,6 +15326,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 80.9,
+        "knee": 173.5,
+        "hip": 177.3,
+        "bar_dev": -0.085,
+        "midfoot_x": 654.3
       },
       "bar": {
         "x": 676.38,
@@ -13768,6 +15393,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 80.9,
+        "knee": 171.4,
+        "hip": 178.7,
+        "bar_dev": -0.033,
+        "midfoot_x": 654.3
+      },
       "bar": {
         "x": 663.0,
         "y": 756.0,
@@ -13826,6 +15458,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 81.2,
+        "knee": 170.3,
+        "hip": 179.8,
+        "bar_dev": -0.053,
+        "midfoot_x": 654.3
       },
       "bar": {
         "x": 668.0,
@@ -13886,6 +15525,13 @@
           "visible": true
         }
       },
+      "angles": {
+        "back": 81.5,
+        "knee": 170.5,
+        "hip": 179.8,
+        "bar_dev": -0.034,
+        "midfoot_x": 654.3
+      },
       "bar": {
         "x": 663.0,
         "y": 760.0,
@@ -13944,6 +15590,13 @@
           "v": 1.0,
           "visible": true
         }
+      },
+      "angles": {
+        "back": 81.9,
+        "knee": 171.9,
+        "hip": 179.9,
+        "bar_dev": -0.03,
+        "midfoot_x": 654.3
       },
       "bar": {
         "x": 662.0,
@@ -15391,5 +17044,21 @@
       "end_t": 7.833,
       "confidence": "medium"
     }
-  ]
+  ],
+  "targets": {
+    "back": {
+      "reference": 45.0,
+      "tolerance": 15.0,
+      "tolerance_provenance": "engineering_tolerance",
+      "unit": "degrees",
+      "citation": "ref p. 9, 11, 23, 32, 35 \u00b7 Fig 2-5, 2-13, 2-22"
+    },
+    "bar_dev": {
+      "reference": null,
+      "tolerance": 0.15,
+      "tolerance_provenance": "engineering_tolerance",
+      "unit": "shin_lengths",
+      "citation": "ref p. 6, 8, 9, 11, 12 \u00b7 Fig 2-5, 2-7"
+    }
+  }
 }
