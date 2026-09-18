@@ -20,12 +20,51 @@ afterwards.
 from __future__ import annotations
 
 import argparse
+import os
+import subprocess
 import sys
 from pathlib import Path
 
-from huggingface_hub import HfApi, whoami
-
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _ensure_venv_interpreter() -> None:
+    """Re-run under the project venv if the dependencies are not on this interpreter.
+
+    `python scripts/deploy_hf.py` picks up whatever `python` means on PATH, which on a machine
+    with a system Python is not the venv this project installed into. The failure is a bare
+    ModuleNotFoundError that says nothing about which interpreter to use, so fix it here instead
+    of asking the reader to know.
+    """
+    try:
+        import huggingface_hub  # noqa: F401
+        return
+    except ImportError:
+        pass
+
+    venv_python = ROOT / "backend" / ".venv" / (
+        "Scripts/python.exe" if os.name == "nt" else "bin/python"
+    )
+    if not venv_python.exists():
+        print("huggingface_hub is not installed and no project venv was found at")
+        print(f"  {venv_python}")
+        print("\nCreate it first (see README Quick start), then:")
+        print(f"  {venv_python} -m pip install huggingface_hub")
+        raise SystemExit(1)
+
+    if Path(sys.executable).resolve() == venv_python.resolve():
+        print("Running under the project venv, but huggingface_hub is missing. Install it:")
+        print(f"  {venv_python} -m pip install huggingface_hub")
+        raise SystemExit(1)
+
+    # Flush before handing over, or this line lands after the child's output.
+    print(f"Switching to the project interpreter: {venv_python}\n", flush=True)
+    raise SystemExit(subprocess.call([str(venv_python), __file__, *sys.argv[1:]]))
+
+
+_ensure_venv_interpreter()
+
+from huggingface_hub import HfApi, whoami  # noqa: E402
 
 SPACE_README = """\
 ---
@@ -109,10 +148,24 @@ def main() -> int:
         print("\ndry run, nothing uploaded")
         return 0
 
+    token = args.token or None
     try:
-        user = whoami()["name"]
+        user = whoami(token=token)["name"]
     except Exception:
-        print("\nNot authenticated. Run `hf auth login`, or set HF_TOKEN, then retry.")
+        # The `hf` CLI installs into whichever environment huggingface_hub went into, which for
+        # this project is the backend venv rather than the system PATH. Spell that out instead
+        # of printing a command the shell will not find.
+        venv_hf = ROOT / "backend" / ".venv" / "Scripts" / "hf.exe"
+        cli = venv_hf if venv_hf.exists() else Path("hf")
+        print("\nNot authenticated with Hugging Face. Pick either:")
+        print(f"\n  1. Log in once:\n       {cli} auth login")
+        print("\n  2. Or pass a token directly:")
+        print("       python scripts/deploy_hf.py --token hf_xxx")
+        print("\n  3. Or set it for the session:")
+        print("       $env:HF_TOKEN = 'hf_xxx'      # PowerShell")
+        print("       export HF_TOKEN=hf_xxx        # bash")
+        print("\nCreate a token at https://huggingface.co/settings/tokens")
+        print("It needs WRITE permission; a read token cannot create a Space.")
         return 1
 
     repo_id = f"{user}/{args.name}"

@@ -36,12 +36,25 @@ Vercel function.
 
 ### Option A: Hugging Face Spaces (no card required) - recommended
 
-The most genuinely free option, and the right audience. Two commands:
+The most genuinely free option, and the right audience.
+
+**Activate the project venv first.** Both `hf` and `huggingface_hub` install into it, not onto the
+system PATH, so without this you get `hf: not recognized` and then `ModuleNotFoundError`:
+
+```powershell
+.\backend\.venv\Scripts\Activate.ps1     # Windows PowerShell
+source backend/.venv/bin/activate        # macOS / Linux
+```
+
+Then two commands:
 
 ```bash
-hf auth login                                   # once; or export HF_TOKEN
+hf auth login                                   # once; or set HF_TOKEN
 python scripts/deploy_hf.py --name squat-coach-api
 ```
+
+The token needs **write** permission; a read token cannot create a Space. Create one at
+https://huggingface.co/settings/tokens.
 
 The script creates the Space as a Docker Space, writes the YAML frontmatter Hugging Face needs,
 and uploads only what the container requires: the Dockerfile, `backend/app`, `skill/` and the

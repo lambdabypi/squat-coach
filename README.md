@@ -76,6 +76,15 @@ plainer but identical in substance. This is also the degradation path if the API
 
 ---
 
+> **Activate the venv before running any script below.** Every dependency installs into
+> `backend/.venv`, so a bare `python scripts/...` picks up the system interpreter and fails with
+> `ModuleNotFoundError`.
+>
+> ```powershell
+> .\backend\.venv\Scripts\Activate.ps1     # Windows PowerShell
+> source backend/.venv/bin/activate        # macOS / Linux
+> ```
+
 ## Headless use
 
 Same code as the API, no UI, no key needed:
