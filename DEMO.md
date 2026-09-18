@@ -56,6 +56,27 @@ Upload, narrate the staged progress, land on the report. Emphasise: this ran now
 - Point at a tolerance pill: `our tolerance` versus `per document`. The document states almost no
   numbers; anything numeric that is not in the text is labelled as ours.
 
+### b2) Show the reading, not just the verdict (1 min)
+
+Turn on **Angles**. The back-angle arc at the hip, the knee readout, the dashed guides at hip and
+knee height — those two lines *are* the depth standard, visible frame by frame — and the plumb line
+through the midfoot that the bar should track. The readout panel compares each to the skill's
+reference and still says `our tolerance` where the number is ours.
+
+Scrub slowly through the descent. The point to make: **this is what the system is measuring, live.**
+The findings are not a separate opinion produced afterwards.
+
+### b3) The corrected pose (1 min)
+
+Turn on **Target pose** and jump to a rep bottom. The dashed ghost is *their* body — same tibia,
+femur and torso lengths measured from this video, same planted foot — solved for the position the
+document describes. The arrow runs from where their hip was to where it needed to be.
+
+If asked why it isn't a 3D animation: a stock animation is the same clip for every user and
+derived from nothing they did, which is the generic advice the brief rules out. And we only ever
+measured two dimensions — rendering a third would be inventing data. Both limits are stated in the
+panel.
+
 ### c) Why depth says "cannot assess" (2 min)
 
 The best 90 seconds of the demo, because it is the most counter-intuitive result.
@@ -103,9 +124,21 @@ than failing on anything hard.
 
 ## Likely questions
 
-**"Why not let the model look at the video directly?"** It would produce fluent, unverifiable
-claims. Every number here is traceable to a frame and a measurement, which is what makes a finding
-arguable. A vision model would also happily assess knees-out from a side view.
+**"Is the LLM looking at the video?"** No. It receives measurements as JSON and writes prose; no
+frame ever reaches it. The seeing is MediaPipe and OpenCV.
+
+**"Why not use a VLM for the vision?"** Not a cost argument — run `scripts/cost_model.py` live. At
+four downscaled frames a VLM is *cheaper* than what we ship ($0.0198 vs $0.0275). It loses on
+capability: no per-landmark visibility score (the signal every `cannot_assess` rests on), no
+pixel-level joint location, no bar path across 236 frames, and nothing a human can check against
+the frame. Give it enough frames to do those things and it costs $0.67 a video — 24× ours — and
+still returns estimates rather than measurements.
+
+**"What about running it on the edge — Jetson?"** That is the strongest version of the question and
+I would take it for a gym-installed unit: zero marginal cost, no upload latency, and no footage of
+someone's body leaving the premises. I would swap MediaPipe for Meta's Sapiens (better on occluded
+joints, which is our weak spot) and run narration locally. The architecture is unchanged — a
+specialist model measures, a language model explains.
 
 **"What if the model is wrong?"** It cannot be wrong about measurements — it does not make them.
 It can only be wrong about wording or judgment, and it is barred in code from making any verdict

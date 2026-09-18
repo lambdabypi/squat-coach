@@ -141,6 +141,88 @@ smaller model, and the honest options are to accept it, move the summary to a la
 generate the summary from the findings in code. I would take the third: the summary is a mechanical
 roll-up of verdict counts and reasons, and does not need a language model at all.
 
+## Why the language model never sees the video
+
+Worth stating plainly, because it is the question the architecture most often gets asked.
+
+**Haiku 4.5 is not used as a VLM.** It receives a JSON object of measurements and the skill's
+rules, and returns prose. No frame, no image block, no video reaches it. The seeing is done by
+MediaPipe Pose Landmarker and OpenCV.
+
+That is not a cost decision — at low frame counts a VLM is actually *cheaper*, and
+`scripts/cost_model.py` says so:
+
+| Approach | Cost per video |
+|---|---:|
+| Shipped: pose + CV locally, LLM narrates numbers | **$0.0275** |
+| VLM, 4 downscaled frames, Haiku 4.5 | $0.0198 |
+| VLM, every 3rd frame, Haiku 4.5 | $0.2327 |
+| VLM, every frame, Haiku 4.5 | $0.6695 |
+| VLM, every frame, Opus 5 | $3.35 |
+
+(Image tokens from Anthropic's documented `width × height / 750`; a 1080×1920 frame is ~2,765
+tokens. Local pose and CV cost nothing in API charges — roughly $0.0008 per video at commodity
+CPU rates.)
+
+The four-frame VLM wins on price and loses on everything that matters here:
+
+- **No per-landmark visibility score.** That single signal is what drives `observed` vs
+  `estimated` and every `cannot_assess` verdict in this system. A VLM has no equivalent — it is
+  equally fluent whether it can see the joint or not.
+- **No pixel-level joint location.** "Hip 0.019 shin-lengths below knee" becomes "looks about
+  parallel", and the borderline depth call — the most interesting result on the common sample —
+  disappears.
+- **No bar path.** Tracking the plate across 236 frames is what produces a path at all.
+- **Nothing to check.** A landmark can be drawn on the frame and verified by eye; that is how
+  four of the five bugs above were caught. A claim cannot be verified this way.
+
+Giving a VLM enough frames to do those things costs 24× the shipped design and still yields
+estimates rather than measurements.
+
+### Running locally on edge hardware
+
+The natural extension, and the strongest version of the "use a better vision model" argument, is
+NVIDIA Jetson-class hardware on-site: no per-video API cost, no upload latency, and no footage of
+someone's body leaving the gym — which is a real consideration for this product.
+
+With a GPU available I would swap MediaPipe for **Meta's Sapiens** (human-centric foundation
+model, materially better on occluded joints — our weakest point, and why knee visibility drops to
+0.84 on the common sample) and run a local model for narration. The marginal cost goes to zero.
+The structure does not change: a specialist vision model measures, a language model explains, and
+the language model still never sees a pixel.
+
+## Showing the work: live angles and the corrected pose
+
+Two additions that make the system's reading inspectable rather than merely reported.
+
+**Live angles.** Every overlay frame carries back angle, knee angle, hip angle and signed bar
+deviation from the midfoot, computed from the same smoothed series the assessment uses — not a
+parallel calculation that could drift from it. On the canvas: an arc at the hip, dashed guides at
+hip and knee height that make the depth standard legible frame by frame, and a plumb line through
+the midfoot the bar should track along. Below, a readout comparing each value to the skill's
+reference, with tolerances still labelled as ours.
+
+**The corrected pose, and why it is not a 3D animation.** A canned 3D animation would be generic
+reference content: the same clip for every user, derived from nothing they did — precisely the
+"generic squat advice" the brief rules out. It would also render a depth dimension a single
+side-on camera never measured.
+
+Instead we solve a two-link IK problem constrained by *this athlete's* measured tibia, femur and
+torso lengths, with their foot planted where it actually was, for the criteria their repetition
+actually failed — and draw the result as a ghost on their own bottom frame. The solve starts from
+the observed angles, so it returns the *nearest* compliant pose: the smallest correction that
+works, not an arbitrary valid one.
+
+It also refuses to fix one criterion by breaking another. Deepening a squat with a planted foot
+drives the knee forward, so a one-sided penalty holds the knee inside the limit the skill declares.
+On the common sample the knee travels from 0.17 to 0.35 shin-lengths past the toe — still inside
+the 0.5 limit, so the guard does not bind here. It exists so a different body cannot be handed
+advice that violates a rule it was passing.
+
+`scripts/test_target_pose.py` re-measures the solved pose against the same rules: bone lengths
+preserved to 0.00% drift, ankle planted to 0.01px, depth corrected from +0.022 to +0.059
+shin-lengths (clearing the 0.03 tolerance), knee and back angle both still compliant.
+
 ## What I verified
 
 - **Pose:** 236/236 frames detected on the common sample; camera-facing side correctly identified
@@ -218,6 +300,10 @@ exist to prevent.
   deliberate trade-off I would defend in a longer build.
 
 ## If I had the next four hours
+
+0. Generate the summary in code and drop it from the model. It is a mechanical roll-up of verdict
+   counts and reasons, it is the only place quality drift has been observed, and removing it
+   removes a failure mode rather than adding a feature.
 
 1. Make pose+bar real-time-ish: detect the plate every N frames, track between detections.
 2. A labelled clip set with known-correct verdicts, so tolerances stop being judgement calls.
