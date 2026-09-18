@@ -31,7 +31,7 @@ has to state actual time spent, and that number is part of what is being assesse
 **Session 1 total: ~2h 40m** (17:31-22:10, minus accumulated short breaks). Entries below are
 stamped with clock time as the work happened.
 
-## Corrected total: 5 to 6 hours
+## Corrected total: 5.6 hours
 
 The 2h 40m above is session 1 only, and was reported as the whole build for a while. It was not.
 A second session ran 00:16-05:16 on 2026-09-18 and is where deployment, the browser-pose rewrite,
@@ -52,10 +52,15 @@ The largest gap, 22:05 to 00:16 (2.18 h), is the break between sessions. The gap
 03:31 (1.31 h) contains the Docker disk-exhaustion incident and a machine restart, so it is part
 work and part downtime.
 
-**Active working time: 5-6 hours.** Commit timestamps bound the sessions but cannot distinguish
-working without committing from being away from the desk, and there were further breaks inside the
-committing stretches that leave no trace in the log. So this is reported as a range, not as a
-false-precision figure. Within the brief's 4-6 hour box at the upper end.
+**Active working time: 5.6 hours**, split roughly 2h 40m in session 1 and 2h 55m in session 2.
+Within the brief's 4-6 hour box at the upper end.
+
+That figure is my own account, not a reconstruction from git. Commit timestamps bound the sessions
+but cannot distinguish working without committing from being away from the desk, and there were
+further breaks inside the committing stretches that leave no trace in the log - which is why the
+wall-clock span is 11.76 hours and the working total is a little over 5. The git derivation above
+is included so the claim can be sanity-checked against something, not because it proves the
+number.
 
 Blocks 0-9 are the assignment as specified. Blocks 10-12 went to manual testing and the defects it
 exposed, which is where most of the real engineering happened: five correctness bugs in the vision

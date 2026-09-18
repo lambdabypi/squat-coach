@@ -2,20 +2,23 @@
 
 ## Time spent
 
-**5 to 6 hours total**, against the brief's 4-6 hour box, in two sessions:
+**5.6 hours total**, against the brief's 4-6 hour box, in two sessions:
 
 | | |
 |---|---|
 | **~2h 40m** | to the first complete working build: skill, vision core, bar tracking, agent, API, frontend, evidence runs and docs |
-| **the remainder** | deployment, the browser-pose rewrite for speed, the report restructure, and the defects found by testing a second video |
+| **~2h 55m** | deployment, the browser-pose rewrite for speed, the report restructure, and the defects found by testing a second video |
 
 An earlier version of this file reported the 2h 40m figure alone. That covered only the first
 session and understated the total, which matters because the brief asks for actual time. The
 correction is recorded rather than quietly edited: the git history spans 17:31 on 2026-09-17 to
-05:16 on 2026-09-18 across 32 commits, and the 5-6 hour figure is active working time within that
-span. Commit timestamps bound the sessions but cannot separate working-without-committing from
-time away from the desk, so the total is reported as the range it honestly is rather than as a
-precise figure the evidence does not support.
+05:16 on 2026-09-18 across 32 commits, an 11.76 hour wall-clock span containing two sessions and
+a long break between them.
+
+The 5.6 hours is active working time, and it is my own account rather than something git can
+prove. Commit timestamps bound the sessions but cannot separate working-without-committing from
+being away from the desk, and there were further breaks inside the committing stretches that
+leave no trace. The derivation and its limits are in [`TIMELOG.md`](TIMELOG.md).
 
 Most of the second session was driven by review questions rather than the original build: deploy
 it, make it faster, try a different video, is the target pose physically possible. That is where
