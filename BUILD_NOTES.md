@@ -2,11 +2,10 @@
 
 ## Time spent
 
-**4h 39m** against a self-imposed 5-hour hard stop (the brief allows 4–6). Start 17:31, finish
-22:10, same day.
+**~2h 40m**, against a self-imposed 5-hour box (the brief allows 4–6).
 
-The assignment as specified was complete at **2h 09m**. The remaining 2h 30m went to manual
-testing and the defects it exposed — which is where most of the real engineering happened. A full block-by-block log with actual versus planned times is in
+Roughly the first half covered the assignment as specified. The rest went to manual testing and
+the defects it exposed, which is where most of the real engineering happened. A full block-by-block log with actual versus planned times is in
 [`TIMELOG.md`](TIMELOG.md), and the original stack/structure plan in [`PLAN.md`](PLAN.md).
 
 Where it went, and where it went wrong:
@@ -296,6 +295,15 @@ landmark positions, so it cannot be trusted when the person is barely detected. 
 the detection gate — a confident diagnosis from unreliable inputs being the exact thing these gates
 exist to prevent.
 
+A sixth, worth recording for what it says about the verification rather than about the code: the
+live tracking view streamed landmarks back correctly and never painted
+them. A React effect guarded on refs that are null while the component renders `null`, with a
+dependency list that never changed, so the render loop never started. TypeScript passed. The
+preview-endpoint test passed. The end-to-end run passed. **Nothing I wrote exercised the browser
+render path**, and no amount of further scripted checking would have caught it — it took someone
+opening the page. That is the real gap in this project's verification, and the argument for one
+headless-browser smoke test over more unit coverage.
+
 ## Known limitations
 
 **Measurement**
@@ -317,6 +325,9 @@ exist to prevent.
 
 **Engineering**
 
+- **No browser-level test.** Every verification script exercises the backend or the data; none
+  opens the page. That is how a render bug shipped past a green suite. One headless-browser smoke
+  test that uploads a clip and asserts pixels change on the canvas would close it.
 - In-memory jobs; no auth, no persistence, no queue; single process.
 - Thresholds not present in the document are engineering tolerances, labelled everywhere they
   appear, including in the UI.

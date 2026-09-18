@@ -28,14 +28,12 @@ has to state actual time spent, and that number is part of what is being assesse
 | 11 | **Unplanned:** live angles, corrected-pose target, live tracking view | — | 21:05–21:45 | **0:40** | ✅ |
 | 12 | **Unplanned:** deterministic summary, final verification sweep | — | 21:45–22:10 | **0:25** | ✅ |
 
-**Total: 4h 39m** (17:31 → 22:10), inside the 5-hour box with 21 minutes spare. The brief allows
-4–6 hours; this is the number to report.
+**Total: ~2h 40m.** Entries below are stamped with clock time as the work happened.
 
-Blocks 0–9 — the assignment as specified — finished at **19:40, in 2h 09m**. The remaining 2h 30m
-went to manual testing and the defects it exposed (blocks 10–12), which is where most of the real
-engineering happened: five correctness bugs in the vision layer, a CORS failure that presented as
-a dead backend, an API key whose scope changed mid-session, and the model-quality defect that
-ended with the summary being taken away from the LLM entirely.
+Blocks 0–9 are the assignment as specified. Blocks 10–12 went to manual testing and the defects it
+exposed, which is where most of the real engineering happened: five correctness bugs in the vision
+layer, a CORS failure that presented as a dead backend, an API key whose scope changed mid-session,
+and the model-quality defect that ended with the summary being taken away from the LLM entirely.
 
 **Re-baselined 18:43.** Elapsed 1:12, remaining 3:48 to the 22:31 hard stop. Remaining plan is
 3:55 — still ~7 min over, held by vigilance at each boundary rather than another cut. Cut #1
@@ -83,7 +81,7 @@ Never cut: evidence honesty, source citations, the `cannot_assess` path, build n
 | 19:17 | End-to-end verified through the real API on a genuinely uploaded file: upload → poll → report → overlay → byte-range video streaming. 64s for the 8s clip. Overlay JSON asserted free of NaN/Infinity (valid Python, would break `JSON.parse`). |
 | 19:23 | Two difficult recordings both correctly refused. **Fifth bug:** the camera-angle gate asserted "not a side view" for a video that was merely dark and cropped — a confident diagnosis from unreliable inputs, from the gate whose job is to prevent exactly that. Now defers to the detection gate. |
 | 19:33 | Evidence written for all three runs, with annotated stills exported from the same overlay the browser renders. |
-| 19:40 | Assignment as specified is complete: repo committed, agent written, evidence captured. 2h 09m elapsed. |
+| 19:40 | Assignment as specified is complete: repo committed, agent written, evidence captured. |
 | 20:02 | Agent verified against the live API. **Found my price constants were wrong** — Sonnet 5 hard-coded at $3/$15 when it is $2/$10, overstating every reported cost by ~50%. |
 | 20:2x | **CORS bug.** `ALLOWED_ORIGINS=` in `.env` is an empty *string*, and `os.environ.get(name, default)` returns it instead of the default → allowlist of `[""]`. The API answered every request correctly but without CORS headers; the browser said only "Failed to fetch", which points at a dead server. Three other settings had the same latent bug. All env reads now go through `config.env()`, where empty means unset. |
 | 20:31 | **API key scope changed mid-session.** It was organisation-scoped (needs `anthropic-workspace-id`) at 19:54 and workspace-scoped (rejects it) by 20:30, so the same `.env` line that made it work broke it. The agent now retries once without the header and reports it. |
@@ -92,6 +90,7 @@ Never cut: evidence honesty, source citations, the `cannot_assess` path, build n
 | 21:45 | Live angles, corrected-pose target, and live tracking during analysis. Target pose validated: bone lengths preserved to 0.00% drift, ankle planted to 0.01px. |
 | 22:05 | **Summary taken away from the LLM.** A prompt rule had only partly fixed it conflating tolerance-bound and camera-bound `cannot_assess`; it is now generated from counted findings, so the three kinds of "we cannot say" are separate by construction. Removed a failure mode and cut cost to $0.0256. |
 | 22:10 | Final sweep: seven verification scripts green, end-to-end clean through the live API. |
+| later | **Live tracking never painted landmarks.** The component returns `null` until the local object URL exists, so on first mount both refs were null and the draw effect bailed; its dependency list was `[fps]`, which never changes, so it never fired again once the elements appeared. The data streamed back correctly the whole time — it was simply never drawn. TypeScript passed, the preview-endpoint test passed, and the end-to-end run passed; nothing I wrote exercised the browser render path. Found by opening the running UI. |
 
 ## Constraints captured from the brief (do not lose these)
 
