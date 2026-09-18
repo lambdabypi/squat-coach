@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LiveTracking from "@/components/LiveTracking";
 import { getRequirements, subscribeToJob, uploadVideo, type PreviewFrame } from "@/lib/api";
+import { submitClientAnalysis, trackInBrowser } from "@/lib/clientPose";
+import { rememberLocalVideo } from "@/lib/localVideo";
 import type { JobStatus, Requirements } from "@/lib/types";
 
 const STAGE_ORDER = [
@@ -25,6 +27,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [localFile, setLocalFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<PreviewFrame[]>([]);
+  const [tracking, setTracking] = useState<{ frame: number; total: number } | null>(null);
+  const [fellBack, setFellBack] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -52,8 +56,33 @@ export default function Home() {
 
   const start = useCallback(async (file: File) => {
     setError(null);
-    setUploadPct(0);
     setLocalFile(file);
+    setPreview([]);
+
+    // Track on this device first. The same analysis takes 88s on a laptop and 302s on the
+    // server's shared vCPUs, and the video never has to leave the machine. Falls back to
+    // uploading the file if the browser cannot run the model.
+    setTracking({ frame: 0, total: 0 });
+    try {
+      const result = await trackInBrowser(file, (p) => {
+        setTracking({ frame: p.frame, total: p.total });
+        if (p.landmarks) {
+          setPreview((prev) => [...prev, { frame: p.frame, joints: p.landmarks! }]);
+        }
+      });
+      setTracking(null);
+      const created = await submitClientAnalysis(result);
+      // The server has no copy of this video, so the report has to play it from here.
+      rememberLocalVideo(created.job_id, file);
+      setJob(created);
+      return;
+    } catch (e) {
+      setTracking(null);
+      console.warn("browser tracking unavailable, uploading instead:", e);
+      setFellBack((e as Error).message);
+    }
+
+    setUploadPct(0);
     try {
       const created = await uploadVideo(file, (f) => setUploadPct(f));
       setUploadPct(null);
@@ -64,7 +93,8 @@ export default function Home() {
     }
   }, []);
 
-  const busy = uploadPct !== null || (job !== null && job.status !== "failed");
+  const busy =
+    tracking !== null || uploadPct !== null || (job !== null && job.status !== "failed");
 
   return (
     <main className="wrap narrow">
@@ -88,6 +118,13 @@ export default function Home() {
       )}
 
       {error && <div className="notice bad">{error}</div>}
+
+      {fellBack && (
+        <div className="notice warn">
+          Could not run tracking in this browser, so the video is being uploaded and analysed on
+          the server instead. Same verdicts, but slower. Reason: {fellBack}
+        </div>
+      )}
 
       {!busy && (
         <>
@@ -183,6 +220,27 @@ export default function Home() {
             </>
           )}
         </>
+      )}
+
+      {tracking !== null && (
+        <div className="card">
+          <h3>Tracking on this device</h3>
+          <div className="bar">
+            <i
+              style={{
+                width: `${tracking.total ? Math.round((tracking.frame / tracking.total) * 100) : 3}%`,
+              }}
+            />
+          </div>
+          <p className="faint" style={{ marginTop: 8, marginBottom: 0 }}>
+            {tracking.total
+              ? `Frame ${tracking.frame + 1} of ${tracking.total}`
+              : "Loading the pose model..."}
+            . This runs on your machine, so your video is not uploaded. Only landmark
+            coordinates and a few small frames are sent.
+          </p>
+          <LiveTracking frames={preview} file={localFile} />
+        </div>
       )}
 
       {uploadPct !== null && (

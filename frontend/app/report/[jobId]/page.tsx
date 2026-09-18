@@ -5,6 +5,7 @@ import FindingCard from "@/components/FindingCard";
 import PoseCompare from "@/components/PoseCompare";
 import VideoWithOverlay, { type PlayerHandle } from "@/components/VideoWithOverlay";
 import { getOverlay, getReport, videoUrl } from "@/lib/api";
+import { localVideoUrl } from "@/lib/localVideo";
 import { groupFindings, headline, presentMeasurement } from "@/lib/present";
 import type { Finding, Overlay, Report } from "@/lib/types";
 
@@ -131,7 +132,7 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
         <div className="sticky-col">
           <VideoWithOverlay
             ref={player}
-            src={videoUrl(jobId)}
+            src={localVideoUrl(jobId) ?? videoUrl(jobId)}
             overlay={ov}
             highlightFrame={highlight}
           />
@@ -244,7 +245,8 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
               </div>
             ))}
             <p className="faint" style={{ marginBottom: 0 }}>
-              Barbell detected in {(rep.bar.observed_fraction * 100).toFixed(0)}% of frames, pose
+              Barbell tracked through {((rep.bar.usable_fraction ?? rep.bar.observed_fraction) * 100).toFixed(0)}%
+              of frames ({(rep.bar.observed_fraction * 100).toFixed(0)}% detected directly), pose
               found in {(rep.pose.detection_fraction * 100).toFixed(0)}%, tracking the{" "}
               {rep.pose.side} side.
             </p>

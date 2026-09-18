@@ -156,18 +156,32 @@ def assess_quality(track: PoseTrack, seg: RepSegmentation, bar: BarTrack | None)
         ok = np.isfinite(bx) & (bx > 0) & (bx < w) & (by > 0) & (by < h)
         bar_frac = float(ok.mean())
         bar_in_frame = bar_frac > 0.8
-        if bar.observed_fraction >= 0.5:
+        # Judge on the fraction whose position rests on real detections, measured or bracketed
+        # between two of them. Reporting only the detected fraction described a clip whose bar
+        # was tracked throughout as "estimated from the shoulder", which was both wrong and
+        # alarming: on the browser-tracking path only a fifth of frames carry an image, yet the
+        # detections bracket every repetition.
+        detected = bar.observed_fraction
+        usable = bar.usable_fraction
+        interpolated = max(0.0, usable - detected)
+
+        if usable >= 0.5:
+            detail = f"The barbell was tracked through {usable:.0%} of frames"
+            if interpolated > 0.01:
+                detail += (f" ({detected:.0%} detected directly, {interpolated:.0%} interpolated "
+                           f"between nearby detections)")
+            detail += "."
             gates.append(Gate("bar_tracked", True,
-                              "ok" if bar.observed_fraction > 0.8 else "degraded",
-                              f"The barbell plate was detected in {bar.observed_fraction:.0%} of frames."
-                              + (f" {bar.note}" if bar.note else ""),
-                              bar.observed_fraction))
+                              "ok" if usable > 0.8 else "degraded",
+                              detail + (f" {bar.note}" if bar.note else ""),
+                              usable))
         else:
             gates.append(Gate("bar_tracked", False, "degraded",
-                              f"The barbell plate was detected in only {bar.observed_fraction:.0%} of "
-                              "frames. Bar position is estimated from the shoulder for the rest, so "
-                              "bar-path findings are indicative rather than measured.",
-                              bar.observed_fraction))
+                              f"The barbell was tracked through only {usable:.0%} of frames "
+                              f"({detected:.0%} detected directly). Bar position is estimated "
+                              "from the shoulder for the rest, so bar-path findings are "
+                              "indicative rather than measured.",
+                              usable))
     else:
         gates.append(Gate("bar_tracked", False, "degraded",
                           "No barbell plate was detected. Bar-path and bar-placement criteria "

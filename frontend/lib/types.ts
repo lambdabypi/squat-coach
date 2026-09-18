@@ -83,7 +83,12 @@ export interface Report {
     shin_length_px: number;
     detection_fraction: number;
   };
-  bar: { observed_fraction: number; median_radius_px: number | null; note: string | null };
+  bar: {
+    observed_fraction: number;
+    usable_fraction?: number;
+    median_radius_px: number | null;
+    note: string | null;
+  };
   scale: {
     mm_per_px: number;
     basis: string;

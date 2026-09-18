@@ -168,7 +168,11 @@ def _real_world_scale(bar) -> dict | None:
     non-standard plate scales every centimetre figure with it. It is returned with the assumption
     attached so the interface can show it, and the normalised value stays the primary figure.
     """
-    if bar is None or not bar.any_tracked or bar.observed_fraction < 0.3:
+    # Gate on the usable fraction, not the directly-detected one. The plate's apparent radius is
+    # a single clip-wide median, so it does not need a detection on every frame to be reliable -
+    # and on the browser-tracking path only a fifth of frames carry an image, which silently
+    # dropped every centimetre figure from the report.
+    if bar is None or not bar.any_tracked or bar.usable_fraction < 0.3:
         return None
     if not np.isfinite(bar.median_radius) or bar.median_radius <= 0:
         return None
@@ -493,6 +497,7 @@ def _assess_track(track, bar, info, skill, use_agent: bool, progress: Progress |
         },
         "bar": {
             "observed_fraction": round(bar.observed_fraction, 3),
+            "usable_fraction": round(bar.usable_fraction, 3),
             "median_radius_px": _clean(bar.median_radius),
             "note": bar.note,
         },
