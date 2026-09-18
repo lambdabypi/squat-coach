@@ -192,7 +192,10 @@ p { margin: 0 0 12px; }
   background: rgba(240,136,62,.18); color: var(--fail);
   border-radius: 99px; padding: 1px 8px; font-size: 12px;
 }
-.qualityrow { display: flex; gap: 10px; margin-bottom: 9px; font-size: 13px; align-items: start; }
+/* flex-start, not start: `start` is the Box Alignment keyword and has patchier support in flex
+   containers, which autoprefixer warns about. The grid rule above keeps `start`, where it is the
+   correct value and well supported. */
+.qualityrow { display: flex; gap: 10px; margin-bottom: 9px; font-size: 13px; align-items: flex-start; }
 
 .pill-sub { opacity: .6; }
 
@@ -223,7 +226,7 @@ p { margin: 0 0 12px; }
 .finding.meets_standard { border-left-color: var(--pass); }
 .finding.does_not_meet_standard { border-left-color: var(--fail); }
 .finding.cannot_assess { border-left-color: var(--unknown); }
-.finding .top { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.finding .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .finding .name { font-weight: 600; font-size: 14px; }
 .finding .exp { font-size: 13.5px; color: var(--muted); margin: 8px 0 0; }
 .finding .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; align-items: center; }
