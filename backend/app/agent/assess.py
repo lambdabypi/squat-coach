@@ -130,11 +130,20 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
     from anthropic import Anthropic
 
     # An organisation-scoped key must name the workspace it is acting for; a workspace-scoped
-    # key must not. Send the header only when one is configured.
+    # key must not. Which one a given key needs is not discoverable from the key itself, and
+    # swapping keys flips the requirement — that cost a debugging round here, with the whole
+    # agent stage silently falling back to the rule engine over one stale header.
+    #
+    # So: send the header when configured, and if the workspace turns out not to exist for this
+    # key, retry once without it rather than losing the assessment. Surfaced in `agent_note`,
+    # never silent.
     workspace = env("ANTHROPIC_WORKSPACE_ID")
-    client = Anthropic(
-        default_headers={"anthropic-workspace-id": workspace} if workspace else None
-    )
+    workspace_note: str | None = None
+
+    def build_client(ws: str | None) -> Anthropic:
+        return Anthropic(default_headers={"anthropic-workspace-id": ws} if ws else None)
+
+    client = build_client(workspace)
     messages = [{
         "role": "user",
         "content": [
@@ -148,14 +157,32 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
         ],
     }]
 
-    resp = client.messages.create(
-        model=MODEL,
-        max_tokens=MAX_TOKENS,
-        system=SYSTEM,
-        tools=[TOOL],
-        tool_choice={"type": "tool", "name": "submit_assessment"},
-        messages=messages,
-    )
+    def call(c: Anthropic):
+        return c.messages.create(
+            model=MODEL,
+            max_tokens=MAX_TOKENS,
+            system=SYSTEM,
+            tools=[TOOL],
+            tool_choice={"type": "tool", "name": "submit_assessment"},
+            messages=messages,
+        )
+
+    try:
+        resp = call(client)
+    except Exception as exc:  # noqa: BLE001
+        text = str(exc)
+        stale_workspace = workspace and "not_found" in text and "orkspace" in text
+        if not stale_workspace:
+            raise
+        # The configured workspace does not exist for this key — most likely the key was
+        # replaced with a workspace-scoped one. Retry without the header.
+        client = build_client(None)
+        resp = call(client)
+        workspace_note = (
+            f"ANTHROPIC_WORKSPACE_ID is set to a workspace this API key cannot see, so the "
+            f"header was dropped and the request retried without it. Blank that variable in "
+            f".env — this key is workspace-scoped and does not need it."
+        )
 
     block = next((b for b in resp.content if b.type == "tool_use"), None)
     if block is None:
@@ -236,6 +263,8 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
 
     note = None
     parts = []
+    if workspace_note:
+        parts.append(workspace_note)
     if missing:
         parts.append(f"{missing} finding(s) were not returned by the model and fall back to the "
                      "rule engine's wording.")

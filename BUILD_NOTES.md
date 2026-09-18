@@ -132,6 +132,15 @@ error this application exists to avoid. The system prompt now forbids substituti
 `cannot_assess`, and the summary instruction separates the two kinds of "we don't know". A larger
 model is one env var away (`ANTHROPIC_MODEL=claude-sonnet-5`) if that trade looks wrong.
 
+**That fix is partial, and the limitation is real.** After the prompt change the summary leads
+with the correct reason ("the depth measurements sit right at the edge of our tolerance") but has
+still been observed appending "from this camera angle" to it. The per-finding explanations — which
+are what the UI shows against each criterion, and what a user acts on — have been correct in every
+run; the drift is confined to the free-text summary. It is a prompt-adherence weakness of the
+smaller model, and the honest options are to accept it, move the summary to a larger model, or
+generate the summary from the findings in code. I would take the third: the summary is a mechanical
+roll-up of verdict counts and reasons, and does not need a language model at all.
+
 ## What I verified
 
 - **Pose:** 236/236 frames detected on the common sample; camera-facing side correctly identified

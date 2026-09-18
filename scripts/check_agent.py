@@ -30,30 +30,55 @@ def main() -> int:
 
     from anthropic import Anthropic
 
-    client = Anthropic(
-        default_headers={"anthropic-workspace-id": workspace} if workspace else None
-    )
-    try:
-        r = client.messages.create(
-            model=MODEL,
-            max_tokens=4,
-            messages=[{"role": "user", "content": "Reply with the single word: ok"}],
+    def attempt(label: str, ws: str | None) -> tuple[bool, str]:
+        client = Anthropic(
+            default_headers={"anthropic-workspace-id": ws} if ws else None
         )
-    except Exception as exc:  # noqa: BLE001
-        msg = str(exc)
-        print(f"\nFAILED: {type(exc).__name__}")
-        print(f"  {msg[:400]}")
-        if "workspace" in msg.lower():
-            print("\n  -> This key is organisation-scoped. Either add")
-            print("     ANTHROPIC_WORKSPACE_ID=<id> to squat-coach/.env,")
-            print("     or use a key created inside a workspace.")
-        return 1
+        try:
+            r = client.messages.create(
+                model=MODEL,
+                max_tokens=4,
+                messages=[{"role": "user", "content": "Reply with the single word: ok"}],
+            )
+        except Exception as exc:  # noqa: BLE001
+            print(f"  {label:28s} FAILED  {type(exc).__name__}: {str(exc)[:200]}")
+            return False, str(exc)
+        text = "".join(b.text for b in r.content if b.type == "text").strip()
+        print(f"  {label:28s} OK      replied {text!r} "
+              f"(in={r.usage.input_tokens} out={r.usage.output_tokens})")
+        return True, ""
 
-    text = "".join(b.text for b in r.content if b.type == "text").strip()
-    print(f"\nOK: {MODEL} replied {text!r}")
-    print(f"tokens: in={r.usage.input_tokens} out={r.usage.output_tokens}")
-    print("The agent stage will narrate assessments.")
-    return 0
+    print("Trying both header configurations:\n")
+    with_ok, with_err = (attempt("with workspace header", workspace)
+                         if workspace else (False, "no workspace configured"))
+    without_ok, without_err = attempt("without workspace header", None)
+
+    print()
+    if without_ok and not workspace:
+        print(f"DIAGNOSIS: working. Model {MODEL} reachable; the key is workspace-scoped and")
+        print("           needs no workspace header.")
+        return 0
+    if without_ok:
+        print("DIAGNOSIS: the key works WITHOUT a workspace header, but a workspace id is set.")
+        print("  -> Blank ANTHROPIC_WORKSPACE_ID in squat-coach/.env.")
+        print("     This key is workspace-scoped already; sending the header names a second")
+        print("     workspace and fails with a 404.")
+        return 1
+    if with_ok:
+        print(f"DIAGNOSIS: working. Model {MODEL} reachable with the configured workspace.")
+        return 0
+
+    print("DIAGNOSIS: neither configuration works.")
+    if "not_found" in with_err or "not found" in with_err.lower():
+        print("  -> The configured workspace id does not exist for THIS key's organisation.")
+        print("     Either the key was replaced with one from a different org, or the")
+        print("     workspace was deleted. Check the Anthropic Console: Settings -> Workspaces,")
+        print("     and copy the id from the URL of the workspace the key belongs to.")
+    elif "scoped to a workspace" in without_err:
+        print("  -> The key is organisation-scoped and needs a VALID workspace id.")
+    else:
+        print("  -> See the errors above.")
+    return 1
 
 
 if __name__ == "__main__":
