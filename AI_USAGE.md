@@ -21,6 +21,12 @@ Working notes, written as the build happened rather than reconstructed afterward
   allowed to judge, explain and cite. If its structured output fails schema validation twice, the
   deterministic verdict ships without narration.
 - **Landmark quality frame by frame,** not in aggregate. See below - this is where it mattered.
+- **Whether the verdicts survive the real browser.** The measurement layer was verified entirely
+  through Python, including a test that replays browser-shaped input through the client endpoint.
+  That test passes and is not sufficient: it uses native MediaPipe, and production runs the same
+  model compiled to WASM. Driving actual Chromium found a verdict the two backends disagreed on.
+- **Whether the corrected pose is achievable, not just valid.** Geometric validity and physical
+  possibility are different questions, and only the first had a test.
 
 ## The mistake I caught
 
@@ -137,7 +143,121 @@ health checks pass, the pipeline runs, the numbers are subtly different. The onl
 caught is that the end-to-end test prints verdict counts and I had the host's numbers memorised
 from earlier runs. A test that asserted "22 findings returned" would have passed.
 
+## The mistake I am least comfortable about
+
+The two above are mistakes in *my process*. This one had been **shipping a coaching verdict that
+was never valid**, and I only found it because I stopped trusting a passing test suite and ran the
+real thing. It also cost me two wrong diagnoses before the data settled it, which is the part worth
+reading.
+
+Everything had been verified through Python. `scripts/test_client_path.py` proved the
+browser-landmark path reproduces the server path's verdicts exactly - all 22 identical. But it
+generates the landmarks with **native** MediaPipe, and production compiles the same model to WASM
+and runs it in a browser. That is the path every real user hits, and nothing had ever executed it.
+
+So I wrote `frontend/tests/browser-path.spec.ts`: start both services, open real Chromium, upload
+the real clip, let the browser do the pose estimation, compare every verdict to the committed
+baseline. It failed on its first real run:
+
+```
+rep2.hip_drive: cannot_assess (null) -> does_not_meet_standard (0.4074)
+```
+
+Native MediaPipe abstains on repetition 2's hip drive. The real browser publishes a confident
+"you did this wrong". Same video, same rules.
+
+**Wrong diagnosis one.** The hip-drive ratio needs the shoulders to rise at least 0.02 shin-lengths
+before it means anything, which on this clip is 5.2 px. I concluded a few pixels of landmark noise
+were deciding between "cannot say" and a failure, built a tidy argument that the floor should be
+set by noise (the ratio's relative error is about `sigma / shoulder_rise`, so the rise should clear
+roughly ten times landmark jitter), raised it to 0.06, and re-ran.
+
+The ratio came back `0.4074`. Identical to the digit. **The fix had changed nothing, which
+disproved the reasoning behind it**: the browser's shoulder rise was *above* 0.06 while native's was
+*below* 0.02, a threefold difference rather than a borderline one. I reverted it. A threshold change
+whose stated justification has been refuted is just fitting the code to a failing test, and keeping
+it would have been the more comfortable option.
+
+**What it actually was.** I made the test dump the browser's own report and diffed it:
+
+| | browser | native |
+|---|---|---|
+| repetition 1 bottom frame | 66 | 65 |
+| repetition 2 bottom frame | 190 | 188 |
+| repetition 2 shoulder rise | 0.186 shin | under 0.02 shin |
+| shin length | 172.4 px | 259.2 px |
+
+The shin difference is expected and harmless - the browser tracks a 720-wide downscale and
+259.2/172.4 is 1.503, exactly the scale factor, which is why every shin-normalised measurement
+agrees. The real cause is that **the bottom of a squat is the peak of a nearly flat curve, so its
+frame index is only determined to within a frame or two.** Hip drive read a fixed 150 ms window
+*starting at that frame* - precisely where the shoulder accelerates hardest. A two-frame shift moved
+the shoulder rise by a factor of nine.
+
+The metric now measures its own stability: it recomputes the ratio across the frames the bottom
+could plausibly be (plus or minus two, taken from the disagreement above rather than guessed) and
+refuses to publish a verdict that the frame choice decides.
+
+**And that is what makes it the uncomfortable one.** Repetition 1's hip-drive ratio ranges from
+**0.36 to 1.85** across those frames - straddling the pass/fail threshold of 1.0 - and it had been
+reported all along as a confident `does_not_meet_standard` at 0.696. It was never a verdict. Both
+repetitions now abstain, the counts move from 13/6/3 to 14/6/2, and both paths agree on all 22.
+
+**What I take from it.** The specific lesson is that a verdict read over a short window anchored at
+an ill-determined frame index is fragile by construction, and no amount of agreement between two
+runs of the *same* backend will show it. The general one is worse, and is now in
+`BUILD_NOTES.md` under Known limitations: **nothing in this project ever asked whether a verdict was
+stable under the uncertainty of its own inputs.** Hip drive is simply where a second pose backend
+made that fragility visible. Depth, back angle and knee position are all read at `bottom_frame`
+too. They should be far less sensitive because they are positions rather than rates, but that is an
+argument, not a measurement.
+
+## Two more from the same session, both found by a question rather than a test
+
+Recorded briefly because they share a shape: the code was confident, the tests were green, and a
+question about whether the output made sense was what exposed them.
+
+**A target position no human could reach.** The solver produces a corrected pose from the athlete's
+own segment lengths, and `scripts/test_target_pose.py` confirmed it was geometrically valid: bone
+lengths preserved to 0.00%, foot planted to 0.01 px, depth achieved, other criteria still inside
+tolerance. Asked whether the ideal position was physically possible, I measured it and it was not:
+the target demanded a **54.7 degree shin lean against the 38.6 the athlete showed**, roughly 16
+degrees more ankle dorsiflexion than they had demonstrated. Reaching it would lift the heel, which
+breaks the document's own feet-flat requirement (ref p.23). The cause was one of my own residual
+terms pulling the hip toward the midfoot, which blocked the hips travelling back and left the knees
+going forward as the only route to depth - the opposite of what the document prescribes (ref p.33).
+The ankle limit is now taken from the lean the athlete actually held with the heel down, because
+their own demonstrated range is evidence where a population figure is a guess about them.
+
+**Measuring the walk-out as part of the lift.** Asked whether the app would work on a different
+video, I ran a real gym clip and it returned a confident bar-path failure that was not credible for
+a coaching demonstration. Two diagnoses were wrong first: reading an exported frame, I blamed
+background plates on the rack, then a bystander standing in shot. Measurement refuted both - the
+tracked shoulder travels 915 to 1383 px with no frame-to-frame jump above 200 px, and every
+worst-case deviation was a real detection within 55 px of the athlete's own shoulder. The trail I
+had misread was the athlete's own walk-out. The actual cause: repetition boundaries came from
+hip-height troughs, and **lifting a loaded bar off the pins raises the hips above standing, so the
+un-rack is a trough** - and so is the re-rack. Repetition 1 was handed a 156-frame "descent" that
+was mostly walking out of the rack. Bar path is a maximum-deviation measurement, so walking
+sideways guaranteed a large one, and heels-flat took its standing reference from a frame where the
+heel was already raised.
+
+The pattern across all three: **my own diagnostic instincts were wrong more often than the code
+was.** Five separate times this session I formed a confident explanation from reading output or
+looking at an image, and measurement contradicted it. The fixes that stuck were the ones where I
+went and got the numbers first.
+
 ## Corrections still open
 
 - Pose gives a hip *centre*, not the hip *crease* the document's depth standard refers to. This is a
   known systematic bias, documented in BUILD_NOTES rather than silently absorbed into a tolerance.
+- **Hip drive now reports nothing on the common sample.** Abstaining is the honest answer to a
+  ratio that swings from 0.36 to 1.85 with the bottom frame, but it is not a good answer. Anchoring
+  the window by hip *displacement* instead of a fixed 150 ms from an uncertain frame should make the
+  criterion stable enough to report again. Not attempted: it is a redesign of a measurement, and
+  doing it without re-verifying both paths would be worse than the abstention.
+- **No other criterion checks its own stability.** Hip drive does only because a second pose
+  backend forced the question.
+- **Every tolerance is still uncalibrated.** They are all tagged `engineering_tolerance` and none
+  has been fitted to labelled footage, because there is none. This is why a criterion sitting near
+  its threshold is reported as too close to call rather than resolved.
