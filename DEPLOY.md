@@ -83,11 +83,16 @@ gcloud run deploy squat-coach-backend \
   --allow-unauthenticated \
   --memory 2Gi \
   --cpu 2 \
-  --timeout 300 \
+  --timeout 900 \
   --min-instances 0 \
   --max-instances 2 \
-  --set-env-vars ALLOWED_ORIGINS=https://YOUR-FRONTEND.vercel.app
+  --set-env-vars "^@^ALLOWED_ORIGINS=https://YOUR-FRONTEND.vercel.app@STREAM_DEADLINE_SECONDS=870"
 ```
+
+The `^@^` prefix sets `@` as the delimiter for that flag. `ALLOWED_ORIGINS` is itself a
+comma-separated list, and gcloud splits `--set-env-vars` on commas by default, so without this
+the second origin is read as a variable with no name and the deploy fails with a usage error.
+Passing several origins is the normal case, not an edge case.
 
 `--source .` builds with Cloud Build, so **no local Docker is needed**, which also means a broken
 Docker Desktop does not block a deploy.
@@ -98,8 +103,8 @@ Every flag above is load-bearing for staying free:
 |---|---|
 | `--min-instances 0` | Scale to zero. A warm instance is billed continuously and would drain the free tier while doing nothing. |
 | `--max-instances 2` | Hard cap. Without it, traffic or a retry loop can scale out and bill you. |
-| `--timeout 300` | Matches the SSE stream's own 290s deadline, so the stream ends itself rather than being cut off. |
-| `--cpu 2` | Analysis is CPU-bound; one core roughly doubles wall time. Two cores at ~90s is ~180 vCPU-seconds per video, so about **1,000 videos per month free**. |
+| `--timeout 900` | Must exceed the SSE stream's own deadline (`STREAM_DEADLINE_SECONDS=870`) so the stream ends itself rather than being cut off mid-analysis. 300s was not enough: server-side analysis of the sample takes **302s** on 2 vCPU here, against 88.6s locally. Raising the CPU to 4 made it *worse*, not better. |
+| `--cpu 2` | Analysis is CPU-bound. At ~302s server-side that is ~600 vCPU-seconds per video, so roughly **300 videos per month free**. The browser-pose path costs a fraction of that, since only the assessment runs here. |
 | default CPU allocation | **Do not** pass `--no-cpu-throttling`. See below. |
 
 **Why the default CPU setting is correct here, which is not obvious.** Cloud Run allocates CPU
