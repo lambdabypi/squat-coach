@@ -130,8 +130,21 @@ projects, so another project's usage can consume the allowance this one relies o
 
 ### Option C: Render or Fly.io
 
-Both take the same Dockerfile. The generous legacy free tiers are closed to new accounts, so check
-what is currently offered before relying on either.
+Both take the same Dockerfile.
+
+**Render's free tier will not run this.** Its free instances cap at 512 MB, and the container was
+**OOM-killed** under a hard `--memory 512m` at the point it began analysing
+(`docker inspect` reported `OOMKilled=true`). The health endpoint came up fine first, so this is
+another case where a container looks healthy and cannot do the work.
+
+The measurement stops there and is worth flagging as a gap: a sweep of 512 / 768 / 1024 MB was
+started but Docker Desktop failed mid-run when the host disk filled, so **768 MB and 1 GB are
+untested**. What is known: 512 MB fails, and the container settled at about 414 MB resident after
+an analysis on an unconstrained host. The 2 GiB configured for Cloud Run is comfortable rather
+than measured-minimal.
+
+Fly.io's and Render's generous legacy free tiers are closed to new accounts, so check what is
+actually on offer before relying on either.
 
 ---
 
