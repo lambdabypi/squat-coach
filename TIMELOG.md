@@ -28,7 +28,34 @@ has to state actual time spent, and that number is part of what is being assesse
 | 11 | **Unplanned:** live angles, corrected-pose target, live tracking view | - | 21:05-21:45 | **0:40** | ✅ |
 | 12 | **Unplanned:** deterministic summary, final verification sweep | - | 21:45-22:10 | **0:25** | ✅ |
 
-**Total: ~2h 40m.** Entries below are stamped with clock time as the work happened.
+**Session 1 total: ~2h 40m** (17:31-22:10, minus accumulated short breaks). Entries below are
+stamped with clock time as the work happened.
+
+## Corrected total: 5 to 6 hours
+
+The 2h 40m above is session 1 only, and was reported as the whole build for a while. It was not.
+A second session ran 00:16-05:16 on 2026-09-18 and is where deployment, the browser-pose rewrite,
+the report restructure and the second-video defect work happened. The brief asks for actual time,
+so the total is corrected here rather than left to be inferred from the commit log.
+
+Derived from git (`git log --reverse --pretty=%at`), 32 commits:
+
+| | |
+|---|---|
+| clock start (this log) | 2026-09-17 17:31 |
+| first commit | 2026-09-17 19:38 |
+| last commit | 2026-09-18 05:16 |
+| wall-clock span | 11.76 h |
+| gaps longer than 25 min | 5.17 h across five gaps |
+
+The largest gap, 22:05 to 00:16 (2.18 h), is the break between sessions. The gap from 02:12 to
+03:31 (1.31 h) contains the Docker disk-exhaustion incident and a machine restart, so it is part
+work and part downtime.
+
+**Active working time: 5-6 hours.** Commit timestamps bound the sessions but cannot distinguish
+working without committing from being away from the desk, and there were further breaks inside the
+committing stretches that leave no trace in the log. So this is reported as a range, not as a
+false-precision figure. Within the brief's 4-6 hour box at the upper end.
 
 Blocks 0-9 are the assignment as specified. Blocks 10-12 went to manual testing and the defects it
 exposed, which is where most of the real engineering happened: five correctness bugs in the vision

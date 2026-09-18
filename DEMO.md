@@ -5,16 +5,52 @@ a new video or change a rule in the source document during the review - both are
 
 ## Before you start
 
+**Run both the deployed app and a local copy.** They are for different parts of this script and
+the reason is not cosmetic.
+
+Deployed, for everything except section (d):
+
+- frontend https://squat-coach-sigma.vercel.app
+- backend https://squat-coach-backend-633153384860.us-central1.run.app/health
+
+Local, required for section (d):
+
 ```bash
 # terminal 1
-cd backend && export PYTHONPATH=$PWD && export ANTHROPIC_API_KEY=... && uvicorn app.main:app --port 8000
+cd backend && export PYTHONPATH=$PWD && uvicorn app.main:app --port 8000
 # terminal 2
 cd frontend && npm run dev
 ```
 
-Have ready: the common sample, the front-view clip (`EVIDENCE/hard-sample/`), and
-`skill/squat_standards.yaml` open in an editor. Pre-warm one analysis so you are not watching a
-progress bar for 60 seconds on camera.
+**Why (d) has to be local.** `load_skill()` re-reads `skill/squat_standards.yaml` on every
+request, so editing a tolerance takes effect on the very next analysis with no restart - which is
+exactly what "change a rule and show the assessment change" needs. But the deployed backend bakes
+the skill into the container image, so the same edit there needs a Cloud Run rebuild of six to
+eight minutes. Do not discover that live.
+
+**Do not set `ANTHROPIC_API_KEY` for this.** Nothing in the codebase sets `temperature`, so the
+Anthropic default of 1.0 applies and the narration wording changes between runs on the same video.
+With no key the deterministic summary writer produces the text, every verdict is identical run to
+run (`scripts/check_determinism.py`), and the rule engine still produces every verdict - the
+language model was never what decided them.
+
+Have ready:
+
+- `EVIDENCE/common-sample/common_sample.mp4` - the brief's comparison clip
+- `EVIDENCE/hard-sample/hard_frontview_20s.mp4` - a real front view, for section (f)
+- `EVIDENCE/hard-sample/hard_degraded.mp4` - too dark and badly cropped, also (f)
+- `samples/yt_txnwoJz.mp4` - a second real gym clip, if they ask for something unseen
+- `skill/squat_standards.yaml` open in an editor
+
+Those video files are gitignored deliberately, so they are on this machine and not in the public
+repository. If you are demoing from a fresh clone, re-fetch with
+`python scripts/fetch_test_clip.py <url> --out samples/clip.mp4`.
+
+Pre-warm one analysis so you are not watching a progress bar on camera. Cloud Run scales to zero,
+so hit `/health` a minute early to wake it.
+
+**Upload limits, if asked:** 200 MB, 60 s, at least 15 fps and 360 px on the short side. A phone
+video fits comfortably.
 
 ---
 

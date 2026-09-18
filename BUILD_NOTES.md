@@ -2,11 +2,28 @@
 
 ## Time spent
 
-**~2h 40m**, against a self-imposed 5-hour box (the brief allows 4-6).
+**5 to 6 hours total**, against the brief's 4-6 hour box, in two sessions:
 
-Roughly the first half covered the assignment as specified. The rest went to manual testing and
-the defects it exposed, which is where most of the real engineering happened. A full block-by-block log with actual versus planned times is in
-[`TIMELOG.md`](TIMELOG.md), and the original stack/structure plan in [`PLAN.md`](PLAN.md).
+| | |
+|---|---|
+| **~2h 40m** | to the first complete working build: skill, vision core, bar tracking, agent, API, frontend, evidence runs and docs |
+| **the remainder** | deployment, the browser-pose rewrite for speed, the report restructure, and the defects found by testing a second video |
+
+An earlier version of this file reported the 2h 40m figure alone. That covered only the first
+session and understated the total, which matters because the brief asks for actual time. The
+correction is recorded rather than quietly edited: the git history spans 17:31 on 2026-09-17 to
+05:16 on 2026-09-18 across 32 commits, and the 5-6 hour figure is active working time within that
+span. Commit timestamps bound the sessions but cannot separate working-without-committing from
+time away from the desk, so the total is reported as the range it honestly is rather than as a
+precise figure the evidence does not support.
+
+Most of the second session was driven by review questions rather than the original build: deploy
+it, make it faster, try a different video, is the target pose physically possible. That is where
+the most interesting defects surfaced, including two that a single test clip could never have
+exposed.
+
+A full block-by-block log with actual versus planned times is in [`TIMELOG.md`](TIMELOG.md), and
+the original stack/structure plan in [`PLAN.md`](PLAN.md).
 
 Where it went, and where it went wrong:
 
