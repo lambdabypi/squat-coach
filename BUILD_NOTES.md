@@ -550,7 +550,22 @@ Stated precisely, so it can be held against us:
   This also forced `--max-instances 1`: with two instances those follow-up fetches could land on
   the instance that never saw the job, 404ing a report that had just been generated. There is no
   concurrency requirement here, so pinning to one instance is free. Surviving a restart would
-  need the reports persisted, which is the database decision recorded above.
+  need the reports persisted server-side, which is the database decision recorded above.
+
+  The browser now keeps its own copy of what it was given, which covers the common case without a
+  database: the report and overlay in `sessionStorage`, and the video blob in IndexedDB. A reload
+  therefore works, and when it falls back to the stored copy the page says so rather than implying
+  the server still has it.
+
+  **This limitation was originally understated, and the correction is worth recording.** It was
+  written as a Cloud Run scale-to-zero problem. In use, the video disappeared on reload against a
+  *live local backend*, because on the browser-tracking path the file is never uploaded at all: it
+  was held in a module-level map that survives client-side navigation and dies on reload, and the
+  fallback pointed the player at `/jobs/{id}/video`, which does not exist on that path. So the
+  verdicts were intact and the footage they were drawn on was a 404. Reported from real use, not
+  from any test, which is the third time in this project that using the product beat the suite.
+  The Playwright test now reloads the page and requires the player's source to be a restored
+  `blob:` URL.
 
 **Coverage**
 
