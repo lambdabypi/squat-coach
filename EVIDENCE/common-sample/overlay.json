@@ -547,12 +547,12 @@
         "back": 82.1,
         "knee": 176.4,
         "hip": 173.6,
-        "bar_dev": -0.097,
+        "bar_dev": -0.016,
         "midfoot_x": 653.5
       },
       "bar": {
-        "x": 678.71,
-        "y": 797.25,
+        "x": 657.67,
+        "y": 770.67,
         "observed": false
       }
     },
@@ -613,12 +613,12 @@
         "back": 81.4,
         "knee": 178.0,
         "hip": 172.0,
-        "bar_dev": -0.103,
+        "bar_dev": -0.015,
         "midfoot_x": 653.6
       },
       "bar": {
-        "x": 680.23,
-        "y": 796.94,
+        "x": 657.33,
+        "y": 771.33,
         "observed": false
       }
     },
@@ -745,12 +745,12 @@
         "back": 80.3,
         "knee": 177.2,
         "hip": 168.2,
-        "bar_dev": -0.105,
+        "bar_dev": -0.009,
         "midfoot_x": 653.7
       },
       "bar": {
-        "x": 680.84,
-        "y": 792.82,
+        "x": 656.0,
+        "y": 775.5,
         "observed": false
       }
     },
@@ -877,12 +877,12 @@
         "back": 78.4,
         "knee": 171.8,
         "hip": 162.8,
-        "bar_dev": -0.099,
+        "bar_dev": 0.016,
         "midfoot_x": 653.6
       },
       "bar": {
-        "x": 679.32,
-        "y": 801.47,
+        "x": 649.5,
+        "y": 784.0,
         "observed": false
       }
     },
@@ -1009,12 +1009,12 @@
         "back": 77.0,
         "knee": 167.4,
         "hip": 157.9,
-        "bar_dev": -0.1,
+        "bar_dev": 0.033,
         "midfoot_x": 652.7
       },
       "bar": {
-        "x": 678.69,
-        "y": 806.17,
+        "x": 644.0,
+        "y": 798.5,
         "observed": false
       }
     },
@@ -1141,12 +1141,12 @@
         "back": 75.7,
         "knee": 160.1,
         "hip": 151.6,
-        "bar_dev": -0.103,
+        "bar_dev": 0.045,
         "midfoot_x": 652.1
       },
       "bar": {
-        "x": 678.7,
-        "y": 815.46,
+        "x": 640.5,
+        "y": 813.5,
         "observed": false
       }
     },
@@ -1537,12 +1537,12 @@
         "back": 71.9,
         "knee": 131.2,
         "hip": 128.2,
-        "bar_dev": -0.051,
+        "bar_dev": 0.1,
         "midfoot_x": 655.0
       },
       "bar": {
-        "x": 668.27,
-        "y": 875.22,
+        "x": 629.12,
+        "y": 874.38,
         "observed": false
       }
     },
@@ -1603,12 +1603,12 @@
         "back": 71.4,
         "knee": 126.6,
         "hip": 124.7,
-        "bar_dev": -0.055,
+        "bar_dev": 0.102,
         "midfoot_x": 654.7
       },
       "bar": {
-        "x": 669.03,
-        "y": 890.7,
+        "x": 628.25,
+        "y": 887.75,
         "observed": false
       }
     },
@@ -1669,12 +1669,12 @@
         "back": 70.9,
         "knee": 122.1,
         "hip": 121.0,
-        "bar_dev": -0.052,
+        "bar_dev": 0.104,
         "midfoot_x": 654.3
       },
       "bar": {
-        "x": 667.94,
-        "y": 902.53,
+        "x": 627.38,
+        "y": 901.12,
         "observed": false
       }
     },
@@ -1735,12 +1735,12 @@
         "back": 70.3,
         "knee": 118.0,
         "hip": 117.5,
-        "bar_dev": -0.052,
+        "bar_dev": 0.104,
         "midfoot_x": 653.5
       },
       "bar": {
-        "x": 666.94,
-        "y": 912.36,
+        "x": 626.5,
+        "y": 914.5,
         "observed": false
       }
     },
@@ -1801,12 +1801,12 @@
         "back": 69.4,
         "knee": 114.4,
         "hip": 114.0,
-        "bar_dev": -0.053,
+        "bar_dev": 0.104,
         "midfoot_x": 652.6
       },
       "bar": {
-        "x": 666.42,
-        "y": 917.04,
+        "x": 625.62,
+        "y": 927.88,
         "observed": false
       }
     },
@@ -1867,12 +1867,12 @@
         "back": 68.1,
         "knee": 111.7,
         "hip": 110.6,
-        "bar_dev": -0.031,
+        "bar_dev": 0.105,
         "midfoot_x": 651.8
       },
       "bar": {
-        "x": 659.89,
-        "y": 940.04,
+        "x": 624.75,
+        "y": 941.25,
         "observed": false
       }
     },
@@ -1933,12 +1933,12 @@
         "back": 66.5,
         "knee": 109.2,
         "hip": 107.1,
-        "bar_dev": -0.032,
+        "bar_dev": 0.107,
         "midfoot_x": 651.6
       },
       "bar": {
-        "x": 659.97,
-        "y": 951.94,
+        "x": 623.88,
+        "y": 954.62,
         "observed": false
       }
     },
@@ -2131,12 +2131,12 @@
         "back": 63.2,
         "knee": 102.7,
         "hip": 99.6,
-        "bar_dev": -0.025,
+        "bar_dev": 0.126,
         "midfoot_x": 651.2
       },
       "bar": {
-        "x": 657.62,
-        "y": 979.14,
+        "x": 618.5,
+        "y": 995.0,
         "observed": false
       }
     },
@@ -2329,12 +2329,12 @@
         "back": 60.9,
         "knee": 97.8,
         "hip": 94.0,
-        "bar_dev": -0.049,
+        "bar_dev": 0.149,
         "midfoot_x": 650.7
       },
       "bar": {
-        "x": 663.55,
-        "y": 1015.22,
+        "x": 612.0,
+        "y": 1036.5,
         "observed": false
       }
     },
@@ -3253,12 +3253,12 @@
         "back": 61.0,
         "knee": 72.4,
         "hip": 76.4,
-        "bar_dev": -0.024,
+        "bar_dev": 0.229,
         "midfoot_x": 650.9
       },
       "bar": {
-        "x": 657.27,
-        "y": 1155.04,
+        "x": 591.5,
+        "y": 1174.0,
         "observed": false
       }
     },
@@ -4837,12 +4837,12 @@
         "back": 58.0,
         "knee": 64.6,
         "hip": 69.7,
-        "bar_dev": 0.03,
+        "bar_dev": 0.249,
         "midfoot_x": 651.3
       },
       "bar": {
-        "x": 643.47,
-        "y": 1233.42,
+        "x": 586.8,
+        "y": 1211.8,
         "observed": false
       }
     },
@@ -4903,12 +4903,12 @@
         "back": 58.4,
         "knee": 68.6,
         "hip": 73.1,
-        "bar_dev": 0.023,
+        "bar_dev": 0.242,
         "midfoot_x": 651.4
       },
       "bar": {
-        "x": 645.5,
-        "y": 1232.4,
+        "x": 588.6,
+        "y": 1196.6,
         "observed": false
       }
     },
@@ -4969,12 +4969,12 @@
         "back": 59.1,
         "knee": 72.2,
         "hip": 75.8,
-        "bar_dev": 0.024,
+        "bar_dev": 0.235,
         "midfoot_x": 651.4
       },
       "bar": {
-        "x": 645.18,
-        "y": 1215.2,
+        "x": 590.4,
+        "y": 1181.4,
         "observed": false
       }
     },
@@ -5035,12 +5035,12 @@
         "back": 59.4,
         "knee": 75.6,
         "hip": 77.7,
-        "bar_dev": 0.039,
+        "bar_dev": 0.227,
         "midfoot_x": 651.0
       },
       "bar": {
-        "x": 640.77,
-        "y": 1201.46,
+        "x": 592.2,
+        "y": 1166.2,
         "observed": false
       }
     },
@@ -5695,12 +5695,12 @@
         "back": 64.6,
         "knee": 95.4,
         "hip": 97.4,
-        "bar_dev": -0.03,
+        "bar_dev": 0.161,
         "midfoot_x": 649.4
       },
       "bar": {
-        "x": 657.18,
-        "y": 991.37,
+        "x": 607.75,
+        "y": 1021.75,
         "observed": false
       }
     },
@@ -5761,12 +5761,12 @@
         "back": 63.9,
         "knee": 98.0,
         "hip": 98.9,
-        "bar_dev": -0.004,
+        "bar_dev": 0.15,
         "midfoot_x": 649.3
       },
       "bar": {
-        "x": 650.42,
-        "y": 990.28,
+        "x": 610.5,
+        "y": 1007.5,
         "observed": false
       }
     },
@@ -5827,12 +5827,12 @@
         "back": 63.9,
         "knee": 100.3,
         "hip": 100.8,
-        "bar_dev": -0.024,
+        "bar_dev": 0.139,
         "midfoot_x": 649.2
       },
       "bar": {
-        "x": 655.35,
-        "y": 970.59,
+        "x": 613.25,
+        "y": 993.25,
         "observed": false
       }
     },
@@ -5959,12 +5959,12 @@
         "back": 65.8,
         "knee": 104.9,
         "hip": 106.1,
-        "bar_dev": -0.013,
+        "bar_dev": 0.117,
         "midfoot_x": 649.0
       },
       "bar": {
-        "x": 652.28,
-        "y": 955.05,
+        "x": 618.6,
+        "y": 963.6,
         "observed": false
       }
     },
@@ -6025,12 +6025,12 @@
         "back": 67.0,
         "knee": 107.1,
         "hip": 108.7,
-        "bar_dev": -0.023,
+        "bar_dev": 0.106,
         "midfoot_x": 648.8
       },
       "bar": {
-        "x": 654.64,
-        "y": 935.68,
+        "x": 621.2,
+        "y": 948.2,
         "observed": false
       }
     },
@@ -6091,12 +6091,12 @@
         "back": 68.1,
         "knee": 110.3,
         "hip": 112.1,
-        "bar_dev": -0.025,
+        "bar_dev": 0.097,
         "midfoot_x": 648.9
       },
       "bar": {
-        "x": 655.44,
-        "y": 927.97,
+        "x": 623.8,
+        "y": 932.8,
         "observed": false
       }
     },
@@ -6157,12 +6157,12 @@
         "back": 69.2,
         "knee": 113.1,
         "hip": 115.5,
-        "bar_dev": -0.033,
+        "bar_dev": 0.089,
         "midfoot_x": 649.5
       },
       "bar": {
-        "x": 657.9,
-        "y": 918.14,
+        "x": 626.4,
+        "y": 917.4,
         "observed": false
       }
     },
@@ -6355,12 +6355,12 @@
         "back": 73.6,
         "knee": 122.0,
         "hip": 126.6,
-        "bar_dev": -0.039,
+        "bar_dev": 0.063,
         "midfoot_x": 651.5
       },
       "bar": {
-        "x": 661.49,
-        "y": 874.63,
+        "x": 635.0,
+        "y": 874.0,
         "observed": false
       }
     },
@@ -6751,12 +6751,12 @@
         "back": 80.1,
         "knee": 151.4,
         "hip": 151.9,
-        "bar_dev": -0.087,
+        "bar_dev": 0.01,
         "midfoot_x": 652.2
       },
       "bar": {
-        "x": 674.67,
-        "y": 817.99,
+        "x": 649.5,
+        "y": 792.0,
         "observed": false
       }
     },
@@ -6817,12 +6817,12 @@
         "back": 81.1,
         "knee": 157.2,
         "hip": 157.5,
-        "bar_dev": -0.085,
+        "bar_dev": 0.004,
         "midfoot_x": 652.9
       },
       "bar": {
-        "x": 674.89,
-        "y": 807.11,
+        "x": 652.0,
+        "y": 780.0,
         "observed": false
       }
     },
@@ -6883,12 +6883,12 @@
         "back": 81.9,
         "knee": 162.4,
         "hip": 162.5,
-        "bar_dev": -0.081,
+        "bar_dev": -0.004,
         "midfoot_x": 653.6
       },
       "bar": {
-        "x": 674.5,
-        "y": 807.95,
+        "x": 654.5,
+        "y": 768.0,
         "observed": false
       }
     },
@@ -8335,12 +8335,12 @@
         "back": 83.9,
         "knee": 173.1,
         "hip": 178.7,
-        "bar_dev": -0.096,
+        "bar_dev": -0.064,
         "midfoot_x": 653.9
       },
       "bar": {
-        "x": 678.75,
-        "y": 798.43,
+        "x": 670.5,
+        "y": 756.5,
         "observed": false
       }
     },
@@ -8467,12 +8467,12 @@
         "back": 83.4,
         "knee": 173.1,
         "hip": 178.3,
-        "bar_dev": -0.089,
+        "bar_dev": -0.052,
         "midfoot_x": 654.0
       },
       "bar": {
-        "x": 677.15,
-        "y": 797.03,
+        "x": 667.5,
+        "y": 758.0,
         "observed": false
       }
     },
@@ -9457,12 +9457,12 @@
         "back": 73.6,
         "knee": 134.9,
         "hip": 132.6,
-        "bar_dev": -0.093,
+        "bar_dev": 0.052,
         "midfoot_x": 653.4
       },
       "bar": {
-        "x": 677.61,
-        "y": 864.58,
+        "x": 640.0,
+        "y": 864.0,
         "observed": false
       }
     },
@@ -13813,12 +13813,12 @@
         "back": 68.2,
         "knee": 91.4,
         "hip": 96.6,
-        "bar_dev": -0.059,
+        "bar_dev": 0.108,
         "midfoot_x": 650.5
       },
       "bar": {
-        "x": 665.71,
-        "y": 1039.01,
+        "x": 622.5,
+        "y": 1061.0,
         "observed": false
       }
     },
@@ -14011,12 +14011,12 @@
         "back": 65.0,
         "knee": 95.1,
         "hip": 96.3,
-        "bar_dev": -0.044,
+        "bar_dev": 0.081,
         "midfoot_x": 650.6
       },
       "bar": {
-        "x": 661.98,
-        "y": 1006.51,
+        "x": 629.5,
+        "y": 1023.0,
         "observed": false
       }
     },
@@ -14209,12 +14209,12 @@
         "back": 64.2,
         "knee": 100.4,
         "hip": 100.3,
-        "bar_dev": -0.042,
+        "bar_dev": 0.053,
         "midfoot_x": 650.0
       },
       "bar": {
-        "x": 660.91,
-        "y": 974.2,
+        "x": 636.17,
+        "y": 975.0,
         "observed": false
       }
     },
@@ -14275,12 +14275,12 @@
         "back": 64.8,
         "knee": 102.8,
         "hip": 102.9,
-        "bar_dev": -0.046,
+        "bar_dev": 0.045,
         "midfoot_x": 650.0
       },
       "bar": {
-        "x": 661.9,
-        "y": 960.14,
+        "x": 638.33,
+        "y": 959.0,
         "observed": false
       }
     },
@@ -14341,12 +14341,12 @@
         "back": 65.8,
         "knee": 105.9,
         "hip": 106.3,
-        "bar_dev": -0.04,
+        "bar_dev": 0.037,
         "midfoot_x": 650.2
       },
       "bar": {
-        "x": 660.63,
-        "y": 947.94,
+        "x": 640.5,
+        "y": 943.0,
         "observed": false
       }
     },
@@ -14407,12 +14407,12 @@
         "back": 67.0,
         "knee": 109.2,
         "hip": 110.0,
-        "bar_dev": -0.046,
+        "bar_dev": 0.029,
         "midfoot_x": 650.3
       },
       "bar": {
-        "x": 662.14,
-        "y": 931.95,
+        "x": 642.67,
+        "y": 927.0,
         "observed": false
       }
     },
@@ -14473,12 +14473,12 @@
         "back": 68.5,
         "knee": 112.7,
         "hip": 114.2,
-        "bar_dev": -0.05,
+        "bar_dev": 0.023,
         "midfoot_x": 650.8
       },
       "bar": {
-        "x": 663.63,
-        "y": 914.42,
+        "x": 644.83,
+        "y": 911.0,
         "observed": false
       }
     },
@@ -14605,12 +14605,12 @@
         "back": 72.6,
         "knee": 121.2,
         "hip": 124.9,
-        "bar_dev": -0.055,
+        "bar_dev": 0.011,
         "midfoot_x": 652.0
       },
       "bar": {
-        "x": 666.27,
-        "y": 877.52,
+        "x": 649.0,
+        "y": 876.0,
         "observed": false
       }
     },
@@ -14671,12 +14671,12 @@
         "back": 74.7,
         "knee": 126.2,
         "hip": 131.0,
-        "bar_dev": -0.052,
+        "bar_dev": 0.006,
         "midfoot_x": 652.6
       },
       "bar": {
-        "x": 665.96,
-        "y": 859.79,
+        "x": 651.0,
+        "y": 857.0,
         "observed": false
       }
     },
@@ -14737,12 +14737,12 @@
         "back": 76.3,
         "knee": 132.3,
         "hip": 137.0,
-        "bar_dev": -0.068,
+        "bar_dev": -0.001,
         "midfoot_x": 652.8
       },
       "bar": {
-        "x": 670.31,
-        "y": 842.95,
+        "x": 653.0,
+        "y": 838.0,
         "observed": false
       }
     },
@@ -14935,12 +14935,12 @@
         "back": 79.0,
         "knee": 150.5,
         "hip": 150.9,
-        "bar_dev": -0.101,
+        "bar_dev": -0.042,
         "midfoot_x": 653.2
       },
       "bar": {
-        "x": 679.31,
-        "y": 823.47,
+        "x": 664.0,
+        "y": 789.33,
         "observed": false
       }
     },
@@ -15001,12 +15001,12 @@
         "back": 79.0,
         "knee": 156.7,
         "hip": 155.2,
-        "bar_dev": -0.092,
+        "bar_dev": -0.039,
         "midfoot_x": 653.8
       },
       "bar": {
-        "x": 677.64,
-        "y": 819.85,
+        "x": 664.0,
+        "y": 777.67,
         "observed": false
       }
     },
@@ -15331,12 +15331,12 @@
         "back": 80.9,
         "knee": 173.5,
         "hip": 177.3,
-        "bar_dev": -0.085,
+        "bar_dev": -0.033,
         "midfoot_x": 654.3
       },
       "bar": {
-        "x": 676.38,
-        "y": 798.51,
+        "x": 663.0,
+        "y": 753.5,
         "observed": false
       }
     },
@@ -15650,14 +15650,14 @@
     },
     {
       "t": 0.233,
-      "x": 678.71,
-      "y": 797.25,
+      "x": 657.67,
+      "y": 770.67,
       "observed": false
     },
     {
       "t": 0.267,
-      "x": 680.23,
-      "y": 796.94,
+      "x": 657.33,
+      "y": 771.33,
       "observed": false
     },
     {
@@ -15668,8 +15668,8 @@
     },
     {
       "t": 0.333,
-      "x": 680.84,
-      "y": 792.82,
+      "x": 656.0,
+      "y": 775.5,
       "observed": false
     },
     {
@@ -15680,8 +15680,8 @@
     },
     {
       "t": 0.4,
-      "x": 679.32,
-      "y": 801.47,
+      "x": 649.5,
+      "y": 784.0,
       "observed": false
     },
     {
@@ -15692,8 +15692,8 @@
     },
     {
       "t": 0.467,
-      "x": 678.69,
-      "y": 806.17,
+      "x": 644.0,
+      "y": 798.5,
       "observed": false
     },
     {
@@ -15704,8 +15704,8 @@
     },
     {
       "t": 0.533,
-      "x": 678.7,
-      "y": 815.46,
+      "x": 640.5,
+      "y": 813.5,
       "observed": false
     },
     {
@@ -15740,44 +15740,44 @@
     },
     {
       "t": 0.733,
-      "x": 668.27,
-      "y": 875.22,
+      "x": 629.12,
+      "y": 874.38,
       "observed": false
     },
     {
       "t": 0.767,
-      "x": 669.03,
-      "y": 890.7,
+      "x": 628.25,
+      "y": 887.75,
       "observed": false
     },
     {
       "t": 0.8,
-      "x": 667.94,
-      "y": 902.53,
+      "x": 627.38,
+      "y": 901.12,
       "observed": false
     },
     {
       "t": 0.833,
-      "x": 666.94,
-      "y": 912.36,
+      "x": 626.5,
+      "y": 914.5,
       "observed": false
     },
     {
       "t": 0.867,
-      "x": 666.42,
-      "y": 917.04,
+      "x": 625.62,
+      "y": 927.88,
       "observed": false
     },
     {
       "t": 0.9,
-      "x": 659.89,
-      "y": 940.04,
+      "x": 624.75,
+      "y": 941.25,
       "observed": false
     },
     {
       "t": 0.933,
-      "x": 659.97,
-      "y": 951.94,
+      "x": 623.88,
+      "y": 954.62,
       "observed": false
     },
     {
@@ -15794,8 +15794,8 @@
     },
     {
       "t": 1.033,
-      "x": 657.62,
-      "y": 979.14,
+      "x": 618.5,
+      "y": 995.0,
       "observed": false
     },
     {
@@ -15812,8 +15812,8 @@
     },
     {
       "t": 1.133,
-      "x": 663.55,
-      "y": 1015.22,
+      "x": 612.0,
+      "y": 1036.5,
       "observed": false
     },
     {
@@ -15896,8 +15896,8 @@
     },
     {
       "t": 1.6,
-      "x": 657.27,
-      "y": 1155.04,
+      "x": 591.5,
+      "y": 1174.0,
       "observed": false
     },
     {
@@ -16040,26 +16040,26 @@
     },
     {
       "t": 2.4,
-      "x": 643.47,
-      "y": 1233.42,
+      "x": 586.8,
+      "y": 1211.8,
       "observed": false
     },
     {
       "t": 2.433,
-      "x": 645.5,
-      "y": 1232.4,
+      "x": 588.6,
+      "y": 1196.6,
       "observed": false
     },
     {
       "t": 2.466,
-      "x": 645.18,
-      "y": 1215.2,
+      "x": 590.4,
+      "y": 1181.4,
       "observed": false
     },
     {
       "t": 2.5,
-      "x": 640.77,
-      "y": 1201.46,
+      "x": 592.2,
+      "y": 1166.2,
       "observed": false
     },
     {
@@ -16118,20 +16118,20 @@
     },
     {
       "t": 2.833,
-      "x": 657.18,
-      "y": 991.37,
+      "x": 607.75,
+      "y": 1021.75,
       "observed": false
     },
     {
       "t": 2.866,
-      "x": 650.42,
-      "y": 990.28,
+      "x": 610.5,
+      "y": 1007.5,
       "observed": false
     },
     {
       "t": 2.9,
-      "x": 655.35,
-      "y": 970.59,
+      "x": 613.25,
+      "y": 993.25,
       "observed": false
     },
     {
@@ -16142,26 +16142,26 @@
     },
     {
       "t": 2.966,
-      "x": 652.28,
-      "y": 955.05,
+      "x": 618.6,
+      "y": 963.6,
       "observed": false
     },
     {
       "t": 3.0,
-      "x": 654.64,
-      "y": 935.68,
+      "x": 621.2,
+      "y": 948.2,
       "observed": false
     },
     {
       "t": 3.033,
-      "x": 655.44,
-      "y": 927.97,
+      "x": 623.8,
+      "y": 932.8,
       "observed": false
     },
     {
       "t": 3.066,
-      "x": 657.9,
-      "y": 918.14,
+      "x": 626.4,
+      "y": 917.4,
       "observed": false
     },
     {
@@ -16178,8 +16178,8 @@
     },
     {
       "t": 3.166,
-      "x": 661.49,
-      "y": 874.63,
+      "x": 635.0,
+      "y": 874.0,
       "observed": false
     },
     {
@@ -16214,20 +16214,20 @@
     },
     {
       "t": 3.366,
-      "x": 674.67,
-      "y": 817.99,
+      "x": 649.5,
+      "y": 792.0,
       "observed": false
     },
     {
       "t": 3.4,
-      "x": 674.89,
-      "y": 807.11,
+      "x": 652.0,
+      "y": 780.0,
       "observed": false
     },
     {
       "t": 3.433,
-      "x": 674.5,
-      "y": 807.95,
+      "x": 654.5,
+      "y": 768.0,
       "observed": false
     },
     {
@@ -16358,8 +16358,8 @@
     },
     {
       "t": 4.166,
-      "x": 678.75,
-      "y": 798.43,
+      "x": 670.5,
+      "y": 756.5,
       "observed": false
     },
     {
@@ -16370,8 +16370,8 @@
     },
     {
       "t": 4.233,
-      "x": 677.15,
-      "y": 797.03,
+      "x": 667.5,
+      "y": 758.0,
       "observed": false
     },
     {
@@ -16460,8 +16460,8 @@
     },
     {
       "t": 4.733,
-      "x": 677.61,
-      "y": 864.58,
+      "x": 640.0,
+      "y": 864.0,
       "observed": false
     },
     {
@@ -16856,8 +16856,8 @@
     },
     {
       "t": 6.933,
-      "x": 665.71,
-      "y": 1039.01,
+      "x": 622.5,
+      "y": 1061.0,
       "observed": false
     },
     {
@@ -16874,8 +16874,8 @@
     },
     {
       "t": 7.033,
-      "x": 661.98,
-      "y": 1006.51,
+      "x": 629.5,
+      "y": 1023.0,
       "observed": false
     },
     {
@@ -16892,32 +16892,32 @@
     },
     {
       "t": 7.133,
-      "x": 660.91,
-      "y": 974.2,
+      "x": 636.17,
+      "y": 975.0,
       "observed": false
     },
     {
       "t": 7.166,
-      "x": 661.9,
-      "y": 960.14,
+      "x": 638.33,
+      "y": 959.0,
       "observed": false
     },
     {
       "t": 7.199,
-      "x": 660.63,
-      "y": 947.94,
+      "x": 640.5,
+      "y": 943.0,
       "observed": false
     },
     {
       "t": 7.233,
-      "x": 662.14,
-      "y": 931.95,
+      "x": 642.67,
+      "y": 927.0,
       "observed": false
     },
     {
       "t": 7.266,
-      "x": 663.63,
-      "y": 914.42,
+      "x": 644.83,
+      "y": 911.0,
       "observed": false
     },
     {
@@ -16928,20 +16928,20 @@
     },
     {
       "t": 7.333,
-      "x": 666.27,
-      "y": 877.52,
+      "x": 649.0,
+      "y": 876.0,
       "observed": false
     },
     {
       "t": 7.366,
-      "x": 665.96,
-      "y": 859.79,
+      "x": 651.0,
+      "y": 857.0,
       "observed": false
     },
     {
       "t": 7.399,
-      "x": 670.31,
-      "y": 842.95,
+      "x": 653.0,
+      "y": 838.0,
       "observed": false
     },
     {
@@ -16958,14 +16958,14 @@
     },
     {
       "t": 7.499,
-      "x": 679.31,
-      "y": 823.47,
+      "x": 664.0,
+      "y": 789.33,
       "observed": false
     },
     {
       "t": 7.533,
-      "x": 677.64,
-      "y": 819.85,
+      "x": 664.0,
+      "y": 777.67,
       "observed": false
     },
     {
@@ -16994,8 +16994,8 @@
     },
     {
       "t": 7.699,
-      "x": 676.38,
-      "y": 798.51,
+      "x": 663.0,
+      "y": 753.5,
       "observed": false
     },
     {
@@ -17070,31 +17070,36 @@
         1783.6438097272612
       ],
       "knee": [
-        485.72647414719916,
-        1638.9916868373489
+        533.8286003044677,
+        1588.0867930821023
       ],
       "hip": [
-        718.2184746019559,
-        1654.3231051948967
+        766.3068753603882,
+        1603.6249490644773
       ],
       "shoulder": [
-        609.1670566381106,
-        1471.673454621166
+        657.2554573965429,
+        1420.9752984907466
       ],
       "bar": [
-        539.4597823373986,
-        1345.6546525232995
+        587.5481830958308,
+        1294.9564963928801
       ],
       "corrections": [
         {
           "criterion_id": "depth",
-          "label": "Sit lower",
-          "detail": "At the bottom your hip was 0.02 shin-lengths below your knee - close enough to level that we could not call it either way. The ghost shows the hip 0.06 below the knee, clearly past parallel. Because your foot stays planted and your bones do not change length, reaching it means the whole hip travels about 0.23 shin-lengths further down and the shin angles further forward.",
+          "label": "Sit back and down",
+          "detail": "At the bottom your hip was 0.02 shin-lengths below your knee - close enough to level that we could not call it either way. The standard wants it 0.06 below the knee, clearly past parallel. The ghost shows where it needed to be. Because your foot stays planted and your bones do not change length, reaching it means the hip travels about 0.04 shin-lengths further down and further back, with the shin held near the 39 degrees of lean you already showed rather than driving the knees forward. Depth comes from the hips going back.",
           "provenance": "document_stated rule, engineering_tolerance margin"
         }
       ],
       "solved": true,
-      "note": null
+      "note": null,
+      "depth_limited": false,
+      "limit_reason": null,
+      "observed_shin_lean_deg": 38.6,
+      "target_shin_lean_deg": 38.6,
+      "hip_behind_midfoot_shin": 0.442
     },
     "2": {
       "frame": 188,
@@ -17104,31 +17109,36 @@
         1782.2995540073953
       ],
       "knee": [
-        484.85813912253104,
-        1638.8879161432008
+        532.8795443262377,
+        1587.5667463030145
       ],
       "hip": [
-        717.3954458815423,
-        1653.6743650404171
+        765.368431430165,
+        1603.0959278301214
       ],
       "shoulder": [
-        584.5924509490951,
-        1436.9790699790328
+        632.5654364977178,
+        1386.400632768737
       ],
       "bar": [
-        548.5162116356965,
-        1360.9468041796458
+        596.4891971843192,
+        1310.36836696935
       ],
       "corrections": [
         {
           "criterion_id": "depth",
-          "label": "Sit lower",
-          "detail": "At the bottom your hip was 0.01 shin-lengths above your knee - close enough to level that we could not call it either way. The ghost shows the hip 0.06 below the knee, clearly past parallel. Because your foot stays planted and your bones do not change length, reaching it means the whole hip travels about 0.26 shin-lengths further down and the shin angles further forward.",
+          "label": "Sit back and down",
+          "detail": "At the bottom your hip was 0.01 shin-lengths above your knee - close enough to level that we could not call it either way. The standard wants it 0.06 below the knee, clearly past parallel. The ghost shows where it needed to be. Because your foot stays planted and your bones do not change length, reaching it means the hip travels about 0.07 shin-lengths further down and further back, with the shin held near the 39 degrees of lean you already showed rather than driving the knees forward. Depth comes from the hips going back.",
           "provenance": "document_stated rule, engineering_tolerance margin"
         }
       ],
       "solved": true,
-      "note": null
+      "note": null,
+      "depth_limited": false,
+      "limit_reason": null,
+      "observed_shin_lean_deg": 38.8,
+      "target_shin_lean_deg": 38.8,
+      "hip_behind_midfoot_shin": 0.445
     }
   }
 }

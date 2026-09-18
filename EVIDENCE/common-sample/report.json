@@ -21,8 +21,9 @@
   },
   "bar": {
     "observed_fraction": 0.801,
+    "usable_fraction": 1.0,
     "median_radius_px": 169.0,
-    "note": "44 frame(s) had a circle detected at an implausible radius and were discarded as background structure."
+    "note": "44 frame(s) had a circle detected at an implausible radius and were discarded as background structure. 47 frame(s) were interpolated between detections up to 10 frames apart."
   },
   "scale": {
     "mm_per_px": 1.3314,
@@ -64,8 +65,8 @@
         "id": "bar_tracked",
         "passed": true,
         "severity": "ok",
-        "detail": "The barbell plate was detected in 80% of frames. 44 frame(s) had a circle detected at an implausible radius and were discarded as background structure.",
-        "value": 0.8008
+        "detail": "The barbell was tracked through 100% of frames (80% detected directly, 20% interpolated between nearby detections). 44 frame(s) had a circle detected at an implausible radius and were discarded as background structure. 47 frame(s) were interpolated between detections up to 10 frames apart.",
+        "value": 1.0
       }
     ],
     "view_ratio": 0.128,
@@ -225,12 +226,12 @@
       ],
       "quote": "Correctly is deep, with hips dropping below level with the top of the patellas. Correctly is therefore full range of motion.",
       "feedback_source": "Any squat that is not deep is a partial squat. If you are high, check that your stance is wide enough but not too wide, that your toes are out enough, and that your knees are tracking parallel to your feet - most people who squat high do not shove their knees out enough.",
-      "uncertainty": "The measurement is at the edge of the tolerance band, making it impossible to distinguish a genuinely deep squat from one that is just barely short.",
-      "explanation": "The hip finished 0.019 shin-lengths below the knee at the bottom, which is within the measurement tolerance and too close to call from this footage.",
+      "uncertainty": null,
+      "explanation": "The hip finished within 0.03 shin-lengths of the knee (+0.019), which is inside our measurement tolerance. Depth is too close to call from this footage rather than clearly good or clearly short.",
       "feedback": null,
       "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -274,11 +275,11 @@
       "quote": "The back angle is formed by the plane of the torso and the floor, which is assumed to be horizontal (meaning level, perpendicular to the force of gravity).",
       "feedback_source": "Most people have a picture in their minds of a vertical torso during the squat. The back angle will not be vertical at all; sit back, lean forward, and shove your knees out. Balance problems usually indicate a back angle that is too vertical.",
       "uncertainty": null,
-      "explanation": "The back angle was 59.2 degrees from horizontal at the bottom, which is within the acceptable range around the reference position.",
+      "explanation": "The back is 59 degrees from horizontal at the bottom, toward the vertical end of our +/-15 degree band around the document's 'about 45 degrees'. The document gives a reference posture, not a pass mark, so this is within range rather than exactly correct.",
       "feedback": null,
       "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -293,17 +294,18 @@
         "frame": 60,
         "t": 2.0,
         "available": true,
-        "confidence": "medium",
+        "confidence": "high",
         "reason": null,
         "detail": {
-          "tracked_fraction": 0.74,
+          "tracked_fraction": 1.0,
+          "detected_fraction": 0.74,
           "worst_deviation_shin": 0.2654,
-          "note": "Midfoot is the midpoint between heel and toe landmarks."
+          "note": "Midfoot is the midpoint between heel and toe landmarks. tracked_fraction counts frames whose bar position is measured or bracketed by measurements; detected_fraction counts measured only."
         }
       },
       "threshold_value": 0.15,
       "threshold_provenance": "engineering_tolerance",
-      "confidence": "medium",
+      "confidence": "high",
       "reason": "The bar drifted up to 0.27 shin-lengths from the midfoot, beyond our 0.15 allowance, so it left the balance point during the lift.",
       "citation": "ref p. 6, 8, 9, 11, 12 \u00b7 Fig 2-5, 2-7",
       "source_pages": [
@@ -315,12 +317,12 @@
       ],
       "quote": "So not only is a straight line the shortest distance between two points, but a straight vertical line is also the most efficient bar path for a barbell moving through space in a gravitational framework.",
       "feedback_source": "When the bar is off-balance, the added energy you must expend due to the leverage of the off-balance load makes the weight harder to lift. Keep the bar travelling in a vertical line over the middle of the foot through the complete range of motion.",
-      "uncertainty": "The tracked fraction was 74%, so the bar was successfully measured through most of the rep.",
-      "explanation": "The bar drifted 0.27 shin-lengths from the midfoot during the lift, exceeding the limit of straight vertical travel over the middle of the foot.",
-      "feedback": "Keep the bar travelling in a vertical line over the middle of the foot through the complete range of motion. When the bar is off-balance, the added energy you must expend due to the leverage of the off-balance load makes the weight harder to lift.",
+      "uncertainty": null,
+      "explanation": "The bar drifted up to 0.27 shin-lengths from the midfoot, beyond our 0.15 allowance, so it left the balance point during the lift.",
+      "feedback": "When the bar is off-balance, the added energy you must expend due to the leverage of the off-balance load makes the weight harder to lift. Keep the bar travelling in a vertical line over the middle of the foot through the complete range of motion.",
       "timestamp_s": 1.9998305084745762,
       "frame_index": 60,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -358,11 +360,11 @@
       "quote": "come up out of the bottom by driving your butt straight up in the air. Up, not forward.",
       "feedback_source": "Think about a chain hooked to your hips, pulling you straight up out of the bottom. Do not think about your knees straightening out, do not think about your feet pushing against the floor. Just drive your hips up out of the bottom.",
       "uncertainty": null,
-      "explanation": "The shoulders rose faster than the hips out of the bottom, with a ratio of 0.70, which means you are lifting your chest instead of driving your hips up.",
+      "explanation": "The shoulders rose faster than the hips out of the bottom (ratio 0.70), which is lifting the chest rather than driving the hips.",
       "feedback": "Think about a chain hooked to your hips, pulling you straight up out of the bottom. Do not think about your knees straightening out, do not think about your feet pushing against the floor. Just drive your hips up out of the bottom.",
       "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -397,11 +399,11 @@
       "quote": "the hips are back, the knees are just a little forward of the toes, and the back is at an angle (about 45 degrees) that will place the bar over the middle of the foot.",
       "feedback_source": null,
       "uncertainty": null,
-      "explanation": "At the bottom, the knee is 0.17 shin-lengths forward of the toe, matching the standard of just a little forward.",
+      "explanation": "At the bottom the knee is 0.17 shin-lengths forward of the toe, matching 'just a little forward of the toes'.",
       "feedback": null,
       "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -434,11 +436,11 @@
       "quote": "The femurs are parallel to the feet, the feet are flat on the ground at the correct angle",
       "feedback_source": null,
       "uncertainty": "Heel landmarks are easily confused by footwear and by the far foot.",
-      "explanation": "The heel remained flat on the floor, moving only 0.01 shin-lengths from standing height.",
+      "explanation": "The heel stayed down; it moved -0.01 shin-lengths from its standing height.",
       "feedback": null,
       "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -472,12 +474,12 @@
       ],
       "quote": "The bar should therefore be in the lowest secure position it can occupy on the back, right below the spine of the scapula",
       "feedback_source": null,
-      "uncertainty": "Correct versus incorrect bar placement differs by roughly two centimetres on the athlete, and we have no calibrated basis for a threshold.",
-      "explanation": "There is no scapular-spine landmark available from pose estimation, so the bar placement cannot be assessed against the standard of being right below the spine of the scapula.",
+      "uncertainty": "There is no scapular-spine landmark in pose estimation, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete.",
+      "explanation": "The bar centre sits 0.51 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
       "feedback": null,
       "timestamp_s": 0.0,
       "frame_index": 0,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -509,12 +511,12 @@
       ],
       "quote": "fix your eyes on a position on the floor 4 or 5 feet in front of you",
       "feedback_source": null,
-      "uncertainty": "The head is occluded by the plate in this frame.",
-      "explanation": "The head is behind the barbell plate at the bottom, so head orientation was inferred rather than observed and cannot be assessed.",
+      "uncertainty": "the head is behind the barbell plate in this frame, so head orientation is inferred by the pose model rather than observed",
+      "explanation": "This could not be measured because the head is behind the barbell plate in this frame, so head orientation is inferred by the pose model rather than observed.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -535,12 +537,12 @@
       ],
       "quote": "You will fail to shove your knees out as you start down. This will make correct depth hard to attain and will kill your hip drive.",
       "feedback_source": null,
-      "uncertainty": "A front-facing or 45-degree camera angle is needed to assess this criterion.",
-      "explanation": "Knees-out is displacement in the frontal plane, perpendicular to a side-view camera, so it contains no information about this standard.",
+      "uncertainty": "Needed to assess this: A front-facing or 45-degree camera angle.",
+      "explanation": "Knees-out is displacement in the frontal plane, perpendicular to the camera. A sagittal view contains no information about it. Requires a front or 45-degree camera.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 2.1664830508474577,
       "frame_index": null,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -562,12 +564,12 @@
       ],
       "quote": "We will use a fairly neutral foot placement, with the heels about shoulder width apart and the toes pointed out at about 30 degrees.",
       "feedback_source": null,
-      "uncertainty": "A front or overhead camera angle is needed to assess this criterion.",
-      "explanation": "Stance width and toe angle are frontal-plane and transverse-plane measurements that cannot be recovered from a single sagittal side view.",
+      "uncertainty": "Needed to assess this: A front or overhead camera angle.",
+      "explanation": "Stance width is a frontal-plane measurement and toe angle is a transverse-plane measurement. Neither is recoverable from a single sagittal view. The document's own illustration of the standard (Figure 2-12) is an overhead view.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 2.1664830508474577,
       "frame_index": null,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 1,
@@ -587,12 +589,12 @@
       ],
       "quote": "Set the rack height so that the bar in the rack is at about the level of your mid-sternum.",
       "feedback_source": null,
-      "uncertainty": "Footage of the unrack with the rack uprights and the lifter both in frame is needed to assess this criterion.",
-      "explanation": "Rack height is a property of the setup before the set, not of the repetition itself, and the rack is typically outside the frame.",
+      "uncertainty": "Needed to assess this: Footage of the unrack, with the rack uprights and the lifter both in frame.",
+      "explanation": "A property of the setup before the set, not of a repetition. The rack and the unracking are typically outside the frame of an uploaded squat clip, and our analysis is rep-scoped.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 2.1664830508474577,
       "frame_index": null,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -630,12 +632,12 @@
       ],
       "quote": "Correctly is deep, with hips dropping below level with the top of the patellas. Correctly is therefore full range of motion.",
       "feedback_source": "Any squat that is not deep is a partial squat. If you are high, check that your stance is wide enough but not too wide, that your toes are out enough, and that your knees are tracking parallel to your feet - most people who squat high do not shove their knees out enough.",
-      "uncertainty": "The measurement is at the edge of the tolerance band, making it impossible to distinguish a genuinely deep squat from one that is just barely short.",
-      "explanation": "The hip finished 0.01 shin-lengths above the knee at the bottom, which is within the measurement tolerance and too close to call from this footage.",
+      "uncertainty": null,
+      "explanation": "The hip finished within 0.03 shin-lengths of the knee (-0.010), which is inside our measurement tolerance. Depth is too close to call from this footage rather than clearly good or clearly short.",
       "feedback": null,
       "timestamp_s": 6.266135593220339,
       "frame_index": 188,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -679,11 +681,11 @@
       "quote": "The back angle is formed by the plane of the torso and the floor, which is assumed to be horizontal (meaning level, perpendicular to the force of gravity).",
       "feedback_source": "Most people have a picture in their minds of a vertical torso during the squat. The back angle will not be vertical at all; sit back, lean forward, and shove your knees out. Balance problems usually indicate a back angle that is too vertical.",
       "uncertainty": null,
-      "explanation": "The back angle was 58.5 degrees from horizontal at the bottom, which is within the acceptable range around the reference position.",
+      "explanation": "The back is 58 degrees from horizontal at the bottom, toward the vertical end of our +/-15 degree band around the document's 'about 45 degrees'. The document gives a reference posture, not a pass mark, so this is within range rather than exactly correct.",
       "feedback": null,
       "timestamp_s": 6.266135593220339,
       "frame_index": 188,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -701,9 +703,10 @@
         "confidence": "high",
         "reason": null,
         "detail": {
-          "tracked_fraction": 0.86,
+          "tracked_fraction": 1.0,
+          "detected_fraction": 0.86,
           "worst_deviation_shin": 0.2381,
-          "note": "Midfoot is the midpoint between heel and toe landmarks."
+          "note": "Midfoot is the midpoint between heel and toe landmarks. tracked_fraction counts frames whose bar position is measured or bracketed by measurements; detected_fraction counts measured only."
         }
       },
       "threshold_value": 0.15,
@@ -721,11 +724,11 @@
       "quote": "So not only is a straight line the shortest distance between two points, but a straight vertical line is also the most efficient bar path for a barbell moving through space in a gravitational framework.",
       "feedback_source": "When the bar is off-balance, the added energy you must expend due to the leverage of the off-balance load makes the weight harder to lift. Keep the bar travelling in a vertical line over the middle of the foot through the complete range of motion.",
       "uncertainty": null,
-      "explanation": "The bar drifted 0.24 shin-lengths from the midfoot during the lift, exceeding the limit of straight vertical travel over the middle of the foot.",
-      "feedback": "Keep the bar travelling in a vertical line over the middle of the foot through the complete range of motion. When the bar is off-balance, the added energy you must expend due to the leverage of the off-balance load makes the weight harder to lift.",
+      "explanation": "The bar drifted up to 0.24 shin-lengths from the midfoot, beyond our 0.15 allowance, so it left the balance point during the lift.",
+      "feedback": "When the bar is off-balance, the added energy you must expend due to the leverage of the off-balance load makes the weight harder to lift. Keep the bar travelling in a vertical line over the middle of the foot through the complete range of motion.",
       "timestamp_s": 5.999491525423728,
       "frame_index": 180,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -757,12 +760,12 @@
       ],
       "quote": "come up out of the bottom by driving your butt straight up in the air. Up, not forward.",
       "feedback_source": "Think about a chain hooked to your hips, pulling you straight up out of the bottom. Do not think about your knees straightening out, do not think about your feet pushing against the floor. Just drive your hips up out of the bottom.",
-      "uncertainty": "The early ascent was too slow to measure the hip-versus-shoulder rise ratio.",
-      "explanation": "The shoulders rose less than 0.02 shin-lengths in the first 150 milliseconds of the ascent, which is too little movement to compare hip and shoulder rise reliably.",
+      "uncertainty": "the shoulders rose less than 0.02 shin-lengths in the first 150 ms of the ascent, which is too little movement to compare hip and shoulder rise reliably",
+      "explanation": "This could not be measured because the shoulders rose less than 0.02 shin-lengths in the first 150 ms of the ascent, which is too little movement to compare hip and shoulder rise reliably.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 6.266135593220339,
       "frame_index": 188,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -797,11 +800,11 @@
       "quote": "the hips are back, the knees are just a little forward of the toes, and the back is at an angle (about 45 degrees) that will place the bar over the middle of the foot.",
       "feedback_source": null,
       "uncertainty": null,
-      "explanation": "At the bottom, the knee is 0.15 shin-lengths forward of the toe, matching the standard of just a little forward.",
+      "explanation": "At the bottom the knee is 0.15 shin-lengths forward of the toe, matching 'just a little forward of the toes'.",
       "feedback": null,
       "timestamp_s": 6.266135593220339,
       "frame_index": 188,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -834,11 +837,11 @@
       "quote": "The femurs are parallel to the feet, the feet are flat on the ground at the correct angle",
       "feedback_source": null,
       "uncertainty": "Heel landmarks are easily confused by footwear and by the far foot.",
-      "explanation": "The heel remained flat on the floor, moving only 0.03 shin-lengths from standing height.",
+      "explanation": "The heel stayed down; it moved 0.03 shin-lengths from its standing height.",
       "feedback": null,
       "timestamp_s": 6.266135593220339,
       "frame_index": 188,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -872,12 +875,12 @@
       ],
       "quote": "The bar should therefore be in the lowest secure position it can occupy on the back, right below the spine of the scapula",
       "feedback_source": null,
-      "uncertainty": "Correct versus incorrect bar placement differs by roughly two centimetres on the athlete, and we have no calibrated basis for a threshold.",
-      "explanation": "There is no scapular-spine landmark available from pose estimation, so the bar placement cannot be assessed against the standard of being right below the spine of the scapula.",
+      "uncertainty": "There is no scapular-spine landmark in pose estimation, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete.",
+      "explanation": "The bar centre sits 0.47 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
       "feedback": null,
       "timestamp_s": 3.9996610169491524,
       "frame_index": 120,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -909,12 +912,12 @@
       ],
       "quote": "fix your eyes on a position on the floor 4 or 5 feet in front of you",
       "feedback_source": null,
-      "uncertainty": "The head is occluded by the plate in this frame.",
-      "explanation": "The head is behind the barbell plate at the bottom, so head orientation was inferred rather than observed and cannot be assessed.",
+      "uncertainty": "the head is behind the barbell plate in this frame, so head orientation is inferred by the pose model rather than observed",
+      "explanation": "This could not be measured because the head is behind the barbell plate in this frame, so head orientation is inferred by the pose model rather than observed.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 6.266135593220339,
       "frame_index": 188,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -935,12 +938,12 @@
       ],
       "quote": "You will fail to shove your knees out as you start down. This will make correct depth hard to attain and will kill your hip drive.",
       "feedback_source": null,
-      "uncertainty": "A front-facing or 45-degree camera angle is needed to assess this criterion.",
-      "explanation": "Knees-out is displacement in the frontal plane, perpendicular to a side-view camera, so it contains no information about this standard.",
+      "uncertainty": "Needed to assess this: A front-facing or 45-degree camera angle.",
+      "explanation": "Knees-out is displacement in the frontal plane, perpendicular to the camera. A sagittal view contains no information about it. Requires a front or 45-degree camera.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 6.266135593220339,
       "frame_index": null,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -962,12 +965,12 @@
       ],
       "quote": "We will use a fairly neutral foot placement, with the heels about shoulder width apart and the toes pointed out at about 30 degrees.",
       "feedback_source": null,
-      "uncertainty": "A front or overhead camera angle is needed to assess this criterion.",
-      "explanation": "Stance width and toe angle are frontal-plane and transverse-plane measurements that cannot be recovered from a single sagittal side view.",
+      "uncertainty": "Needed to assess this: A front or overhead camera angle.",
+      "explanation": "Stance width is a frontal-plane measurement and toe angle is a transverse-plane measurement. Neither is recoverable from a single sagittal view. The document's own illustration of the standard (Figure 2-12) is an overhead view.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 6.266135593220339,
       "frame_index": null,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     },
     {
       "rep_index": 2,
@@ -987,23 +990,16 @@
       ],
       "quote": "Set the rack height so that the bar in the rack is at about the level of your mid-sternum.",
       "feedback_source": null,
-      "uncertainty": "Footage of the unrack with the rack uprights and the lifter both in frame is needed to assess this criterion.",
-      "explanation": "Rack height is a property of the setup before the set, not of the repetition itself, and the rack is typically outside the frame.",
+      "uncertainty": "Needed to assess this: Footage of the unrack, with the rack uprights and the lifter both in frame.",
+      "explanation": "A property of the setup before the set, not of a repetition. The rack and the unracking are typically outside the frame of an uploaded squat clip, and our analysis is rep-scoped.",
       "feedback": null,
-      "timestamp_s": null,
+      "timestamp_s": 6.266135593220339,
       "frame_index": null,
-      "narrated_by": "agent"
+      "narrated_by": "rules"
     }
   ],
   "summary": "Your back angle, knee position at the bottom (sagittal) and heels flat on the floor met the standard on both repetitions. The main thing to fix is bar path over the midfoot, which did not meet the standard on both repetitions (ref p. 6, 8, 9, 11, 12 \u00b7 Fig 2-5, 2-7). Also short: hip drive out of the bottom. Your squat depth and bar placement on the back landed inside our measurement tolerance, so it was too close to call either way - that is a limit of the measurement, not of the camera angle. We could not measure eye gaze direction in this clip - the evidence was not visible in the frames we needed. Hip drive out of the bottom could not be measured on one repetition, so that verdict covers only part of the set. A side view cannot judge knees shoved out; stance width and toe angle; rack height and unracking procedure at all; those need a different camera angle.",
   "blocked": false,
-  "agent_note": null,
-  "cost": {
-    "model": "claude-haiku-4-5",
-    "input_tokens": 13033,
-    "cache_read_tokens": 0,
-    "cache_write_tokens": 0,
-    "output_tokens": 2485,
-    "estimated_usd": 0.0255
-  }
+  "agent_note": "Run with --no-agent: deterministic rule engine only, no language model involved.",
+  "cost": null
 }

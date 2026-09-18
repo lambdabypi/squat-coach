@@ -258,6 +258,23 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
               the position the reference document describes. It is not a stock animation of
               someone else.
             </p>
+            {/* Segment lengths are not the same thing as range of motion, and an earlier version
+                of this panel claimed "your body" while asking for 16 degrees more ankle bend than
+                the athlete had shown - which would have lifted the heel and broken a different
+                requirement. The target is now held to the lean they demonstrated, so this states
+                which sense of "your body" is meant. */}
+            <p className="faint" style={{ marginTop: -4 }}>
+              It also stays inside the ankle bend you actually showed at the bottom
+              {targetPose.observed_shin_lean_deg != null && (
+                <> (about {Math.round(targetPose.observed_shin_lean_deg)} degrees of shin lean)</>
+              )}
+              , so the extra depth comes from the hips travelling back rather than the knees
+              going further forward. We measured your segment lengths, not your flexibility, so
+              treat the ankle range as the floor of what you can do and not a limit on it.
+            </p>
+            {targetPose.depth_limited && targetPose.note && (
+              <p className="uncertain">{targetPose.note}</p>
+            )}
             {targetPose.corrections.map((c) => (
               <div key={c.criterion_id} className="feedback" style={{ marginTop: 10 }}>
                 <strong>{c.label}.</strong> {c.detail}

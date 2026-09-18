@@ -176,6 +176,13 @@ export interface TargetPose {
   corrections: Correction[];
   solved: boolean;
   note: string | null;
+  // Set when a physical limit, not effort, stops the target reaching depth. limit_reason names
+  // which one bound, so the message does not blame the ankle for a balance limit.
+  depth_limited: boolean;
+  limit_reason: "ankle" | "balance" | "ankle_and_balance" | "unknown" | null;
+  observed_shin_lean_deg: number | null;
+  target_shin_lean_deg: number | null;
+  hip_behind_midfoot_shin: number | null;
 }
 
 export interface JobStatus {

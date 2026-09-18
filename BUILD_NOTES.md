@@ -245,13 +245,58 @@ works, not an arbitrary valid one.
 
 It also refuses to fix one criterion by breaking another. Deepening a squat with a planted foot
 drives the knee forward, so a one-sided penalty holds the knee inside the limit the skill declares.
-On the common sample the knee travels from 0.17 to 0.35 shin-lengths past the toe - still inside
-the 0.5 limit, so the guard does not bind here. It exists so a different body cannot be handed
-advice that violates a rule it was passing.
+It exists so a different body cannot be handed advice that violates a rule it was passing.
 
 `scripts/test_target_pose.py` re-measures the solved pose against the same rules: bone lengths
-preserved to 0.00% drift, ankle planted to 0.01px, depth corrected from +0.022 to +0.059
+preserved to 0.00% drift, ankle planted to 0.01px, depth corrected from +0.022 to +0.060
 shin-lengths (clearing the 0.03 tolerance), knee and back angle both still compliant.
+
+**A geometrically valid target that no human could reach.** All of the above passed while the
+target was biomechanically wrong, and it took the user asking "is the ideal position even
+possible for a human?" to find it. The original residuals pulled the hip toward the midfoot on
+the reasoning that a balanced squat stays over the foot. That term stopped the hips travelling
+*back*, so the only remaining route to depth was the knees going *forward*, and the solver duly
+asked for a **54.7 degree shin lean against the 38.6 the athlete showed - 16 degrees more ankle
+dorsiflexion**, with the knee travelling from 0.17 to 0.35 shin-lengths past the toe. Sixteen
+degrees is not a cue anyone can apply; reaching it lifts the heel, which breaks the document's own
+feet-flat requirement (ref p.23). The target satisfied depth by quietly violating a criterion it
+was not checking, and the document actually prescribes the opposite: "sit back, lean forward, and
+shove your knees out" (ref p.33).
+
+`test_target_pose.py` could not have caught this. It asks whether the pose is *geometrically*
+valid - bones preserved, foot planted, depth met, other criteria inside tolerance - and the pose
+was all of those. Achievability is a different question, so it needed a different script:
+`scripts/check_target_feasible.py`.
+
+Two changes, both one-sided limits rather than targets:
+
+- **Ankle range, measured from the athlete.** A population dorsiflexion figure would be a guess
+  about this person. Their own deepest observed shin lean, held with the heel down, is evidence.
+  The solver may ask for that plus `ANKLE_ALLOWANCE_DEG = 4` and no more.
+- **Balance, as a limit.** Removing the midfoot pull meant depth now comes from the hips going
+  back, so the failure mode inverted: not a knee past its limit but a hip so far back the athlete
+  sits down. `BALANCE_LIMIT_SHIN = 0.60` catches that without prescribing posture.
+
+After the fix, on the common sample: **shin lean 38.6 -> 38.6 degrees (no extra dorsiflexion
+asked for), knee 0.168 -> 0.168 shin-lengths (it does not move at all), hip 0.444 -> 0.442
+shin-lengths behind the midfoot (balance unchanged), and depth still reached at exactly 0.060.**
+The whole correction is the hip dropping 0.038 shin-lengths - small, balanced, and inside range
+the athlete had already demonstrated on camera.
+
+Two honest leftovers. First, depth is *almost always* reachable by rotating the femur, so the
+`depth_limited` path - which reports "this needs mobility work, not a cue" and names whether the
+ankle or balance bound - does not fire on either sample repetition and is therefore untested on
+real input. Second, the observed lean of 38.6 degrees already **exceeds** the 35-degree population
+shod-dorsiflexion reference. Either that reference does not describe this athlete or the 2D view
+inflates the angle; `check_target_feasible.py` prints this as context rather than a verdict,
+because the athlete demonstrably held the position on video. It is the reason the limit is
+anchored to their own measurement instead of a published range.
+
+One bug found on the way out: the new fields carried `np.float64` and `np.bool_`, which `json`
+refuses. Because numpy 2 reports `np.bool_`'s type name as plain `bool`, the error reads
+"Object of type bool is not JSON serializable" - self-contradictory, and it would have surfaced
+in the API response rather than at the point of construction. `run_cli.py` exposed it only
+because `report.json` was written and `overlay.json` was not.
 
 ## What I verified
 
