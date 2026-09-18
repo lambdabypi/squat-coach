@@ -132,14 +132,33 @@ error this application exists to avoid. The system prompt now forbids substituti
 `cannot_assess`, and the summary instruction separates the two kinds of "we don't know". A larger
 model is one env var away (`ANTHROPIC_MODEL=claude-sonnet-5`) if that trade looks wrong.
 
-**That fix is partial, and the limitation is real.** After the prompt change the summary leads
-with the correct reason ("the depth measurements sit right at the edge of our tolerance") but has
-still been observed appending "from this camera angle" to it. The per-finding explanations — which
-are what the UI shows against each criterion, and what a user acts on — have been correct in every
-run; the drift is confined to the free-text summary. It is a prompt-adherence weakness of the
-smaller model, and the honest options are to accept it, move the summary to a larger model, or
-generate the summary from the findings in code. I would take the third: the summary is a mechanical
-roll-up of verdict counts and reasons, and does not need a language model at all.
+**The prompt fix was only partial, so the summary was taken away from the model entirely.**
+After the prompt change the summary led with the correct reason ("the depth measurements sit right
+at the edge of our tolerance") but was still observed appending "from this camera angle" to it. The
+per-finding explanations were correct in every run; the drift was confined to the free-text
+summary — which is the most-read paragraph in the report.
+
+Rather than keep asking a prompt to hold a distinction, `skill/summary.py` now builds the summary
+from the counted findings. The three reasons a verdict can be withheld are **separate lists built
+from separate conditions**, so they cannot bleed into one another:
+
+| Reason | What it means | What fixes it |
+|---|---|---|
+| Inside measurement tolerance | We measured it; the value is too close to the line to call | Nothing the athlete can film differently |
+| Evidence missing in this clip | The landmark was occluded in the frames we needed | Re-record with better framing or lighting |
+| Structurally unassessable | A sagittal camera cannot see this property at all | A different camera angle |
+
+The agent still writes every per-finding explanation and every piece of coaching feedback; only
+the roll-up moved. `scripts/test_summary.py` asserts the distinction survives into the prose — it
+fails the build if a tolerance-bound result is described in camera language.
+
+This removed a failure mode rather than adding a feature, and it made the output slightly cheaper
+($0.0256 from $0.0275) because the model writes fewer tokens.
+
+Writing the deterministic version surfaced two things the model had been papering over: a
+criterion can fail on one repetition and be unmeasurable on another, which reads as a
+contradiction unless stated explicitly; and several criterion names contain "and"
+("stance width and toe angle"), so a comma-and list of them is unparseable and needs semicolons.
 
 ## Why the language model never sees the video
 
@@ -301,9 +320,7 @@ exist to prevent.
 
 ## If I had the next four hours
 
-0. Generate the summary in code and drop it from the model. It is a mechanical roll-up of verdict
-   counts and reasons, it is the only place quality drift has been observed, and removing it
-   removes a failure mode rather than adding a feature.
+*(The first item on this list — generating the summary in code — was done; see above.)*
 
 1. Make pose+bar real-time-ish: detect the plate every N frames, track between detections.
 2. A labelled clip set with known-correct verdicts, so tolerances stop being judgement calls.

@@ -46,12 +46,10 @@ TONE
 Direct and encouraging, the way a good coach talks. No hedging filler, no praise for things that
 were not assessed. A lifter reading this should know exactly what to change on the next set.
 
-The `summary` is 2-4 sentences for the whole video: what went well, the single most important
-thing to fix, and an honest word about what this camera angle could not judge. Every claim in it
-must be traceable to a finding above it — the summary is the most-read part of the report and the
-easiest place to introduce a claim nothing supports. Keep the two kinds of "we don't know" apart:
-a measurement too close to the threshold to call is not the same as something the camera could
-not see.
+You do not write an overall summary. That is generated from the findings in code, so that the
+three distinct reasons a verdict can be withheld — a measurement inside tolerance, evidence
+missing from this clip, and something a side view structurally cannot see — stay separate by
+construction rather than by your remembering to keep them apart.
 """
 
 

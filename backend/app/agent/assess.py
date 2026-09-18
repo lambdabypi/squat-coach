@@ -39,7 +39,7 @@ CACHE_READ_MULTIPLIER = 0.10
 
 TOOL = {
     "name": "submit_assessment",
-    "description": "Submit the finished assessment: one finding per candidate, plus a summary.",
+    "description": "Submit the finished assessment: one finding per candidate.",
     "input_schema": {
         "type": "object",
         "properties": {
@@ -71,9 +71,8 @@ TOOL = {
                     "required": ["rep_index", "criterion_id", "verdict", "explanation"],
                 },
             },
-            "summary": {"type": "string", "description": "2-4 sentences for the whole video."},
         },
-        "required": ["findings", "summary"],
+        "required": ["findings"],
     },
 }
 
@@ -89,7 +88,8 @@ class AgentFinding(BaseModel):
 
 class AgentOutput(BaseModel):
     findings: list[AgentFinding]
-    summary: str = Field(min_length=20)
+    # No summary. The overall roll-up is generated deterministically in skill/summary.py —
+    # see the note there on why it was taken away from the model.
 
 
 # Ordered by confidence. The agent may only move down this list, never up.
@@ -275,7 +275,6 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
 
     return {
         "findings": findings,
-        "summary": parsed.summary,
         "note": note,
         "cost": {
             "model": MODEL,

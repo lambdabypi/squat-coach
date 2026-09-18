@@ -17,6 +17,7 @@ import numpy as np
 
 from .skill.loader import load_skill
 from .skill.rules import evaluate_all
+from .skill.summary import build_summary
 from .vision.bar import BarDetector
 from .vision.metrics import Measurement
 from .vision.pose import extract_pose
@@ -267,7 +268,8 @@ def analyse(
     _p(progress, "Measuring against the standards", 1.0)
 
     # 6. Agent ----------------------------------------------------------------
-    summary = None
+    # The summary is built here, from the counted findings, whether or not the agent runs.
+    summary = build_summary(skill, candidates, len(seg.reps), quality) if candidates else None
     cost = None
     agent_note = None
 
@@ -338,7 +340,6 @@ def analyse(
             from .agent.assess import assess_with_agent
             agent_out = assess_with_agent(skill, candidates, seg.reps, quality, info)
             findings = agent_out["findings"]
-            summary = agent_out["summary"]
             cost = agent_out["cost"]
             agent_note = agent_out.get("note")
         except Exception as exc:  # noqa: BLE001 - degrade, never fail the run
