@@ -2,8 +2,11 @@
 
 ## Time spent
 
-**4h 00m** against a self-imposed 5-hour hard stop (the brief allows 4–6). Start 17:31, finish
-21:31, same day. A full block-by-block log with actual versus planned times is in
+**4h 39m** against a self-imposed 5-hour hard stop (the brief allows 4–6). Start 17:31, finish
+22:10, same day.
+
+The assignment as specified was complete at **2h 09m**. The remaining 2h 30m went to manual
+testing and the defects it exposed — which is where most of the real engineering happened. A full block-by-block log with actual versus planned times is in
 [`TIMELOG.md`](TIMELOG.md), and the original stack/structure plan in [`PLAN.md`](PLAN.md).
 
 Where it went, and where it went wrong:
@@ -16,6 +19,9 @@ Where it went, and where it went wrong:
 | Vision core + bar tracking (merged) | 1:15 | 0:50 | |
 | Agent, API, frontend | 1:30 | 1:05 | |
 | Evidence, correctness fixes, docs | 0:45 | 0:44 | |
+| *Unplanned:* manual testing and the bugs it found | — | 1:25 | CORS, API key scope, model switch |
+| *Unplanned:* live angles, corrected pose, live tracking | — | 0:40 | |
+| *Unplanned:* deterministic summary, final verification | — | 0:25 | |
 
 The single overrun was block 1, and it was caused by trusting a green metric — the detail is in
 [`AI_USAGE.md`](AI_USAGE.md). I absorbed it by generating documentation from the skill YAML rather
