@@ -13,14 +13,37 @@ Deployed, for everything except section (d):
 - frontend https://squat-coach-sigma.vercel.app
 - backend https://squat-coach-backend-633153384860.us-central1.run.app/health
 
-Local, required for section (d):
+Local, required for section (d). **The virtual environment is inside `backend/`, not at the
+repository root**, so activate it after changing directory:
+
+```powershell
+# terminal 1 - Windows PowerShell
+cd backend
+.\.venv\Scripts\Activate.ps1
+$env:PYTHONPATH = $PWD
+uvicorn app.main:app --port 8000
+
+# terminal 2
+cd frontend
+npm run dev
+```
 
 ```bash
-# terminal 1
-cd backend && export PYTHONPATH=$PWD && uvicorn app.main:app --port 8000
+# terminal 1 - macOS / Linux
+cd backend && source .venv/bin/activate && export PYTHONPATH=$PWD && uvicorn app.main:app --port 8000
 # terminal 2
 cd frontend && npm run dev
 ```
+
+No environment variables are needed for the local pair. `lib/api.ts` falls back to
+`http://localhost:8000`, and the backend's default CORS allowlist is already
+`http://localhost:3000` and `http://127.0.0.1:3000`. Confirm the backend prints
+`[cors] allowed origins: http://localhost:3000, ...` on startup; if it prints something else, an
+`ALLOWED_ORIGINS` value is set in your shell and the browser will refuse every request.
+
+Sanity-check the pair before section (d) by loading http://localhost:3000 and confirming the
+"Before you record" card appears. It is populated from `GET /requirements`, so if it renders, the
+frontend is talking to the local backend rather than the deployed one.
 
 **Why (d) has to be local.** `load_skill()` re-reads `skill/squat_standards.yaml` on every
 request, so editing a tolerance takes effect on the very next analysis with no restart - which is
@@ -138,6 +161,29 @@ Then show the guard: set that tolerance's `provenance` to `document_stated` and 
 loader refuses to boot. A tolerance is a measurement margin and the document states none, so that
 edit is always a mistake and fails loudly rather than silently mislabelling our number as the
 book's.
+
+**Rehearse this on the fast path first.** `scripts/test_skill_edit.py` makes both points in
+seconds, without waiting on an analysis, by running the real evaluators against the back angles
+actually measured on the common sample:
+
+```powershell
+backend\.venv\Scripts\python.exe scripts/test_skill_edit.py
+```
+
+Expected output:
+
+```
+BEFORE (tolerance 15):  rep 1  59.2 deg -> meets_standard
+                        rep 2  58.5 deg -> meets_standard
+AFTER  (tolerance 5):   rep 1  59.2 deg -> does_not_meet_standard
+                        rep 2  58.5 deg -> does_not_meet_standard
+PROVENANCE GUARD: rejected as expected
+restored the original skill file
+```
+
+That script restores the YAML on its own way out. **The edit you make on camera does not.** A
+forgotten `5` makes back angle fail on every clip for the rest of the demo and is the least obvious
+thing to notice going wrong, so run `git diff skill/` before you start presenting.
 
 ### e) An incorrect result, investigated (1 min)
 
