@@ -102,6 +102,50 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
             highlightFrame={highlight}
           />
 
+          {(() => {
+            const tp = overlay.target_poses?.[String(activeRep)];
+            if (!tp || tp.corrections.length === 0) return null;
+            return (
+              <>
+                <h2>How to fix it — repetition {activeRep}</h2>
+                <div className="card">
+                  <p className="muted" style={{ marginTop: 0 }}>
+                    The dashed target on the video is <strong>your</strong> body: the same shin,
+                    thigh and torso lengths measured from this video, with your foot planted where
+                    it actually was, solved for the position the reference document describes. It
+                    is not a stock animation of someone else.
+                  </p>
+                  {tp.corrections.map((c) => (
+                    <div key={c.criterion_id} className="feedback" style={{ marginTop: 10 }}>
+                      <strong>{c.label}.</strong> {c.detail}
+                      <div className="faint" style={{ marginTop: 6 }}>
+                        {c.provenance.includes("engineering")
+                          ? "The rule comes from the document; the size of the target margin is our choice, not the document's."
+                          : "Stated in the reference document."}
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    className="chip"
+                    style={{ marginTop: 12 }}
+                    onClick={() => {
+                      player.current?.seek(tp.t);
+                      setHighlight(tp.frame);
+                    }}
+                  >
+                    ▸ Jump to {tp.t.toFixed(2)}s and compare
+                  </button>
+                  <p className="faint" style={{ marginTop: 12, marginBottom: 0 }}>
+                    Shown in two dimensions only. This is a single side-on camera, so we never
+                    measured depth and do not render it. The target says nothing about knees-out
+                    or stance — a side view cannot see either.
+                  </p>
+                  {!tp.solved && tp.note && <p className="uncertain">{tp.note}</p>}
+                </div>
+              </>
+            );
+          })()}
+
           <h2>Recording quality</h2>
           <div className="card">
             {report.quality.gates.map((g) => (

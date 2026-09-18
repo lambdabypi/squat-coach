@@ -20,6 +20,7 @@ ORANGE = (62, 136, 240)    # landmark inferred by the model
 BLUE = (255, 166, 88)
 BAR = (102, 209, 255)
 GREY = (158, 148, 139)
+GHOST = (196, 242, 94)     # corrected pose, BGR
 
 
 def main() -> int:
@@ -70,6 +71,28 @@ def main() -> int:
                 if f["bar"]["x"] is not None:
                     cv2.circle(frame, (int(f["bar"]["x"]), int(f["bar"]["y"])), 14,
                                BAR if f["bar"]["observed"] else GREY, -1)
+
+                # Corrected-pose ghost, if one was solved for this frame.
+                for tp in (overlay.get("target_poses") or {}).values():
+                    if abs(tp["frame"] - idx) > 1:
+                        continue
+                    chain = [tp["ankle"], tp["knee"], tp["hip"], tp["shoulder"]]
+                    pts = [(int(p[0]), int(p[1])) for p in chain]
+                    for a, b in zip(pts, pts[1:]):
+                        cv2.line(frame, a, b, GHOST, 5, cv2.LINE_AA)
+                    for p in pts:
+                        cv2.circle(frame, p, 10, GHOST, -1)
+                    hip_actual = f["joints"]["hip"]
+                    if hip_actual["x"] is not None:
+                        cv2.arrowedLine(
+                            frame,
+                            (int(hip_actual["x"]), int(hip_actual["y"])),
+                            pts[2], GHOST, 4, cv2.LINE_AA, tipLength=0.25,
+                        )
+                    cv2.putText(frame, "TARGET", (pts[2][0] + 16, pts[2][1] + 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 5)
+                    cv2.putText(frame, "TARGET", (pts[2][0] + 16, pts[2][1] + 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, GHOST, 2)
 
                 label = f"{wanted[idx]}  t={f['t']:.2f}s  frame={idx}"
                 cv2.putText(frame, label, (16, 42), cv2.FONT_HERSHEY_SIMPLEX,

@@ -23,6 +23,7 @@ from .vision.pose import extract_pose
 from .vision.probe import probe
 from .vision.quality import assess_quality
 from .vision.reps import segment_reps
+from .vision.target_pose import solve_target_pose
 from .vision.smoothing import angle_from_horizontal, interpolate_gaps, smooth
 
 Progress = Callable[[str, float], None]
@@ -203,6 +204,37 @@ def analyse(
     # 5. Deterministic rules --------------------------------------------------
     _p(progress, "Measuring against the standards", 0.0)
     candidates = evaluate_all(skill, track, seg.reps, bar, quality)
+
+    # 5b. A corrected pose per repetition, for the criteria that actually failed.
+    #
+    # Borderline counts as worth correcting: a depth result inside the tolerance is precisely
+    # the case where showing the athlete the target position is most useful.
+    targets_by_rep: dict[int, dict] = {}
+    correctable = {"depth", "back_angle"}
+    back_ref = 45.0
+    knee_limit = 0.5
+    try:
+        back_ref = skill.by_id("back_angle").rule.reference_value or 45.0
+    except KeyError:
+        pass
+    try:
+        kt = skill.by_id("knee_forward_of_toes").tolerance
+        knee_limit = kt.value if kt else knee_limit
+    except KeyError:
+        pass
+    for rep in seg.reps:
+        failed = {
+            c.criterion_id for c in candidates
+            if c.rep_index == rep.index
+            and c.criterion_id in correctable
+            and c.verdict in ("does_not_meet_standard", "cannot_assess")
+            and c.measurement is not None and c.measurement.available
+        }
+        if not failed:
+            continue
+        tp = solve_target_pose(track, rep, bar, failed, back_ref, knee_limit)
+        if tp is not None:
+            targets_by_rep[rep.index] = tp.to_dict()
     _p(progress, "Measuring against the standards", 1.0)
 
     # 6. Agent ----------------------------------------------------------------
@@ -322,4 +354,6 @@ def analyse(
         "cost": cost,
     }
 
-    return {"report": report, "overlay": build_overlay(track, bar, seg, info, skill)}
+    overlay = build_overlay(track, bar, seg, info, skill)
+    overlay["target_poses"] = targets_by_rep
+    return {"report": report, "overlay": overlay}

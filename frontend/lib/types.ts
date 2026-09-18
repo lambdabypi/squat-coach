@@ -144,6 +144,27 @@ export interface Overlay {
   bar_path: { t: number; x: number | null; y: number | null; observed: boolean }[];
   reps: Rep[];
   targets: { back?: Target; bar_dev?: Target };
+  target_poses: Record<string, TargetPose>;
+}
+
+export interface Correction {
+  criterion_id: string;
+  label: string;
+  detail: string;
+  provenance: string;
+}
+
+export interface TargetPose {
+  frame: number;
+  t: number;
+  ankle: [number, number];
+  knee: [number, number];
+  hip: [number, number];
+  shoulder: [number, number];
+  bar: [number, number] | null;
+  corrections: Correction[];
+  solved: boolean;
+  note: string | null;
 }
 
 export interface JobStatus {

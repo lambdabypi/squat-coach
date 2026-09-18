@@ -25,6 +25,7 @@ const COL = {
   angle2: "#7fd1e8",
   hipLine: "rgba(199,146,234,.5)",
   kneeLine: "rgba(127,209,232,.5)",
+  ghost: "#5ef2c4",
 };
 
 /** Text with a dark outline so it stays readable over any footage. */
@@ -63,6 +64,7 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [showBarPath, setShowBarPath] = useState(true);
   const [showAngles, setShowAngles] = useState(true);
+  const [showGhost, setShowGhost] = useState(true);
   const [t, setT] = useState(0);
   const [live, setLive] = useState<OverlayFrame["angles"] | null>(null);
 
@@ -223,6 +225,55 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
           }
         }
 
+        // Corrected-pose ghost: their own limb lengths, solved for the document's geometry.
+        // Only drawn at the bottom frame it was solved for, so it is never confused with a
+        // claim about the rest of the movement.
+        if (showGhost) {
+          const tp = Object.values(overlay.target_poses ?? {}).find(
+            (p) => Math.abs(p.frame - i) <= 1,
+          );
+          if (tp) {
+            const S = overlay.width / 1080;
+            ctx.save();
+            ctx.setLineDash([12 * S, 8 * S]);
+            ctx.lineWidth = 5 * S;
+            ctx.strokeStyle = COL.ghost;
+            const chain: [number, number][] = [tp.ankle, tp.knee, tp.hip, tp.shoulder];
+            ctx.beginPath();
+            ctx.moveTo(chain[0][0], chain[0][1]);
+            for (const p of chain.slice(1)) ctx.lineTo(p[0], p[1]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            for (const p of chain) {
+              ctx.beginPath();
+              ctx.arc(p[0], p[1], 9 * S, 0, Math.PI * 2);
+              ctx.fillStyle = COL.ghost;
+              ctx.fill();
+            }
+            if (tp.bar) {
+              ctx.beginPath();
+              ctx.arc(tp.bar[0], tp.bar[1], 14 * S, 0, Math.PI * 2);
+              ctx.setLineDash([6 * S, 5 * S]);
+              ctx.strokeStyle = COL.ghost;
+              ctx.lineWidth = 3 * S;
+              ctx.stroke();
+              ctx.setLineDash([]);
+            }
+            // Arrow from where the hip was to where it needed to be.
+            const actualHip = f.joints.hip;
+            if (actualHip?.x != null) {
+              ctx.strokeStyle = COL.ghost;
+              ctx.lineWidth = 3 * S;
+              ctx.beginPath();
+              ctx.moveTo(actualHip.x, actualHip.y!);
+              ctx.lineTo(tp.hip[0], tp.hip[1]);
+              ctx.stroke();
+            }
+            ctx.restore();
+            label(ctx, "target", tp.hip[0] + 18 * S, tp.hip[1] + 8 * S, S, COL.ghost);
+          }
+        }
+
         if (highlightFrame != null && Math.abs(i - highlightFrame) <= 1) {
           ctx.strokeStyle = COL.bar;
           ctx.lineWidth = Math.max(4, overlay.width * 0.006);
@@ -235,7 +286,7 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
 
     rafRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [overlay, showSkeleton, showBarPath, showAngles, highlightFrame]);
+  }, [overlay, showSkeleton, showBarPath, showAngles, showGhost, highlightFrame]);
 
   const rep = overlay.reps.find((r) => t >= r.start_t && t <= r.end_t);
 
@@ -265,6 +316,14 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
         >
           Angles
         </button>
+        {Object.keys(overlay.target_poses ?? {}).length > 0 && (
+          <button
+            className={`chip${showGhost ? " on" : ""}`}
+            onClick={() => setShowGhost((v) => !v)}
+          >
+            Target pose
+          </button>
+        )}
         {overlay.reps.map((r) => (
           <button
             key={r.index}

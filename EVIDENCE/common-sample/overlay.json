@@ -17060,5 +17060,75 @@
       "unit": "shin_lengths",
       "citation": "ref p. 6, 8, 9, 11, 12 \u00b7 Fig 2-5, 2-7"
     }
+  },
+  "target_poses": {
+    "1": {
+      "frame": 65,
+      "t": 2.1664830508474577,
+      "ankle": [
+        689.7935935429169,
+        1783.6438097272612
+      ],
+      "knee": [
+        485.72647414719916,
+        1638.9916868373489
+      ],
+      "hip": [
+        718.2184746019559,
+        1654.3231051948967
+      ],
+      "shoulder": [
+        609.1670566381106,
+        1471.673454621166
+      ],
+      "bar": [
+        539.4597823373986,
+        1345.6546525232995
+      ],
+      "corrections": [
+        {
+          "criterion_id": "depth",
+          "label": "Sit lower",
+          "detail": "At the bottom your hip was 0.02 shin-lengths below your knee \u2014 close enough to level that we could not call it either way. The ghost shows the hip 0.06 below the knee, clearly past parallel. Because your foot stays planted and your bones do not change length, reaching it means the whole hip travels about 0.23 shin-lengths further down and the shin angles further forward.",
+          "provenance": "document_stated rule, engineering_tolerance margin"
+        }
+      ],
+      "solved": true,
+      "note": null
+    },
+    "2": {
+      "frame": 188,
+      "t": 6.266135593220339,
+      "ankle": [
+        689.5587699753903,
+        1782.2995540073953
+      ],
+      "knee": [
+        484.85813912253104,
+        1638.8879161432008
+      ],
+      "hip": [
+        717.3954458815423,
+        1653.6743650404171
+      ],
+      "shoulder": [
+        584.5924509490951,
+        1436.9790699790328
+      ],
+      "bar": [
+        548.5162116356965,
+        1360.9468041796458
+      ],
+      "corrections": [
+        {
+          "criterion_id": "depth",
+          "label": "Sit lower",
+          "detail": "At the bottom your hip was 0.01 shin-lengths above your knee \u2014 close enough to level that we could not call it either way. The ghost shows the hip 0.06 below the knee, clearly past parallel. Because your foot stays planted and your bones do not change length, reaching it means the whole hip travels about 0.26 shin-lengths further down and the shin angles further forward.",
+          "provenance": "document_stated rule, engineering_tolerance margin"
+        }
+      ],
+      "solved": true,
+      "note": null
+    }
   }
 }
