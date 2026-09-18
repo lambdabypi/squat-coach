@@ -102,6 +102,8 @@ Other scripts:
 | `scripts/bench_accuracy.py` | Check whether a faster pose model changes the verdicts. |
 | `scripts/cost_model.py` | Compare measured API spend against a modelled VLM architecture. |
 | `scripts/strip_emdashes.py` | Keep punctuation plain ASCII across the repository. |
+| `scripts/check_gpu.py` | Ask the installed libraries whether they can reach this machine's GPU. |
+| `scripts/bench_opencl.py` | Measure whether OpenCL accelerates barbell detection. |
 
 ---
 

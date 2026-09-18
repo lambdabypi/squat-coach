@@ -151,6 +151,33 @@ and would remain the bottleneck unless ported to CUDA. **Section 4's first recom
 more than the hardware.** Buying a Jetson to accelerate a pipeline that spends 51% of its time in a
 circle detector would be solving the wrong problem.
 
+## 6b. Would this laptop's GPU help?
+
+Measured on the development machine: **NVIDIA GeForce GTX 1650 Ti**, 4 GB, compute capability
+7.5, 16 compute units, alongside an i7-10750H (6 cores / 12 threads). A real CUDA GPU. Three
+routes to it, and `scripts/check_gpu.py` and `scripts/bench_opencl.py` test each:
+
+| Route | Result on this machine |
+|---|---|
+| OpenCV CUDA | `cv2.cuda.getCudaEnabledDeviceCount()` returns **0**. The pip `opencv-contrib-python` wheel is built without CUDA; the build info does not mention it. |
+| MediaPipe GPU delegate | **Fails**: `NotImplementedError: ValidatedGraphConfig Initialization failed`. The Python GPU delegate is Linux-only; Windows gets CPU only. |
+| OpenCL (OpenCV T-API) | **Works** and selects the 1650 Ti, and buys nothing: 352.7 ms/frame warm versus 354.7 ms on CPU, a **1.01x** difference that is measurement noise. |
+
+The OpenCL result is the interesting one. OpenCV recognises the GPU and runs the pipeline through
+it, but `HoughCircles` has no OpenCL path, so it silently falls back to the CPU. The transfer of
+each 1080x1920 frame to the device and back costs roughly what the accelerated `cvtColor` and
+`medianBlur` save.
+
+**Amdahl's law settles the rest.** Pose is only 17% of the analysis. Even an infinitely fast pose
+stage caps the overall gain at about **1.2x**. The two real costs are HoughCircles at 51% and
+agent narration at 31%, and a GPU addresses neither: the first has no GPU implementation in stock
+OpenCV, the second is a network call.
+
+So the honest answer is that **the free algorithmic fix in section 4 beats every GPU route
+available here**, and by a wide margin: 2.5x from changing the detection cadence, against roughly
+1.2x from a Linux reinstall plus a custom CUDA OpenCV build. Use the GPU only after the cadence
+fix, and only if profiling then says the remaining time is somewhere a GPU can reach.
+
 ## 7. Would a better pose model help?
 
 Meta's **Sapiens** is the obvious candidate on accuracy: human-centric foundation models at
@@ -168,6 +195,56 @@ truth exists to prove the accuracy is actually better on this task. An earlier d
 figures were checked and was wrong about the direction of the trade.
 
 ---
+
+## 7b. Could this be hosted free on Vercel?
+
+**The frontend, yes, trivially.** It is a Next.js app with no secrets and no inference. That is
+exactly what Vercel is for. Point `NEXT_PUBLIC_API_URL` at wherever the backend lives and deploy.
+
+**The Python backend, no.** Not because of any single hard wall, but because four of them stack
+up. Vercel's published Hobby limits:
+
+| Limit | Hobby | Our need |
+|---|---|---|
+| Request body | **4.5 MB** | the common sample alone is 3.4 MB; phone video is far larger |
+| Bundle, uncompressed | 500 MB (Python) | **516 MB** measured, trimmable to ~410 MB |
+| Max duration | 300 s | 85 s on 6 cores, but Hobby gives **1 vCPU** |
+| Memory / CPU | 2 GB / 1 vCPU | fits on memory, not on cores |
+
+**The 4.5 MB body limit is the decisive one.** It is not a tuning knob; a squat video will
+essentially always exceed it. Working around it means uploading straight to blob storage from the
+browser and passing the backend a URL, which is a different upload architecture from the one
+built here.
+
+The bundle is fixable. Measured today: 516 MB including the 29 MB pose model. Swapping
+`opencv-contrib-python` (118.5 MB installed) for `opencv-python-headless` (41.8 MB wheel) is free
+of consequence, since this project uses only `VideoCapture`, `cvtColor`, `medianBlur`,
+`HoughCircles`, `resize` and the drawing calls, none of which are contrib-only. Dropping
+`matplotlib`, which arrives as a MediaPipe dependency and is never imported, saves another 30 MB.
+That lands near 410 MB, under the cap. Vercel's Large Functions beta raises the ceiling to 5 GB
+anyway.
+
+The deeper mismatch is architectural. This backend accepts an upload, returns a job id, processes
+in a background thread, and serves progress from an in-memory store while the client polls. On
+stateless serverless every poll may land on a different instance, and background work stops when
+the response is sent. Fitting Vercel means doing the whole analysis synchronously inside one
+request, on 1 vCPU, under 300 seconds, with a cold start that loads MediaPipe and a 29 MB model.
+Plus `ffprobe`, which the pipeline shells out to and which is not present in the Python runtime.
+
+**Free hosting that does fit the shape.** Anything that runs a container with a writable temp
+directory and a long-lived process:
+
+- **Hugging Face Spaces** - free CPU tier, Docker or FastAPI, `ffmpeg` installable, sleeps when
+  idle. Reported as 2 vCPU / 16 GB, though sources disagree; verify current specs before relying
+  on it. The natural home for this, and the audience is right.
+- **Google Cloud Run** - always-free allowance of roughly 2M requests and 360k vCPU-seconds per
+  month. Containers, so `ffmpeg` and the model ship in the image, and it scales to zero.
+- **Render / Fly.io** - both viable, but the generous legacy free tiers are closed to new
+  accounts, so check what is actually on offer.
+
+**Recommended split:** frontend on Vercel, backend as a container on Cloud Run or a Space, with
+the browser uploading directly to object storage rather than through the API. That also removes
+the 4.5 MB problem wherever the backend ends up.
 
 ## 8. Other work this build did not reach
 
@@ -209,3 +286,10 @@ Vendor and third-party figures used above. Everything else in this document was 
 - [Sapiens: Foundation for Human Vision Models](https://arxiv.org/abs/2408.12569) - model sizes and resolution; no inference throughput published
 - [facebookresearch/sapiens](https://github.com/facebookresearch/sapiens) - reference implementation
 - [Evaluation of Pose Estimation Systems for Sign Language Translation](https://arxiv.org/pdf/2604.24609) - third-party Sapiens throughput on V100
+- [MediaPipe GPU Delegate is not yet supported for Windows](https://github.com/google/mediapipe/issues/5126) and [GPU Delegate support on Windows Python](https://github.com/google/mediapipe/issues/4575) - the Linux-only limitation
+- [MediaPipe GPU Support](https://ai.google.dev/edge/mediapipe/framework/getting_started/gpu_support) - OpenGL ES 3.1+ on Linux desktop
+- [Vercel Functions Limits](https://vercel.com/docs/functions/limitations) - 4.5 MB request body, 500 MB Python bundle, 300 s Hobby duration, 2 GB / 1 vCPU
+- [Python Vercel Functions bundle size limit increased to 500MB](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb)
+- [Vercel Functions can now be up to 5GB in package size](https://vercel.com/changelog/vercel-functions-can-now-be-up-to-5-gb-in-package-size) - Large Functions beta
+- [Platforms with a real free tier for developers in 2026](https://render.com/articles/platforms-with-a-real-free-tier-for-developers-in-2026) - current state of free tiers
+- [7 Best FREE Platforms to Host Machine Learning Models](https://www.kdnuggets.com/7-best-free-platforms-to-host-machine-learning-models) - Hugging Face Spaces and Cloud Run free allowances
