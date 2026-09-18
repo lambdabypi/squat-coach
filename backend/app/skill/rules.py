@@ -240,11 +240,29 @@ def evaluate_rep(
 
         uncertainty = m.reason
         degraded = [g for g in quality.gates if g.severity == "degraded" and not g.passed]
-        if c.id in {"back_angle", "knee_forward_of_toes"} and quality.view_ratio > 0.25:
-            note = ("The camera is only roughly side-on, which foreshortens the movement plane and "
-                    "biases angle measurements.")
-            uncertainty = f"{uncertainty} {note}".strip() if uncertainty else note
-            confidence = _cap(confidence, "medium")
+        if quality.view_ratio > 0.25:
+            # An off-axis camera degrades the angle criteria and the bar path by two different
+            # mechanisms, so they do not get the same sentence. Yaw foreshortens anteroposterior
+            # distance by cos(angle), which biases angles. For the bar path the larger effect is
+            # that the tracked circle is the NEAR plate, whose centre sits well outside the
+            # athlete's plane of movement: rotate the camera and that lateral offset projects as
+            # a horizontal shift, straight into a measurement defined against the midfoot.
+            #
+            # This was missed because the only clip with a degraded view arrived late. It reported
+            # bar path as a high-confidence failure at 0.34 shin-lengths on a view_ratio of 0.35,
+            # while the two angle criteria on the same clip correctly carried the caveat.
+            note = None
+            if c.id in {"back_angle", "knee_forward_of_toes"}:
+                note = ("The camera is only roughly side-on, which foreshortens the movement plane "
+                        "and biases angle measurements.")
+            elif c.id == "bar_path_over_midfoot":
+                note = ("The camera is only roughly side-on. The plate we track is the near one, "
+                        "and its centre sits outside your plane of movement, so an off-axis camera "
+                        "shifts it sideways in the image. Treat the size of this deviation as "
+                        "indicative rather than measured.")
+            if note is not None:
+                uncertainty = f"{uncertainty} {note}".strip() if uncertainty else note
+                confidence = _cap(confidence, "medium")
         if rep.confidence == "low":
             confidence = _cap(confidence, "low")
 
