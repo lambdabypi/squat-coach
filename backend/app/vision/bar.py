@@ -41,6 +41,10 @@ MAX_R_TORSO = 0.95
 DARK_MAX_INTENSITY = 110        # a loaded plate is dark
 RADIUS_CONSISTENCY_TOL = 0.22   # reject detections this far from the clip median radius
 BAR_ABOVE_SHOULDER_PX = 0.0     # the bar sits essentially at the shoulder landmark height
+# Longest run of undetected frames that two real detections may bracket and still be filled by
+# interpolation. At 30fps this is a third of a second, over which a barbell cannot do anything
+# the endpoints do not describe. Wider than this and it would be extrapolation.
+MAX_INTERPOLATION_GAP = 10
 
 
 @dataclass
@@ -51,11 +55,29 @@ class BarTrack:
     basis_observed: np.ndarray    # (N,) bool - True only where a plate was actually detected
     median_radius: float
     observed_fraction: float
+    # True where the position was linearly interpolated between two real detections close
+    # enough together to bracket it. A loaded barbell moves smoothly, so a position bounded by
+    # measurements a few frames either side carries a measurement's worth of evidence, unlike
+    # the shoulder-offset fallback which is a guess. Kept separate from basis_observed so the
+    # distinction survives into the report rather than being quietly promoted.
+    interpolated: np.ndarray | None = None
     note: str | None = None
 
     @property
     def any_tracked(self) -> bool:
         return bool(np.isfinite(self.x).any())
+
+    @property
+    def usable(self) -> np.ndarray:
+        """Frames whose bar position rests on real detections, measured or bracketed."""
+        if self.interpolated is None:
+            return self.basis_observed
+        return self.basis_observed | self.interpolated
+
+    @property
+    def usable_fraction(self) -> float:
+        u = self.usable
+        return float(u.mean()) if len(u) else 0.0
 
     def to_overlay(self, fps: float) -> list[dict]:
         return [
@@ -73,27 +95,43 @@ class BarTrack:
 class BarDetector:
     """Accumulates per-frame candidates during the single pose decode pass."""
 
-    def __init__(self) -> None:
+    def __init__(self, width: int = 0, height: int = 0) -> None:
         self._x: list[float] = []
         self._y: list[float] = []
         self._r: list[float] = []
         self._obs: list[bool] = []
         self._shoulder: list[tuple[float, float]] = []
         self._torso: list[float] = []
+        # Needed only when frames are not supplied, to scale normalised landmarks.
+        self._w = width
+        self._h = height
 
     # -- called once per frame from extract_pose's frame_sink -------------------
 
-    def feed(self, idx: int, frame: np.ndarray, lms) -> None:
+    def feed(self, idx: int, frame: np.ndarray | None, lms) -> None:
+        """One frame. `frame` may be None to record the shoulder without detecting.
+
+        Passing None is how the client-side path works: the browser computes landmarks for every
+        frame but only uploads a decimated set of images. Every frame still contributes its
+        shoulder position, so the estimated fallback and the frame-to-frame radius consistency
+        check behave as they do in the full-decode path; only the Hough search is skipped.
+        """
         if lms is None:
             self._push(np.nan, np.nan, np.nan, False, (np.nan, np.nan), np.nan)
             return
 
-        h, w = frame.shape[:2]
+        h, w = (frame.shape[:2] if frame is not None else (self._h, self._w))
         sx = (lms[L_SHOULDER].x + lms[R_SHOULDER].x) / 2 * w
         sy = (lms[L_SHOULDER].y + lms[R_SHOULDER].y) / 2 * h
         hx = (lms[L_HIP].x + lms[R_HIP].x) / 2 * w
         hy = (lms[L_HIP].y + lms[R_HIP].y) / 2 * h
         torso = float(np.hypot(sx - hx, sy - hy))
+
+        if frame is None:
+            # Shoulder recorded, detection skipped: finalise() will fill this from the
+            # shoulder offset and mark it `estimated`.
+            self._push(np.nan, np.nan, np.nan, False, (sx, sy), torso)
+            return
         if not np.isfinite(torso) or torso < 10:
             self._push(np.nan, np.nan, np.nan, False, (sx, sy), torso)
             return
@@ -185,14 +223,40 @@ class BarDetector:
             note = ("The barbell plate was never detected; bar position is estimated from the "
                     "shoulder landmark throughout and the bar path should be treated as indicative only.")
 
-        missing = ~obs & np.isfinite(sh[:, 0])
+        # Interpolate across gaps that two real detections bracket, before falling back to the
+        # shoulder. This matters for the client-landmark path, where only a decimated set of
+        # frames is uploaded: without it a 20% detection rate looked like 20% evidence, and the
+        # bar-path criterion abstained on a clip the full-decode path assessed fine. Long gaps
+        # are left alone, because extrapolating a bar position across half a repetition is a
+        # guess dressed as a measurement.
+        interpolated = np.zeros(n, dtype=bool)
+        idx = np.flatnonzero(obs)
+        if idx.size >= 2:
+            for a, b in zip(idx, idx[1:]):
+                gap = b - a - 1
+                if gap <= 0 or gap > MAX_INTERPOLATION_GAP:
+                    continue
+                for k in range(a + 1, b):
+                    w = (k - a) / (b - a)
+                    x[k] = x[a] + (x[b] - x[a]) * w
+                    y[k] = y[a] + (y[b] - y[a]) * w
+                    r[k] = r[a] + (r[b] - r[a]) * w
+                    interpolated[k] = True
+
+        missing = ~obs & ~interpolated & np.isfinite(sh[:, 0])
         x[missing] = sh[missing, 0]
         y[missing] = sh[missing, 1] + offset
+
+        if interpolated.any():
+            extra = (f"{int(interpolated.sum())} frame(s) were interpolated between "
+                     f"detections up to {MAX_INTERPOLATION_GAP} frames apart.")
+            note = f"{note} {extra}" if note else extra
 
         return BarTrack(
             x=x, y=y, r=r,
             basis_observed=obs,
             median_radius=med_r,
             observed_fraction=observed_fraction,
+            interpolated=interpolated,
             note=note,
         )

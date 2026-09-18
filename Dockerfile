@@ -67,7 +67,17 @@ COPY skill skill
 RUN mkdir -p backend/storage/uploads backend/storage/artifacts
 
 ENV PYTHONPATH=/srv/backend \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    # Thread pools must be sized before the numeric libraries load, so set them here as well as
+    # in app/cpu.py. OpenCV and TFLite otherwise size their pools from the HOST's core count,
+    # which inside a 2 vCPU cgroup means dozens of threads contending over two cores' worth of
+    # time. That is what made the deployed service 10x slower than the same image locally, and
+    # why raising the vCPU allocation made it slower rather than faster.
+    OMP_NUM_THREADS=2 \
+    OPENBLAS_NUM_THREADS=2 \
+    MKL_NUM_THREADS=2 \
+    NUMEXPR_NUM_THREADS=2 \
+    VECLIB_MAXIMUM_THREADS=2
 
 EXPOSE 7860
 

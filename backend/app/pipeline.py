@@ -11,6 +11,7 @@ system's job is to say something true, not something fluent.
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Callable
 
 import numpy as np
@@ -20,7 +21,7 @@ from .skill.rules import evaluate_all
 from .skill.summary import build_summary
 from .vision.bar import BarDetector
 from .vision.metrics import Measurement
-from .vision.pose import extract_pose
+from .vision.pose import extract_pose, pose_track_from_client
 from .vision.probe import probe
 from .vision.quality import assess_quality
 from .vision.reps import segment_reps
@@ -250,6 +251,99 @@ def analyse(
     )
     bar = detector.finalise()
 
+    return _assess_track(track, bar, info, skill, use_agent, progress)
+
+
+def analyse_client_landmarks(
+    payload: dict,
+    frames: dict[int, "np.ndarray"],
+    use_agent: bool = True,
+    progress: Progress | None = None,
+) -> dict:
+    """Assess from landmarks computed in the browser, plus a decimated set of frames.
+
+    Why this exists: the same image that tracks at 4.1 frames per second on a developer laptop
+    managed 0.41 on Cloud Run, and raising the vCPU allocation made it worse. The container was
+    not misconfigured - it reported 4 CPUs and used 4 threads - the shared vCPUs are simply much
+    slower per core, which is not something a flag can fix.
+
+    So pose moves to the device that already has fast hardware: the user's own. What does NOT
+    move is the measurement layer. Everything below this function is the same code the local
+    build runs, so the verified numbers stay comparable. Reimplementing smoothing, repetition
+    detection, the metrics and the inverse-kinematics solve in JavaScript would have produced a
+    second implementation with its own answers, which is how a subtly different OpenCV version
+    once returned 12/6/4 where the verified build returns 13/6/3.
+
+    Barbell detection still needs pixels, so the client uploads a decimated set of frames and
+    HoughCircles runs on those alone. Every frame still contributes its shoulder position, so
+    frames without an image fall back to the labelled `estimated` bar position exactly as they
+    do when a plate is missed in the full-decode path.
+    """
+    skill = load_skill()
+
+    video = payload["video"]
+    info = SimpleNamespace(
+        path="client",
+        filename=video.get("filename", "client-upload"),
+        codec=video.get("codec", "client"),
+        width=int(video["width"]),
+        height=int(video["height"]),
+        fps=float(video["fps"]),
+        duration_s=float(video["duration_s"]),
+        frame_count=int(video.get("frame_count", 0)),
+        rotation_deg=0,
+        is_portrait=int(video["height"]) > int(video["width"]),
+    )
+
+    _p(progress, "Checking the video", 1.0)
+
+    track = pose_track_from_client(
+        payload["frames"], info.fps, info.width, info.height,
+    )
+
+    # Barbell detection over the uploaded frames only.
+    _p(progress, "Tracking the movement", 0.2)
+    detector = BarDetector(width=info.width, height=info.height)
+    raw = _client_landmark_objects(payload["frames"], track.n)
+    for i in range(track.n):
+        detector.feed(i, frames.get(i), raw[i])
+        if progress and track.n:
+            _p(progress, "Tracking the movement", 0.2 + 0.8 * (i + 1) / track.n)
+    bar = detector.finalise()
+
+    return _assess_track(track, bar, info, skill, use_agent, progress)
+
+
+class _LM:
+    """Minimal stand-in for a MediaPipe landmark, so BarDetector needs no changes."""
+
+    __slots__ = ("x", "y", "visibility")
+
+    def __init__(self, x: float, y: float, v: float) -> None:
+        self.x, self.y, self.visibility = x, y, v
+
+
+def _client_landmark_objects(frames: list[dict], n: int) -> list[list | None]:
+    """Rebuild index-addressable landmark lists from the client payload."""
+    out: list[list | None] = [None] * n
+    for f in frames:
+        i = int(f["i"])
+        lm = f.get("lm") or {}
+        if not lm or i >= n:
+            continue
+        # 33 slots so BarDetector's fixed indices resolve.
+        row: list = [_LM(0.0, 0.0, 0.0) for _ in range(33)]
+        for key, v in lm.items():
+            k = int(key)
+            if 0 <= k < 33 and v and len(v) >= 3:
+                row[k] = _LM(float(v[0]), float(v[1]), float(v[2]))
+        out[i] = row
+    return out
+
+
+def _assess_track(track, bar, info, skill, use_agent: bool, progress: Progress | None) -> dict:
+    """Everything after tracking. Shared by the server-side and client-side entry points so
+    there is exactly one implementation of the measurements."""
     # 3. Reps ---------------------------------------------------------------
     _p(progress, "Finding repetitions", 0.0)
     seg = segment_reps(track)
@@ -316,7 +410,7 @@ def analyse(
         return {
             "report": {
                 "video": {
-                    "filename": video_path.name,
+                    "filename": info.filename,
                     "width": info.width, "height": info.height,
                     "fps": info.fps, "duration_s": info.duration_s,
                     "frame_count": info.frame_count, "codec": info.codec,
@@ -381,7 +475,7 @@ def analyse(
 
     report = {
         "video": {
-            "filename": video_path.name,
+            "filename": info.filename,
             "width": info.width, "height": info.height,
             "fps": info.fps, "duration_s": info.duration_s,
             "frame_count": info.frame_count, "codec": info.codec,

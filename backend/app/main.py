@@ -11,8 +11,10 @@ import json
 import os
 from pathlib import Path
 
+import cv2
+import numpy as np
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 
@@ -20,6 +22,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 # exported by hand or pasted into a shell. The file is gitignored.
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
+from . import cpu
 from .config import env, env_list
 from .jobs import store
 from .skill.loader import load_skill
@@ -37,9 +40,15 @@ MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 DEFAULT_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
 ALLOWED_ORIGINS = env_list("ALLOWED_ORIGINS", DEFAULT_ORIGINS)
 
-# Upper bound on how long one SSE connection may stay open. Cloud Run's own request timeout is
-# 300s, so this sits just under it: the stream should end itself rather than be cut off.
-MAX_STREAM_SECONDS = 290.0
+# Upper bound on how long one SSE connection may stay open. Keep it just under the platform's
+# request timeout so the stream ends itself with a clear message rather than being cut off.
+#
+# Configurable because the right value is a property of the host, not of this code. The local
+# build analyses the common sample in 88s on a 6-core i7; the same image on Cloud Run managed
+# 0.41 frames per second against 4.1 locally and blew through a 290s deadline twice, once at
+# 2 vCPU and once at 4. Raising vCPU made it slower, not faster, most likely thread contention
+# in MediaPipe's pool on a shared allocation. Sizing this from local timings was the mistake.
+STREAM_DEADLINE_SECONDS = float(env("STREAM_DEADLINE_SECONDS", "290") or 290)
 
 
 def _sse(event: str, payload: dict) -> str:
@@ -62,6 +71,10 @@ def health() -> dict:
         "skill_version": skill.meta.skill_version,
         "criteria": len(skill.criteria),
         "agent_configured": bool(env("ANTHROPIC_API_KEY")),
+        # Exposed because a 10x slowdown between this image running locally and the same image
+        # running on Cloud Run turned out to be worth diagnosing rather than guessing at.
+        "cpu": cpu.describe(),
+        "stream_deadline_s": STREAM_DEADLINE_SECONDS,
     }
 
 
@@ -130,6 +143,49 @@ async def upload_video(file: UploadFile = File(...)) -> dict:
     return job.public()
 
 
+@app.post("/analyses")
+async def create_client_analysis(
+    payload: str = Form(...),
+    frames: list[UploadFile] = File(default=[]),
+) -> dict:
+    """Assess from landmarks the browser already computed, plus a decimated set of frames.
+
+    The tracking that dominates the runtime moves to the device that has fast hardware. What
+    stays here is the measurement layer, unchanged, so the numbers remain comparable with the
+    locally verified run.
+
+    `payload` is JSON: video metadata plus one entry per frame of MediaPipe landmarks. `frames`
+    are JPEGs named by frame index (`42.jpg`), uploaded only for the subset the barbell detector
+    needs.
+    """
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=400, detail=f"payload is not valid JSON: {exc}")
+
+    for key in ("video", "frames"):
+        if key not in data:
+            raise HTTPException(status_code=400, detail=f"payload is missing '{key}'")
+    if not data["frames"]:
+        raise HTTPException(status_code=400, detail="payload contains no landmark frames")
+
+    decoded: dict[int, "np.ndarray"] = {}
+    for upload in frames:
+        stem = Path(upload.filename or "").stem
+        if not stem.isdigit():
+            continue
+        raw = await upload.read()
+        if not raw:
+            continue
+        img = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
+        if img is not None:
+            decoded[int(stem)] = img
+
+    job = store.create(data["video"].get("filename", "client-upload"), Path("client"))
+    store.submit_client(job, data, decoded, use_agent=bool(env("ANTHROPIC_API_KEY")))
+    return job.public()
+
+
 @app.get("/jobs/{job_id}")
 def job_status(job_id: str) -> dict:
     job = store.get(job_id)
@@ -179,7 +235,7 @@ async def job_events(job_id: str):
         sent_preview = 0
         last_status: tuple | None = None
         # A bound, so a wedged job cannot hold an instance open indefinitely.
-        deadline = asyncio.get_event_loop().time() + MAX_STREAM_SECONDS
+        deadline = asyncio.get_event_loop().time() + STREAM_DEADLINE_SECONDS
 
         while True:
             current = (job.status, job.stage, round(job.progress, 3))
@@ -198,7 +254,13 @@ async def job_events(job_id: str):
 
             if asyncio.get_event_loop().time() > deadline:
                 yield _sse("end", {"status": "timeout",
-                                   "error": "The analysis exceeded the streaming deadline."})
+                                   "error": (
+                                       f"The analysis did not finish within "
+                                       f"{STREAM_DEADLINE_SECONDS:.0f}s. The work may still be "
+                                       f"running; raise STREAM_DEADLINE_SECONDS and the "
+                                       f"platform request timeout if this host is slower than "
+                                       f"the deadline assumes."
+                                   )})
                 return
 
             await asyncio.sleep(0.25)
@@ -250,6 +312,8 @@ def _validate_skill_at_startup() -> None:
     print(f"[skill] v{skill.meta.skill_version}: {len(skill.criteria)} criteria "
           f"({len(skill.assessable)} assessable, {len(skill.unassessable)} not from a side view)")
     print(f"[cors]  allowed origins: {', '.join(ALLOWED_ORIGINS)}")
+    print(f"[cpu]   {cpu.configure()}")
+    print(f"[cpu]   {cpu.describe()}")
     if not env("ANTHROPIC_API_KEY"):
         print("[agent] ANTHROPIC_API_KEY is not set - running with the deterministic rule "
               "engine only. Findings and measurements are unaffected; wording is plainer.")

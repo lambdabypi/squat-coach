@@ -71,6 +71,38 @@ class JobStore:
     def submit(self, job: Job, use_agent: bool = True) -> None:
         self._pool.submit(self._run, job, use_agent)
 
+    def submit_client(
+        self, job: Job, payload: dict, frames: dict, use_agent: bool = True,
+    ) -> None:
+        """Run the client-landmark path. Same job lifecycle, different front half."""
+        self._pool.submit(self._run_client, job, payload, frames, use_agent)
+
+    def _run_client(self, job: Job, payload: dict, frames: dict, use_agent: bool) -> None:
+        from .pipeline import analyse_client_landmarks
+
+        def progress(stage: str, pct: float) -> None:
+            job.stage = stage
+            job.progress = pct
+
+        job.status = "processing"
+        job.stage = "Checking the video"
+        # The browser already tracked the movement, so seed the preview from what it sent
+        # rather than leaving the live view empty on this path.
+        try:
+            job.result = analyse_client_landmarks(
+                payload, frames, use_agent=use_agent, progress=progress,
+            )
+            job.status = "done"
+            job.stage = "Complete"
+            job.progress = 1.0
+        except Exception as exc:  # noqa: BLE001
+            job.status = "failed"
+            job.stage = "Failed"
+            job.error = f"{type(exc).__name__}: {exc}"
+            traceback.print_exc()
+        finally:
+            job.finished_at = datetime.now(timezone.utc).isoformat()
+
     def _run(self, job: Job, use_agent: bool) -> None:
         from .pipeline import analyse
         from .vision.probe import ProbeError

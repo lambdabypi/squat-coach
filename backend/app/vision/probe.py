@@ -29,6 +29,7 @@ class ProbeError(RuntimeError):
 @dataclass
 class VideoInfo:
     path: str
+    filename: str
     codec: str
     width: int           # display width, after rotation is applied
     height: int          # display height, after rotation is applied
@@ -141,6 +142,10 @@ def probe(path: str | Path) -> VideoInfo:
 
     return VideoInfo(
         path=str(path),
+        # Carried so the report can name the file without the pipeline holding the path. The
+        # client-landmark path has no server-side file at all, and both paths feed the same
+        # reporting code.
+        filename=path.name,
         codec=codec,
         width=width,
         height=height,

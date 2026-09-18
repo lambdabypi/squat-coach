@@ -210,7 +210,14 @@ def head_pitch_proxy(track: PoseTrack, rep: Rep, bar: BarTrack | None) -> Measur
     # returned a confident "looking down" from landmarks nobody can see. If the head falls
     # inside the detected plate, the pose model is inferring, not observing.
     if bar is not None and bar.any_tracked and np.isfinite(bar.median_radius):
-        if bar.basis_observed[f] and np.isfinite(bar.x[f]):
+        # Deliberately NOT restricted to frames where the plate was detected. An earlier version
+        # required `basis_observed[f]`, so on the client-landmark path - where only a decimated
+        # set of frames is uploaded - the check silently skipped at bottom frames with no image
+        # and gaze came back as meets_standard on footage where the head is behind the plate.
+        # An occlusion test that only runs when convenient is worse than none: it turns a
+        # cannot_assess into a pass. The bar position is known to within a few pixels whatever
+        # its basis, which is ample for a "is the head inside the plate" question.
+        if np.isfinite(bar.x[f]) and np.isfinite(bar.y[f]):
             d = float(np.hypot(nose[0] - bar.x[f], nose[1] - bar.y[f]))
             if d < bar.median_radius:
                 return _unavailable(
@@ -252,7 +259,14 @@ def max_bar_horizontal_deviation_from_midfoot(track: PoseTrack, rep: Rep, bar: B
     dev = np.abs(bar_x[ok] - midfoot_x[ok]) / shin
     j = int(np.argmax(dev))
     frame = lo + int(np.flatnonzero(ok)[j])
-    observed_frac = float(np.mean(bar.basis_observed[lo:hi + 1]))
+    # Interpolated positions count as evidence: they are bounded by real detections a few
+    # frames apart, unlike the shoulder-offset fallback. Without this the client-landmark path
+    # read a 20% detection rate as 20% evidence and abstained on a clip the full-decode path
+    # assessed, even though the uploaded frames bracketed the whole repetition.
+    usable = bar.usable[lo:hi + 1]
+    detected = bar.basis_observed[lo:hi + 1]
+    observed_frac = float(np.mean(usable))
+    measured_frac = float(np.mean(detected))
     basis = "observed" if observed_frac >= 0.5 else "estimated"
     return Measurement(
         mid, float(dev.max()), "shin_lengths", basis, frame, frame / track.fps, True,
@@ -262,8 +276,11 @@ def max_bar_horizontal_deviation_from_midfoot(track: PoseTrack, rep: Rep, bar: B
          "plate could not be detected; treat the bar path as indicative, not measured."),
         detail={
             "tracked_fraction": round(observed_frac, 2),
+            "detected_fraction": round(measured_frac, 2),
             "worst_deviation_shin": round(float(dev.max()), 4),
-            "note": "Midfoot is the midpoint between heel and toe landmarks.",
+            "note": ("Midfoot is the midpoint between heel and toe landmarks. "
+                     "tracked_fraction counts frames whose bar position is measured or "
+                     "bracketed by measurements; detected_fraction counts measured only."),
         },
     )
 

@@ -90,6 +90,104 @@ class PoseTrack:
         return float(min(self.vis[n][i] for n in names))
 
 
+# The landmark indices a client must send. Everything the measurement layer reads, for both
+# sides, so the server still decides which side faces the camera rather than trusting the client.
+CLIENT_LANDMARK_INDICES = sorted(
+    {NOSE}
+    | set(LEFT.values())
+    | set(RIGHT.values())
+)
+
+
+def pose_track_from_client(
+    frames: list[dict],
+    fps: float,
+    width: int,
+    height: int,
+) -> PoseTrack:
+    """Build a PoseTrack from landmarks computed in the browser.
+
+    The same pose model runs either side of this boundary; only the place it runs changes. That
+    matters because it means the measurement layer below is unchanged and the numbers it produces
+    stay comparable with the locally verified run. A browser reimplementation of the measurements
+    themselves would have been a second implementation with its own answers.
+
+    `frames` is a list of `{"i": int, "lm": {index: [x, y, visibility]}}` with x and y normalised
+    to 0..1, exactly as MediaPipe reports them. Frames where no pose was found may be omitted or
+    sent with an empty `lm`.
+    """
+    if not frames:
+        raise ValueError("No landmark frames were supplied.")
+
+    by_index = {int(f["i"]): (f.get("lm") or {}) for f in frames}
+    n_frames = max(by_index) + 1
+    idxs = list(range(n_frames))
+
+    def get(i: int, landmark: int) -> tuple[float, float, float] | None:
+        lm = by_index.get(i)
+        if not lm:
+            return None
+        v = lm.get(str(landmark), lm.get(landmark))
+        if not v or len(v) < 3:
+            return None
+        return float(v[0]), float(v[1]), float(v[2])
+
+    detected = np.array([bool(by_index.get(i)) for i in idxs], dtype=bool)
+    if not detected.any():
+        raise ValueError("No person was detected in any frame.")
+
+    # Same side-selection rule as the server-side path: the camera-facing leg is the one whose
+    # landmarks are consistently visible, because the far leg is occluded by the near one.
+    def side_score(mapping: dict[str, int]) -> float:
+        vals = []
+        for joint in SIDE_VOTE_JOINTS:
+            seen = [get(i, mapping[joint]) for i in idxs]
+            vis = [s[2] for s in seen if s is not None]
+            vals.append(float(np.mean(vis)) if vis else 0.0)
+        return float(np.mean(vals))
+
+    l_score, r_score = side_score(LEFT), side_score(RIGHT)
+    side, mapping = ("left", LEFT) if l_score >= r_score else ("right", RIGHT)
+
+    track = PoseTrack(
+        fps=fps,
+        width=width,
+        height=height,
+        side=side,
+        side_confidence=abs(l_score - r_score),
+        frame_idx=np.array(idxs),
+        t=np.array(idxs) / fps,
+        detected=detected,
+    )
+
+    joints = list(mapping.keys()) + ["nose"]
+    for j in joints:
+        track.xy[j] = np.full((n_frames, 2), np.nan)
+        track.vis[j] = np.zeros(n_frames)
+    track.both_hips_x = np.full((n_frames, 2), np.nan)
+    track.both_shoulders_x = np.full((n_frames, 2), np.nan)
+
+    for i in idxs:
+        for j, index in mapping.items():
+            s = get(i, index)
+            if s is None:
+                continue
+            track.xy[j][i] = (s[0] * width, s[1] * height)
+            track.vis[j][i] = s[2]
+        nose = get(i, NOSE)
+        if nose is not None:
+            track.xy["nose"][i] = (nose[0] * width, nose[1] * height)
+            track.vis["nose"][i] = nose[2]
+        lh, rh = get(i, LEFT["hip"]), get(i, RIGHT["hip"])
+        if lh and rh:
+            track.both_hips_x[i] = (lh[0] * width, rh[0] * width)
+        ls, rs = get(i, LEFT["shoulder"]), get(i, RIGHT["shoulder"])
+        if ls and rs:
+            track.both_shoulders_x[i] = (ls[0] * width, rs[0] * width)
+
+    return track
+
+
 def _iter_frames(path: Path) -> Iterator[tuple[int, np.ndarray]]:
     cap = cv2.VideoCapture(str(path))
     if not cap.isOpened():
