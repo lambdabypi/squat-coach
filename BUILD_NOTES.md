@@ -55,7 +55,7 @@ the block-1 overrun; the pipeline now reads strictly sequentially.
 |---|---|---|
 | MediaPipe Pose Landmarker (heavy) | 33 landmarks **with per-landmark visibility**. That score is what makes "observed vs estimated" and `cannot_assess` possible at all. | Slower than `lite`/`full`; 2D only. |
 | OpenCV HoughCircles + darkness scoring | A loaded plate is a large dark circle at shoulder height — a real observation of the bar, not a shoulder-offset guess. Bar path over the midfoot is a named requirement. | Fails on bumper-free bars and dark gyms; falls back to a labelled estimate. |
-| Claude `claude-sonnet-5` | Judgment, grounding and phrasing at low latency and low cost. Prompt caching on the skill block. | — |
+| Claude `claude-haiku-4-5` | This stage does constrained work — judge a supplied measurement against a supplied rule, then write two sentences. The cheapest current model is the right default. Override with `ANTHROPIC_MODEL`. | Needed one extra prompt rule the larger model didn't (below). |
 | Next.js + hand-written CSS | One less build-config risk inside a 5-hour box. | No design system. |
 | In-memory job store | A queue is not what this exercise tests. | Restart loses jobs; single process only. |
 
@@ -97,25 +97,40 @@ Pose inference is ~15fps on its own; adding per-frame Hough detection drops it t
 the obvious optimisation target — run Hough every N frames and interpolate, or seed a CSRT tracker
 between detections — and it was not worth the remaining budget.
 
-**Per-video LLM cost, measured on the common sample:**
+**Per-video LLM cost, measured on the common sample with `claude-haiku-4-5`:**
 
 ```
-input 11,938 · cache write 4,436 · cache read 0 · output 3,755  ->  $0.1088
+input 13,058 · cache write 0 · cache read 0 · output 2,886  ->  $0.0275
 ```
 
-Two corrections to what I estimated before measuring, both in the same direction: I predicted
-5–8s for the agent and it took **33s**, and I predicted "comfortably under $0.05" and it was
-**$0.1088** — about double. The output is larger than I assumed because the agent writes an
-explanation and an uncertainty note for all 22 findings, not just the interesting ones.
+Three corrections, each found by measuring something I had asserted:
 
-Cache read is 0 on a first run; the skill block (~4.4k tokens) is cached thereafter, so subsequent
-videos in the same session cost roughly $0.09. Cost scales with repetition count, since findings
-are per rep × criterion — a 5-rep set would be around $0.25.
+1. **I predicted 5–8s for the agent; it takes ~25–33s.** The output is larger than I assumed
+   because the agent writes an explanation and an uncertainty note for all 22 findings, not just
+   the interesting ones.
+2. **My price constants were wrong.** I had `claude-sonnet-5` hard-coded at $3/$15 per MTok when
+   it is $2/$10, which overstated every reported cost by ~50%. Pricing is now a per-model table,
+   and an unrecognised model reports token counts with a `null` dollar figure rather than a
+   fabricated one.
+3. **Prompt caching does not apply at this size.** The skill block is **2,053 tokens**, below
+   `claude-haiku-4-5`'s minimum cacheable prefix, so the `cache_control` breakpoint is silently
+   ignored — `cache_write` and `cache_read` are both 0 on every call, verified over two identical
+   requests in `scripts/test_cache.py`. An earlier draft of this document claimed the skill block
+   was cached across videos. It is not, on this model. The breakpoint is harmless and starts
+   working if the skill grows or a larger model is configured.
 
-At consumer volume that is the dominant unit cost and would need attention: batching reps into one
-finding per criterion, or dropping narration for `cannot_assess` findings where the rule engine's
-wording is already adequate, would cut it by more than half. The figure is measured per run and
-reported in `report.cost`, never estimated.
+Cost scales with repetition count, since findings are per rep × criterion — a 5-rep set is around
+$0.06. At consumer volume the obvious reductions are batching reps into one finding per criterion,
+or skipping narration for `cannot_assess` findings where the rule engine's wording is already
+adequate. The figure is measured per run and reported in `report.cost`, never estimated.
+
+**On model choice.** Haiku 4.5 costs a third of Sonnet 5 here and produced identical verdicts —
+unsurprising, since it does not decide verdicts. It did need one prompt rule the larger model did
+not: its first summary said depth was *"too close to the camera to call"* when the evidence said
+too close to the *tolerance*. Those are different findings, and conflating them is exactly the
+error this application exists to avoid. The system prompt now forbids substituting a cause for a
+`cannot_assess`, and the summary instruction separates the two kinds of "we don't know". A larger
+model is one env var away (`ANTHROPIC_MODEL=claude-sonnet-5`) if that trade looks wrong.
 
 ## What I verified
 

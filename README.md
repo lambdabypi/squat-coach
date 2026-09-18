@@ -62,6 +62,8 @@ Names only — no values are committed. See [`.env.example`](.env.example).
 | Variable | Required | Purpose |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | no | Enables the agent stage. Without it the deterministic rule engine runs alone. |
+| `ANTHROPIC_WORKSPACE_ID` | no | Only for organisation-scoped keys, which Anthropic rejects without it. |
+| `ANTHROPIC_MODEL` | no | Assessment model. Defaults to `claude-haiku-4-5`. |
 | `ALLOWED_ORIGINS` | no | CORS origins for the API. Defaults to `http://localhost:3000`. |
 | `NEXT_PUBLIC_API_URL` | no | Backend URL the browser calls. Defaults to `http://localhost:8000`. |
 

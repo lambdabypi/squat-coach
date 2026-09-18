@@ -1,6 +1,6 @@
 """The assessment agent.
 
-One tool call, all repetitions at once, with the skill in a cached prompt block. The agent's
+One tool call, all repetitions at once, with the skill in its own prompt block. The agent's
 output is validated against the evidence it was given, and any finding that fails validation is
 replaced by the deterministic one rather than discarded silently.
 
@@ -20,13 +20,22 @@ from pydantic import BaseModel, Field, ValidationError
 from ..skill.rules import FAILS, MEETS, UNKNOWN, Candidate
 from .prompts import SYSTEM, evidence_block, skill_block
 
-MODEL = "claude-sonnet-5"
+# Haiku 4.5 by default: this stage does constrained work — judge a supplied measurement against
+# a supplied rule, then write two sentences — so the cheapest current model is the right default.
+# Override with ANTHROPIC_MODEL to compare quality against a larger model.
+MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5")
 MAX_TOKENS = 8000
 
-# Published per-million-token prices for the model above, used for the cost estimate we report.
-PRICE_IN_PER_MTOK = 3.00
-PRICE_OUT_PER_MTOK = 15.00
-PRICE_CACHE_READ_PER_MTOK = 0.30
+# Published per-million-token prices. Table-driven because an earlier hard-coded pair was wrong
+# (Sonnet 5 priced at 3/15 when it is 2/10), which overstated the reported cost by ~50%.
+# Cache writes bill at 1.25x input; cache reads at 0.1x input.
+PRICING = {
+    "claude-haiku-4-5": {"input": 1.00, "output": 5.00},
+    "claude-sonnet-5": {"input": 2.00, "output": 10.00},
+    "claude-opus-5": {"input": 5.00, "output": 25.00},
+}
+CACHE_WRITE_MULTIPLIER = 1.25
+CACHE_READ_MULTIPLIER = 0.10
 
 TOOL = {
     "name": "submit_assessment",
@@ -129,7 +138,11 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
     messages = [{
         "role": "user",
         "content": [
-            # Cached: identical for every video, so we pay full price once per session.
+            # Identical for every video, so it carries the cache breakpoint. Note that on
+            # claude-haiku-4-5 this block (~2.1k tokens) is BELOW the minimum cacheable prefix,
+            # so the breakpoint is silently ignored and cache_read stays 0 — verified in
+            # scripts/test_cache.py. Harmless, and it starts paying off if the skill grows or a
+            # larger model is configured.
             {"type": "text", "text": skill_block(skill), "cache_control": {"type": "ephemeral"}},
             {"type": "text", "text": evidence_block(candidates, reps, quality, info)},
         ],
@@ -209,12 +222,17 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
     cache_read = getattr(u, "cache_read_input_tokens", 0) or 0
     cache_write = getattr(u, "cache_creation_input_tokens", 0) or 0
     plain_in = u.input_tokens
-    cost = (
-        plain_in / 1e6 * PRICE_IN_PER_MTOK
-        + cache_write / 1e6 * PRICE_IN_PER_MTOK * 1.25
-        + cache_read / 1e6 * PRICE_CACHE_READ_PER_MTOK
-        + u.output_tokens / 1e6 * PRICE_OUT_PER_MTOK
-    )
+
+    price = PRICING.get(MODEL)
+    if price is None:
+        cost = None  # unknown model: report tokens, never a fabricated dollar figure
+    else:
+        cost = (
+            plain_in / 1e6 * price["input"]
+            + cache_write / 1e6 * price["input"] * CACHE_WRITE_MULTIPLIER
+            + cache_read / 1e6 * price["input"] * CACHE_READ_MULTIPLIER
+            + u.output_tokens / 1e6 * price["output"]
+        )
 
     note = None
     parts = []
@@ -236,6 +254,6 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
             "cache_read_tokens": cache_read,
             "cache_write_tokens": cache_write,
             "output_tokens": u.output_tokens,
-            "estimated_usd": round(cost, 4),
+            "estimated_usd": round(cost, 4) if cost is not None else None,
         },
     }

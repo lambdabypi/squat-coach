@@ -35,7 +35,7 @@ requirements."*
 | Bar tracking | **OpenCV** — HoughCircles on the plate, seeded from the shoulder landmark, handed to a CSRT tracker | The plate is a large high-contrast circle in a side view; this is a genuine *observation* of the bar, not a shoulder-offset guess. Falls back to the shoulder proxy, labelled `estimated`. |
 | Video I/O | **OpenCV VideoCapture** + **ffmpeg/ffprobe** (already installed) | ffprobe gates the upload (duration, fps, rotation, resolution) before we spend compute. |
 | Backend | **FastAPI** + Pydantic v2, Python 3.13 | Same process owns the CV, the skill and the agent. Pydantic models are the contract between geometry and LLM and frontend. |
-| Agent | **Claude `claude-sonnet-5`** via the Anthropic Python SDK, tool-use + structured output, prompt caching on the skill block | Geometry is computed in code and handed to the model as evidence; the model does judgment, grounding and phrasing. It never measures. |
+| Agent | **Claude** via the Anthropic Python SDK, tool-use + structured output | Geometry is computed in code and handed to the model as evidence; the model does judgment, grounding and phrasing. It never measures. *(Shipped as `claude-haiku-4-5`; the planned prompt caching turned out not to apply at this prompt size — see BUILD_NOTES.)* |
 | Frontend | **Next.js 15 (App Router) + TypeScript + Tailwind** | UI only — no API keys, no CV. `<video>` + `<canvas>` overlay is the fastest path to a synchronized annotated player. |
 | Job state | In-memory dict + polling `GET /jobs/{id}` | A queue is not the point of this exercise. Documented as a known limitation. |
 
@@ -272,6 +272,10 @@ vs `estimated` (derived or inferred). The UI renders estimates in a visibly diff
 ---
 
 ## 7. Cost & latency estimate (to be measured, not guessed, in block 8)
+
+> **Measured afterwards — these estimates were wrong.** Actual: ~60s vision, ~25–33s agent,
+> $0.0275 per video on `claude-haiku-4-5`, and the skill block does not cache at this size.
+> See BUILD_NOTES for the corrections. Left unedited below as the original plan.
 
 | | Estimate |
 |---|---|
