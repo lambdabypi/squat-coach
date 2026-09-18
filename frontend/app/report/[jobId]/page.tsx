@@ -63,6 +63,22 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
   const anyTargetPose = Object.values(ov.target_poses ?? {}).some(
     (p) => p.corrections.length > 0,
   );
+
+  // Only these two can be corrected by the solver, so when there is no target position the
+  // reader deserves to see where each of them actually landed. The previous copy said "within
+  // the standard or could not be measured", which conflates a pass with an abstention - the
+  // exact distinction the rest of this report works to keep apart.
+  const CORRECTABLE = ["depth", "back_angle"];
+  const correctableStatus = CORRECTABLE.map((id) => {
+    const f = findings.find((x) => x.criterion_id === id);
+    const p = f ? presentMeasurement(f, rep) : null;
+    return {
+      id,
+      name: f?.criterion_name ?? id,
+      verdict: f?.verdict ?? "cannot_assess",
+      value: p?.primary ?? null,
+    };
+  });
   const issues = rep.quality.gates.filter((g) => g.severity !== "ok");
 
   const card = (f: Finding) => (
@@ -199,10 +215,34 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
           <h2>What to change</h2>
           {!targetPose || targetPose.corrections.length === 0 ? (
             <div className="card">
-              <p className="muted" style={{ marginBottom: 0 }}>
-                Nothing to correct on repetition {activeRep}: depth and back angle were either
-                within the standard or could not be measured, so there is no target position to
-                show. Other repetitions in this set do have one.
+              <p className="muted">
+                No target position for repetition {activeRep}. A target is only solved for the
+                two criteria it can correct, and here is where each stands:
+              </p>
+              <table>
+                <tbody>
+                  {correctableStatus.map((s) => (
+                    <tr key={s.id}>
+                      <td>{s.name}</td>
+                      <td>
+                        <span className={`verdict-badge v-${s.verdict}`}>
+                          {s.verdict === "meets_standard"
+                            ? "meets standard"
+                            : s.verdict === "does_not_meet_standard"
+                              ? "does not meet"
+                              : "cannot assess"}
+                        </span>
+                      </td>
+                      <td className="faint">{s.value ?? "not measured"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="faint" style={{ marginTop: 12, marginBottom: 0 }}>
+                Two repetitions that look the same can land on opposite sides of a tolerance.
+                Where a measurement sits close to the line, expect one repetition to be called
+                and the next to be left open: that is the tolerance doing its job, not the two
+                repetitions differing in any way you could see.
               </p>
             </div>
           ) : (

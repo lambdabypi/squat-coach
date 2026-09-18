@@ -354,6 +354,23 @@ Stated precisely, so it can be held against us:
   structurally unassessable from a side view. See `skill/coverage.md`.
 - Two more, bar placement and eye gaze, are capped at low confidence and usually abstain.
 
+**The browser-tracking path**
+
+- **The equivalence test simulates the browser rather than using it.**
+  `scripts/test_client_path.py` proves the client path reproduces the server path's verdicts
+  exactly, but it generates the landmarks with *native Python MediaPipe*. The real browser runs
+  the same model compiled to WASM, possibly on the GPU delegate. Those are not bit-identical,
+  and near a tolerance boundary the difference is enough to change a verdict: on a real browser
+  run, repetition 1 measured deep enough for depth to pass while repetition 2 stayed inside the
+  0.03 shin-length band and was left open, on two repetitions a viewer would call identical.
+  That behaviour is correct - it is the tolerance doing its job - but the test does not cover
+  the numerics that produced it. Closing this needs a headless browser running the actual WASM
+  build and comparing against the native result.
+- **A verdict near the tolerance is not stable across pose backends.** Documented above for
+  heavy/full/lite; the browser build is a fourth backend with the same property. The report now
+  shows where each correctable criterion landed when no target position is produced, so a reader
+  can see a borderline call rather than inferring a bug from a missing panel.
+
 **Engineering**
 
 - **No browser-level test.** Every verification script exercises the backend or the data; none
