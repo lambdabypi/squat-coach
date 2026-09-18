@@ -1,0 +1,14 @@
+.git
+.venv
+backend/.venv
+backend/models
+backend/storage
+frontend
+node_modules
+EVIDENCE
+scripts
+*.md
+.env
+__pycache__
+**/__pycache__
+*.pyc
