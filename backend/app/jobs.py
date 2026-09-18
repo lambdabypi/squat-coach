@@ -18,6 +18,8 @@ from typing import Any, Literal
 
 Status = Literal["queued", "processing", "done", "failed"]
 
+MAX_PREVIEW_FRAMES = 1200   # ~80s of clip at every 2nd frame; a bound, not an expectation
+
 
 @dataclass
 class Job:
@@ -31,6 +33,11 @@ class Job:
     result: dict[str, Any] | None = None
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     finished_at: str | None = None
+    # Landmark snapshots emitted while tracking runs, so the user watches the analysis happen
+    # instead of a progress bar. Bounded: a long clip must not grow this without limit.
+    preview: list[dict] = field(default_factory=list)
+    video_w: int = 0
+    video_h: int = 0
 
     def public(self) -> dict:
         return {
@@ -72,10 +79,16 @@ class JobStore:
             job.stage = stage
             job.progress = pct
 
+        def preview(payload: dict) -> None:
+            if len(job.preview) < MAX_PREVIEW_FRAMES:
+                job.preview.append(payload)
+
         job.status = "processing"
         job.stage = "Checking the video"
         try:
-            job.result = analyse(job.path, use_agent=use_agent, progress=progress)
+            job.result = analyse(
+                job.path, use_agent=use_agent, progress=progress, preview=preview,
+            )
             job.status = "done"
             job.stage = "Complete"
             job.progress = 1.0

@@ -169,10 +169,29 @@ def _targets(skill) -> dict:
     return out
 
 
+PREVIEW_JOINTS = {
+    "shoulder": (11, 12), "hip": (23, 24), "knee": (25, 26),
+    "ankle": (27, 28), "heel": (29, 30), "toe": (31, 32),
+}
+PREVIEW_EVERY = 2   # frames; enough for the preview to look continuous without flooding polls
+
+
+def _preview_payload(idx: int, lms, side_right: bool) -> dict:
+    """A compact landmark snapshot in normalised coordinates, for the live view."""
+    out: dict = {"frame": idx, "joints": {}}
+    if lms is None:
+        return out
+    for name, (li, ri) in PREVIEW_JOINTS.items():
+        lm = lms[ri if side_right else li]
+        out["joints"][name] = [round(lm.x, 4), round(lm.y, 4), round(lm.visibility, 2)]
+    return out
+
+
 def analyse(
     video_path: str | Path,
     use_agent: bool = True,
     progress: Progress | None = None,
+    preview: Callable[[dict], None] | None = None,
 ) -> dict:
     video_path = Path(video_path)
     skill = load_skill()
@@ -183,11 +202,21 @@ def analyse(
     _p(progress, "Checking the video", 1.0)
 
     # 2. Pose + bar, in a single decode pass --------------------------------
+    # The bar detector and the live preview both ride on this one decode; nothing re-reads
+    # the file.
     detector = BarDetector()
+
+    def sink(idx: int, frame, lms) -> None:
+        detector.feed(idx, frame, lms)
+        if preview is not None and idx % PREVIEW_EVERY == 0:
+            # Side is not yet decided at this point (it needs the whole clip), so the preview
+            # shows the left chain. It is a progress view, not evidence.
+            preview(_preview_payload(idx, lms, side_right=False))
+
     track = extract_pose(
         video_path, info.fps,
         progress=lambda f: _p(progress, "Tracking the movement", f),
-        frame_sink=detector.feed,
+        frame_sink=sink,
     )
     bar = detector.finalise()
 

@@ -72,27 +72,33 @@ def main() -> int:
                     cv2.circle(frame, (int(f["bar"]["x"]), int(f["bar"]["y"])), 14,
                                BAR if f["bar"]["observed"] else GREY, -1)
 
-                # Corrected-pose ghost, if one was solved for this frame.
+                # Corrected pose, drawn the way the product draws it: one headline mark for
+                # depth (a band from where the hip was to where it needs to be) plus a quiet
+                # dashed target leg. A full bright skeleton over the existing one read as noise.
                 for tp in (overlay.get("target_poses") or {}).values():
                     if abs(tp["frame"] - idx) > 1:
                         continue
-                    chain = [tp["ankle"], tp["knee"], tp["hip"], tp["shoulder"]]
-                    pts = [(int(p[0]), int(p[1])) for p in chain]
-                    for a, b in zip(pts, pts[1:]):
-                        cv2.line(frame, a, b, GHOST, 5, cv2.LINE_AA)
-                    for p in pts:
-                        cv2.circle(frame, p, 10, GHOST, -1)
                     hip_actual = f["joints"]["hip"]
+                    hip_t = (int(tp["hip"][0]), int(tp["hip"][1]))
                     if hip_actual["x"] is not None:
-                        cv2.arrowedLine(
-                            frame,
-                            (int(hip_actual["x"]), int(hip_actual["y"])),
-                            pts[2], GHOST, 4, cv2.LINE_AA, tipLength=0.25,
-                        )
-                    cv2.putText(frame, "TARGET", (pts[2][0] + 16, pts[2][1] + 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 5)
-                    cv2.putText(frame, "TARGET", (pts[2][0] + 16, pts[2][1] + 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, GHOST, 2)
+                        y_from = int(hip_actual["y"])
+                        y_to = hip_t[1]
+                        band = frame.copy()
+                        cv2.rectangle(band, (0, min(y_from, y_to)),
+                                      (frame.shape[1], max(y_from, y_to)), GHOST, -1)
+                        cv2.addWeighted(band, 0.16, frame, 0.84, 0, frame)
+                        cv2.line(frame, (0, y_to), (frame.shape[1], y_to), GHOST, 4, cv2.LINE_AA)
+                        cv2.arrowedLine(frame, (hip_t[0], y_from), (hip_t[0], y_to),
+                                        GHOST, 5, cv2.LINE_AA, tipLength=0.22)
+                        for col, th in ((( 0, 0, 0), 6), (GHOST, 2)):
+                            cv2.putText(frame, "SIT TO HERE", (18, y_to - 16),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.95, col, th, cv2.LINE_AA)
+
+                    leg = [tp["ankle"], tp["knee"], tp["hip"]]
+                    pts = [(int(p[0]), int(p[1])) for p in leg]
+                    for a, b in zip(pts, pts[1:]):
+                        cv2.line(frame, a, b, GHOST, 3, cv2.LINE_AA)
+                    cv2.circle(frame, hip_t, 11, GHOST, -1)
 
                 label = f"{wanted[idx]}  t={f['t']:.2f}s  frame={idx}"
                 cv2.putText(frame, label, (16, 42), cv2.FONT_HERSHEY_SIMPLEX,

@@ -98,8 +98,15 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       setLive(f?.angles ?? null);
 
+      // When the target is shown, the athlete's own pose recedes so the comparison reads as
+      // "you (faint) versus target (bright)" instead of two equally loud skeletons.
+      const ghostFor = showGhost
+        ? Object.values(overlay.target_poses ?? {}).find((p) => Math.abs(p.frame - i) <= 1)
+        : undefined;
+      const dim = ghostFor ? 0.3 : 1;
+
       if (f) {
-        if (showAngles) {
+        if (showAngles && !ghostFor) {
           const S = overlay.width / 1080; // scale annotation weight with resolution
           const j = f.joints;
 
@@ -168,13 +175,13 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
             const ja = f.joints[a];
             const jb = f.joints[b];
             if (!ja?.x || !jb?.x || ja.y == null || jb.y == null) continue;
-            ctx.globalAlpha = ja.visible && jb.visible ? 0.95 : 0.35;
+            ctx.globalAlpha = (ja.visible && jb.visible ? 0.95 : 0.35) * dim;
             ctx.beginPath();
             ctx.moveTo(ja.x, ja.y);
             ctx.lineTo(jb.x, jb.y);
             ctx.stroke();
           }
-          ctx.globalAlpha = 1;
+          ctx.globalAlpha = dim;
 
           const r = Math.max(5, overlay.width * 0.008);
           for (const [name, j] of Object.entries(f.joints)) {
@@ -186,6 +193,7 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
             ctx.fillStyle = j.visible ? COL.observed : COL.low;
             ctx.fill();
           }
+          ctx.globalAlpha = 1;
         }
 
         if (showBarPath) {
@@ -228,50 +236,66 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
         // Corrected-pose ghost: their own limb lengths, solved for the document's geometry.
         // Only drawn at the bottom frame it was solved for, so it is never confused with a
         // claim about the rest of the movement.
-        if (showGhost) {
-          const tp = Object.values(overlay.target_poses ?? {}).find(
-            (p) => Math.abs(p.frame - i) <= 1,
-          );
-          if (tp) {
-            const S = overlay.width / 1080;
+        if (ghostFor) {
+          const tp = ghostFor;
+          const S = overlay.width / 1080;
+          const actualHip = f.joints.hip;
+
+          // One idea per annotation. The headline is depth, so the headline mark is a single
+          // horizontal band from where the hip finished to where it needed to be — the
+          // earlier full-skeleton ghost drew four bright segments over four existing ones and
+          // read as noise rather than as an instruction.
+          if (actualHip?.x != null) {
+            const yFrom = actualHip.y!;
+            const yTo = tp.hip[1];
             ctx.save();
-            ctx.setLineDash([12 * S, 8 * S]);
-            ctx.lineWidth = 5 * S;
+            ctx.fillStyle = "rgba(94,242,196,.16)";
+            ctx.fillRect(0, Math.min(yFrom, yTo), canvas.width, Math.abs(yTo - yFrom));
+
             ctx.strokeStyle = COL.ghost;
-            const chain: [number, number][] = [tp.ankle, tp.knee, tp.hip, tp.shoulder];
+            ctx.lineWidth = 4 * S;
             ctx.beginPath();
-            ctx.moveTo(chain[0][0], chain[0][1]);
-            for (const p of chain.slice(1)) ctx.lineTo(p[0], p[1]);
+            ctx.moveTo(0, yTo);
+            ctx.lineTo(canvas.width, yTo);
             ctx.stroke();
-            ctx.setLineDash([]);
-            for (const p of chain) {
-              ctx.beginPath();
-              ctx.arc(p[0], p[1], 9 * S, 0, Math.PI * 2);
-              ctx.fillStyle = COL.ghost;
-              ctx.fill();
-            }
-            if (tp.bar) {
-              ctx.beginPath();
-              ctx.arc(tp.bar[0], tp.bar[1], 14 * S, 0, Math.PI * 2);
-              ctx.setLineDash([6 * S, 5 * S]);
-              ctx.strokeStyle = COL.ghost;
-              ctx.lineWidth = 3 * S;
-              ctx.stroke();
-              ctx.setLineDash([]);
-            }
-            // Arrow from where the hip was to where it needed to be.
-            const actualHip = f.joints.hip;
-            if (actualHip?.x != null) {
-              ctx.strokeStyle = COL.ghost;
-              ctx.lineWidth = 3 * S;
-              ctx.beginPath();
-              ctx.moveTo(actualHip.x, actualHip.y!);
-              ctx.lineTo(tp.hip[0], tp.hip[1]);
-              ctx.stroke();
-            }
+
+            // Arrow showing which way to travel.
+            const cx = tp.hip[0];
+            ctx.lineWidth = 5 * S;
+            ctx.beginPath();
+            ctx.moveTo(cx, yFrom);
+            ctx.lineTo(cx, yTo);
+            ctx.stroke();
+            const dir = Math.sign(yTo - yFrom) || 1;
+            ctx.beginPath();
+            ctx.moveTo(cx, yTo);
+            ctx.lineTo(cx - 12 * S, yTo - dir * 18 * S);
+            ctx.moveTo(cx, yTo);
+            ctx.lineTo(cx + 12 * S, yTo - dir * 18 * S);
+            ctx.stroke();
             ctx.restore();
-            label(ctx, "target", tp.hip[0] + 18 * S, tp.hip[1] + 8 * S, S, COL.ghost);
+
+            label(ctx, "sit to here", 16 * S, yTo - 14 * S, S, COL.ghost);
           }
+
+          // The target leg, thin and dashed: enough to show the shape, quiet enough not to
+          // compete with the athlete's own body.
+          ctx.save();
+          ctx.globalAlpha = 0.9;
+          ctx.setLineDash([10 * S, 9 * S]);
+          ctx.lineWidth = 3 * S;
+          ctx.strokeStyle = COL.ghost;
+          const chain: [number, number][] = [tp.ankle, tp.knee, tp.hip];
+          ctx.beginPath();
+          ctx.moveTo(chain[0][0], chain[0][1]);
+          for (const p of chain.slice(1)) ctx.lineTo(p[0], p[1]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.arc(tp.hip[0], tp.hip[1], 11 * S, 0, Math.PI * 2);
+          ctx.fillStyle = COL.ghost;
+          ctx.fill();
+          ctx.restore();
         }
 
         if (highlightFrame != null && Math.abs(i - highlightFrame) <= 1) {

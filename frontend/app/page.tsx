@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import LiveTracking from "@/components/LiveTracking";
 import { getJob, getRequirements, uploadVideo } from "@/lib/api";
 import type { JobStatus, Requirements } from "@/lib/types";
 
@@ -22,6 +23,7 @@ export default function Home() {
   const [uploadPct, setUploadPct] = useState<number | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [localFile, setLocalFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -49,6 +51,7 @@ export default function Home() {
   const start = useCallback(async (file: File) => {
     setError(null);
     setUploadPct(0);
+    setLocalFile(file);
     try {
       const created = await uploadVideo(file, (f) => setUploadPct(f));
       setUploadPct(null);
@@ -215,6 +218,10 @@ export default function Home() {
             Tracking runs on the CPU at roughly 7&times; the clip length, and writing the
             assessment adds about half a minute. An 8-second video takes around 90 seconds.
           </p>
+
+          {job.stage === "Tracking the movement" && (
+            <LiveTracking jobId={job.job_id} file={localFile} />
+          )}
         </div>
       )}
 

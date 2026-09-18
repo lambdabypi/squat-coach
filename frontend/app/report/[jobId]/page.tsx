@@ -2,6 +2,7 @@
 
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import FindingCard from "@/components/FindingCard";
+import PoseCompare from "@/components/PoseCompare";
 import VideoWithOverlay, { type PlayerHandle } from "@/components/VideoWithOverlay";
 import { getOverlay, getReport, videoUrl } from "@/lib/api";
 import type { Overlay, Report } from "@/lib/types";
@@ -109,11 +110,16 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
               <>
                 <h2>How to fix it — repetition {activeRep}</h2>
                 <div className="card">
+                  <PoseCompare
+                    frame={overlay.frames[tp.frame]}
+                    target={tp}
+                    shinPx={overlay.shin_length_px}
+                  />
                   <p className="muted" style={{ marginTop: 0 }}>
-                    The dashed target on the video is <strong>your</strong> body: the same shin,
-                    thigh and torso lengths measured from this video, with your foot planted where
-                    it actually was, solved for the position the reference document describes. It
-                    is not a stock animation of someone else.
+                    That target is <strong>your</strong> body: the same shin, thigh and torso
+                    lengths measured from this video, with your foot planted where it actually
+                    was, solved for the position the reference document describes. It is not a
+                    stock animation of someone else.
                   </p>
                   {tp.corrections.map((c) => (
                     <div key={c.criterion_id} className="feedback" style={{ marginTop: 10 }}>

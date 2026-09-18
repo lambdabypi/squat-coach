@@ -129,6 +129,26 @@ def job_status(job_id: str) -> dict:
     return job.public()
 
 
+@app.get("/jobs/{job_id}/preview")
+def job_preview(job_id: str, since: int = 0) -> dict:
+    """Landmark snapshots produced so far, for the live view during tracking.
+
+    Incremental: the client passes the count it already holds and gets only what is new, so
+    polling stays cheap for the whole run rather than re-sending the clip every second.
+    """
+    job = store.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Unknown job.")
+    snapshot = job.preview[since:]
+    return {
+        "total": len(job.preview),
+        "since": since,
+        "frames": snapshot,
+        "status": job.status,
+        "stage": job.stage,
+    }
+
+
 @app.get("/jobs/{job_id}/report")
 def job_report(job_id: str) -> dict:
     job = store.get(job_id)
