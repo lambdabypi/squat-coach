@@ -1,7 +1,7 @@
 """In-memory job store.
 
 Deliberately simple: a dict and a thread pool. A queue, a database and a worker fleet are not
-what this exercise is testing, and the limitation is stated in BUILD_NOTES — a restart loses
+what this exercise is testing, and the limitation is stated in BUILD_NOTES - a restart loses
 jobs, and the store does not survive more than one process.
 """
 

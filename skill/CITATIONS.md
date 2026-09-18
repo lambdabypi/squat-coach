@@ -2,7 +2,7 @@
 
 <!-- GENERATED from squat_standards.yaml by scripts/gen_skill_docs.py. Do not edit. -->
 
-Source: *The Squat* — Starting Strength, reference pages 1-35 (combined PDF pages 4-38).
+Source: *The Squat* - Starting Strength, reference pages 1-35 (combined PDF pages 4-38).
 reference page N = combined PDF page N+3
 
 Every quote below is verbatim from the reference document and was checked against the PDF by hand. A fabricated citation would be worse here than no citation at all.

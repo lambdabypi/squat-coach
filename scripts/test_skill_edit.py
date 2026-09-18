@@ -55,7 +55,7 @@ def main() -> int:
         )
         try:
             load_skill(YAML)
-            print("\nPROVENANCE GUARD: FAILED — a document_stated tolerance was accepted")
+            print("\nPROVENANCE GUARD: FAILED - a document_stated tolerance was accepted")
             return 1
         except Exception as exc:
             first = str(exc).strip().splitlines()

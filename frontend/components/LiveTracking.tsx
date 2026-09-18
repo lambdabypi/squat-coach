@@ -77,7 +77,7 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
   // `url` MUST stay in the dependency list. This component returns null until the object URL
   // exists, so on first mount there is no <video> and no <canvas> and the refs are null. With
   // only [fps] here the effect bailed on that first run and never fired again once the elements
-  // appeared — landmarks streamed in correctly and nothing was ever painted.
+  // appeared - landmarks streamed in correctly and nothing was ever painted.
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -155,7 +155,7 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
           onLoadedMetadata={(e) => {
             const v = e.currentTarget;
             // Size the canvas as soon as the real dimensions are known, rather than waiting for
-            // the draw loop to notice — otherwise the first frames paint into a 300x150 default
+            // the draw loop to notice - otherwise the first frames paint into a 300x150 default
             // and appear stretched.
             const c = canvasRef.current;
             if (c && v.videoWidth) {
@@ -173,7 +173,7 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
       <p className="faint" style={{ marginTop: 8, marginBottom: 0 }}>
         Landmarks streamed back for {analysed} frames so far, drawn as they arrive. Green means the
         joint was seen, orange means the model is inferring it. The video itself plays from your
-        own device — only the landmark coordinates travel back over the network.
+        own device - only the landmark coordinates travel back over the network.
       </p>
     </div>
   );

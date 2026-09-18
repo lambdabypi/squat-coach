@@ -85,7 +85,7 @@ def citations_md(skill) -> str:
         "",
         "<!-- GENERATED from squat_standards.yaml by scripts/gen_skill_docs.py. Do not edit. -->",
         "",
-        f"Source: *{skill.meta.document_title}* — {skill.meta.document_source}.",
+        f"Source: *{skill.meta.document_title}* - {skill.meta.document_source}.",
         f"{skill.meta.page_offset_note}",
         "",
         "Every quote below is verbatim from the reference document and was checked against the "

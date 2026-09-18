@@ -96,7 +96,7 @@ def build_summary(
     name = {c.id: c.name.lower() for c in skill.criteria}
     sentences: list[str] = []
 
-    # 1. What held up. Only criteria clean on every repetition — a partial pass is not praise.
+    # 1. What held up. Only criteria clean on every repetition - a partial pass is not praise.
     clean = [cid for cid in order if passed.get(cid, 0) == n_reps]
     if clean:
         sentences.append(
@@ -118,16 +118,16 @@ def build_summary(
         if rest:
             sentences.append(f"Also short: {_join(rest)}.")
 
-    # 3. Ambiguous measurements — explicitly NOT a camera problem.
+    # 3. Ambiguous measurements - explicitly NOT a camera problem.
     if borderline:
         names = [name[c] for c in sorted(borderline, key=order.index)]
         verb = "landed" if len(names) == 1 else "landed"
         sentences.append(
             f"Your {_join(names)} {verb} inside our measurement tolerance, so it was too close "
-            f"to call either way — that is a limit of the measurement, not of the camera angle."
+            f"to call either way - that is a limit of the measurement, not of the camera angle."
         )
 
-    # 4. Missing evidence in this particular clip — a recording problem, fixable by re-filming.
+    # 4. Missing evidence in this particular clip - a recording problem, fixable by re-filming.
     #
     # A criterion can legitimately appear here *and* in the failure list when it failed on one
     # repetition and could not be measured on another. Saying so explicitly avoids a summary
@@ -137,7 +137,7 @@ def build_summary(
         only = sorted(unmeasured - both, key=order.index)
         if only:
             sentences.append(
-                f"We could not measure {_join([name[c] for c in only])} in this clip — the "
+                f"We could not measure {_join([name[c] for c in only])} in this clip - the "
                 f"evidence was not visible in the frames we needed."
             )
         for cid in sorted(both, key=order.index):
@@ -151,7 +151,7 @@ def build_summary(
                 f"verdict covers only part of the set."
             )
 
-    # 5. Structurally invisible to a side view — no re-filming from this angle will help.
+    # 5. Structurally invisible to a side view - no re-filming from this angle will help.
     if structural:
         sentences.append(
             f"A side view cannot judge {_join([name[c] for c in sorted(structural, key=order.index)])} "

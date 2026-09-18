@@ -42,7 +42,7 @@ def main() -> int:
 
     print()
     if failures:
-        print(f"{failures} case(s) FAILED — the guard does not hold")
+        print(f"{failures} case(s) FAILED - the guard does not hold")
         return 1
     print("All cases hold: the agent may only abstain. It can never upgrade an abstention into a")
     print("verdict, nor flip a pass to a failure or back.")

@@ -2,7 +2,7 @@
 
 Upload a side-view barbell squat. Squat Coach tracks the hips, knees, ankles and the barbell,
 segments the set into repetitions, and assesses each one against *The Squat* chapter of
-*Starting Strength* — citing the page behind every verdict, and saying plainly which criteria a
+*Starting Strength* - citing the page behind every verdict, and saying plainly which criteria a
 side view cannot judge at all.
 
 The reference document is not baked into the application. It lives in [`skill/`](skill/) as an
@@ -13,14 +13,14 @@ application code touched.
 
 ## What it does
 
-1. **Gates the upload** — codec, duration, frame rate, resolution — and rejects with a reason you
+1. **Gates the upload** - codec, duration, frame rate, resolution - and rejects with a reason you
    can act on, before spending any compute.
 2. **Tracks the movement** in a single decode pass: MediaPipe pose landmarks plus OpenCV barbell
    plate detection.
 3. **Finds repetitions** from the hip-height signal and locates each bottom position.
 4. **Runs quality gates** that decide what the footage is capable of supporting.
 5. **Measures** depth, back angle, bar path, hip drive and knee position in code.
-6. **Assesses** each repetition with Claude, which judges, grounds and phrases — but never
+6. **Assesses** each repetition with Claude, which judges, grounds and phrases - but never
    measures.
 7. **Shows the evidence**: a canvas overlay synchronised to the video, with every finding linked
    to the timestamp it came from.
@@ -57,7 +57,7 @@ Open <http://localhost:3000>.
 
 ### Environment variables
 
-Names only — no values are committed. See [`.env.example`](.env.example).
+Names only - no values are committed. See [`.env.example`](.env.example).
 
 | Variable | Required | Purpose |
 |---|---|---|
@@ -120,14 +120,14 @@ from the book.
 ## Layout
 
 ```
-skill/            the document-derived standard — rules, coverage, citations
+skill/            the document-derived standard - rules, coverage, citations
 backend/app/
   vision/         probe, pose, bar, smoothing, reps, metrics, quality
   skill/          loader (validation) and rules (deterministic verdicts)
   agent/          prompts, tool schema, validated assessment
   pipeline.py     orchestration
   main.py         FastAPI
-frontend/         Next.js UI — no secrets, no inference
+frontend/         Next.js UI - no secrets, no inference
 EVIDENCE/         runs on the common sample and two difficult recordings
 scripts/          headless tools
 ```
@@ -140,7 +140,7 @@ Stated at greater length in [`BUILD_NOTES.md`](BUILD_NOTES.md):
 
 - 2D monocular pose. The document's depth landmark is the hip **crease**; the model gives a hip
   **joint centre**, which sits higher and biases depth toward "not deep enough".
-- Three of the document's eight headline criteria — knees-out, stance, rack height — cannot be
+- Three of the document's eight headline criteria - knees-out, stance, rack height - cannot be
   assessed from a side view at all.
 - In-memory job store: a restart loses jobs, and it does not survive more than one process.
 - Bar detection assumes a visible plate. Without one it falls back to a shoulder-offset estimate,

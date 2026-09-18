@@ -8,7 +8,7 @@ and the first version of this exploited none of it.
 HoughCircles over a horizontal band around the shoulder but left the search unbounded across the
 full frame width. On the common sample it reported a circle on 5 of 5 sampled frames and looked
 like a success; three of those five were rack uprights, rig frames and ceiling gaps. The recorded
-radii gave it away — 164, 306, 294, 306, 168 px — two clusters, when a plate can only produce one.
+radii gave it away - 164, 306, 294, 306, 168 px - two clusters, when a plate can only produce one.
 
 The obvious repair, locking onto the modal radius across the clip, failed too: spurious circles
 *outnumbered* the plate 73 to 42, so the mode was the background. The tell was that bar x ranged
@@ -48,7 +48,7 @@ class BarTrack:
     x: np.ndarray                 # (N,) pixels, NaN where unknown
     y: np.ndarray
     r: np.ndarray
-    basis_observed: np.ndarray    # (N,) bool — True only where a plate was actually detected
+    basis_observed: np.ndarray    # (N,) bool - True only where a plate was actually detected
     median_radius: float
     observed_fraction: float
     note: str | None = None

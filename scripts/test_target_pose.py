@@ -72,7 +72,7 @@ def main() -> int:
         print(f"  [{'ok  ' if ok else 'FAIL'}] depth: hip {d:+.3f} shin below knee "
               f"(needs > {depth_tol} to clear tolerance)")
         d_actual = (actual["hip"][1] - actual["knee"][1]) / shin
-        print(f"         was {d_actual:+.3f} — this is the correction being shown")
+        print(f"         was {d_actual:+.3f} - this is the correction being shown")
 
         # 4. It must not break knee position, which was passing.
         toe = (j["toe"]["x"], j["toe"]["y"])

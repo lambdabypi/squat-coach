@@ -107,7 +107,7 @@ def extract_pose(
 ) -> PoseTrack:
     """Run pose over the whole clip in one sequential pass.
 
-    `frame_sink` lets the bar tracker piggyback on the same decode pass — decoding twice
+    `frame_sink` lets the bar tracker piggyback on the same decode pass - decoding twice
     would double the dominant cost of the pipeline.
     """
     video_path = Path(video_path)

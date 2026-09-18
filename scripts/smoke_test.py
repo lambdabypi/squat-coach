@@ -38,7 +38,7 @@ def detect_plate(frame: np.ndarray, shoulder_xy: tuple[float, float] | None):
     """Find the barbell plate as a large circle near shoulder height.
 
     Returns (x, y, r, basis) or None. basis is 'observed' when a circle was actually
-    found in pixels — that distinction is what keeps the report defensible.
+    found in pixels - that distinction is what keeps the report defensible.
     """
     h, w = frame.shape[:2]
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -64,7 +64,7 @@ def detect_plate(frame: np.ndarray, shoulder_xy: tuple[float, float] | None):
     if circles is None:
         return None
     circles = np.round(circles[0]).astype(int)
-    # Prefer the circle closest to the shoulder in x — that's the near-side plate.
+    # Prefer the circle closest to the shoulder in x - that's the near-side plate.
     if shoulder_xy is not None:
         circles = sorted(circles, key=lambda c: abs(c[0] - shoulder_xy[0]))
     x, y, r = circles[0]

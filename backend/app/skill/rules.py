@@ -203,7 +203,7 @@ def evaluate_rep(
             feedback_source=" ".join(c.feedback_on_fail.text.split()) if c.feedback_on_fail else None,
         )
 
-        # Structurally unassessable from a side view — always, and we say what is needed.
+        # Structurally unassessable from a side view - always, and we say what is needed.
         if c.assessable_from_side_view is Assessability.NONE:
             out.append(Candidate(
                 **base, verdict=UNKNOWN, measurement=None,

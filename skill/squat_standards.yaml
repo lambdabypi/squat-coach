@@ -1,11 +1,11 @@
-# Squat assessment skill — derived from the supplied reference document.
+# Squat assessment skill - derived from the supplied reference document.
 #
 # Source: "The Squat", Starting Strength (reference pages 1-35 = combined PDF pages 4-38).
 # Every `quote` below is verbatim from that document and was checked against the PDF by hand.
 #
 # THE PROVENANCE RULE, which is the whole point of this file:
 #   Each threshold carries `provenance`, one of:
-#     document_stated       - the document states this, in words or geometry. Citable as a requirement.
+#     document_stated      - the document states this, in words or geometry. Citable as a requirement.
 #     engineering_tolerance - OUR margin, for landmark noise or measurement limits. NOT a document
 #                             requirement, must never be presented to a user as one.
 #   The document states almost no numbers. Where it gives geometry rather than a figure

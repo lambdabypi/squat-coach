@@ -102,7 +102,7 @@ def build_overlay(track, bar, seg, info, skill) -> dict:
     """Per-frame drawing data for the canvas overlay, in video pixel coordinates.
 
     The frontend synchronises this to <video>.currentTime rather than re-encoding an
-    annotated file — instant to produce, and scrubbable.
+    annotated file - instant to produce, and scrubbable.
     """
     smoothed = {j: smooth(interpolate_gaps(track.joint(j)), track.fps) for j in OVERLAY_JOINTS}
     shin_px = track.shin_length_px()
@@ -150,6 +150,35 @@ def build_overlay(track, bar, seg, info, skill) -> dict:
         # assessment uses. Each carries its provenance: the UI must not present our measurement
         # tolerance as something the document requires.
         "targets": _targets(skill),
+    }
+
+
+STANDARD_PLATE_DIAMETER_MM = 450.0   # competition bumper plate, the usual 45 lb / 20 kg disc
+
+
+def _real_world_scale(bar) -> dict | None:
+    """Millimetres per pixel, from the detected plate.
+
+    Shin-lengths are the right internal unit because they are intrinsic to the athlete, but
+    nobody thinks in them. A competition bumper plate is 450 mm across, so a detected plate is a
+    ruler lying in the frame.
+
+    This is an assumption, not a measurement: change plates and older iron are smaller, and a
+    non-standard plate scales every centimetre figure with it. It is returned with the assumption
+    attached so the interface can show it, and the normalised value stays the primary figure.
+    """
+    if bar is None or not bar.any_tracked or bar.observed_fraction < 0.3:
+        return None
+    if not np.isfinite(bar.median_radius) or bar.median_radius <= 0:
+        return None
+    return {
+        "mm_per_px": round(STANDARD_PLATE_DIAMETER_MM / (2 * bar.median_radius), 4),
+        "basis": "barbell_plate",
+        "assumption": (
+            f"Assumes a standard {STANDARD_PLATE_DIAMETER_MM:.0f} mm competition plate. "
+            "Centimetre figures scale with that assumption; the shin-length figures do not."
+        ),
+        "confidence": "medium" if bar.observed_fraction > 0.6 else "low",
     }
 
 
@@ -373,6 +402,7 @@ def analyse(
             "median_radius_px": _clean(bar.median_radius),
             "note": bar.note,
         },
+        "scale": _real_world_scale(bar),
         "quality": quality.to_dict(),
         "reps": [r.to_dict() for r in seg.reps],
         "rep_note": seg.note,

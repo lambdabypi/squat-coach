@@ -20,7 +20,7 @@ Working notes, written as the build happened rather than reconstructed afterward
   drive are computed in `vision/metrics.py`; the LLM receives those numbers as evidence and is only
   allowed to judge, explain and cite. If its structured output fails schema validation twice, the
   deterministic verdict ships without narration.
-- **Landmark quality frame by frame,** not in aggregate. See below — this is where it mattered.
+- **Landmark quality frame by frame,** not in aggregate. See below - this is where it mattered.
 
 ## The mistake I caught
 
@@ -37,11 +37,11 @@ That is the kind of number it is very tempting to accept and move on from. It wa
 path, it was green, and the schedule was already tight.
 
 I wrote the annotated frames to disk and looked at two of them instead. Frame 23's circle sat
-neatly on the plate. **Frame 70's circle was enormous** — centred on the ceiling, enclosing most of
+neatly on the plate. **Frame 70's circle was enormous** - centred on the ceiling, enclosing most of
 the upper half of the image. The printed radii told the same story once I read them as a series
 rather than as five independent successes: `164, 306, 294, 306, 168`. A plate's apparent radius is
 essentially constant for a fixed camera. Two clusters means the detector was locking onto two
-different things, and the larger cluster was background structure — the rack, the rig, ceiling gaps.
+different things, and the larger cluster was background structure - the rack, the rig, ceiling gaps.
 
 So the real score was about 2/5, reported as 5/5. **The metric was measuring "did Hough return a
 circle", not "did Hough return the plate".**
@@ -63,21 +63,21 @@ correct squat is close to vertical, so x should barely move. A 232px standard de
 same way as the first.**
 
 The actual bug was in my search region. The smoke test constrained the search *vertically* to a
-band around the shoulder, but left it unconstrained *horizontally* across all 1080 px — so every
+band around the shoulder, but left it unconstrained *horizontally* across all 1080 px - so every
 piece of gym equipment in the frame was a candidate. The fix is to anchor the ROI to the pose in
 both axes: a box around the shoulder landmark sized relative to the lifter's own torso length,
 scored on darkness, proximity to the shoulder, and consistency with a running median radius, then
 handed to a CSRT tracker with periodic re-detection.
 
 **What I took from it.** Two things, one specific and one general. Specifically: a detector's hit
-rate is worthless as a quality signal unless the "hit" is defined as the *right* detection —
+rate is worthless as a quality signal unless the "hit" is defined as the *right* detection -
 count-based metrics on unvalidated detections launder failure into success. Generally: when a
 result arrives green on a tight schedule, that is precisely when it deserves the look, because the
 schedule is what makes you want to skip it.
 
 This also changed the product, not just the code. It is why `Measurement.basis` distinguishes
-`observed` from `estimated` throughout the report: when plate detection degrades — bumper-free
-bars, cluttered racks, poor light — the system falls back to a shoulder-offset estimate and says so
+`observed` from `estimated` throughout the report: when plate detection degrades - bumper-free
+bars, cluttered racks, poor light - the system falls back to a shoulder-offset estimate and says so
 on the finding, rather than presenting an inferred bar path with the same confidence as a tracked
 one.
 
@@ -86,7 +86,7 @@ one.
 Worth recording because it was not a drill. The first run with a real API key failed:
 
 ```
-BadRequestError: 400 — This API key is not scoped to a workspace, so this request must
+BadRequestError: 400 - This API key is not scoped to a workspace, so this request must
 include the anthropic-workspace-id header with the ID of the workspace to use.
 ```
 

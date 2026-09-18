@@ -51,7 +51,7 @@ def main() -> int:
 
     report = result["report"]
     print(f"\n{'=' * 78}")
-    print(f"{video.name} — analysed in {elapsed:.1f}s")
+    print(f"{video.name} - analysed in {elapsed:.1f}s")
     print(f"{'=' * 78}")
 
     info = report["video"]

@@ -47,7 +47,7 @@ class Rep:
         return self.end_frame / self.fps
 
     def ascent_window(self, seconds: float) -> tuple[int, int]:
-        """Frames covering the first `seconds` of the ascent — the hip-drive window."""
+        """Frames covering the first `seconds` of the ascent - the hip-drive window."""
         lo = self.bottom_frame
         hi = min(self.end_frame, lo + max(2, int(round(seconds * self.fps))))
         return lo, hi

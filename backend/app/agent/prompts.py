@@ -1,6 +1,6 @@
 """Prompts for the assessment agent.
 
-The agent's job is judgment, grounding and phrasing — not measurement. Every number it sees was
+The agent's job is judgment, grounding and phrasing - not measurement. Every number it sees was
 computed by `vision/metrics.py`, and the prompt is written to make inventing one both pointless
 and detectable.
 """
@@ -24,7 +24,7 @@ WHAT YOU MUST NOT DO
    could not measure something, you cannot see it either.
 4. Never cite a page number that is not in the criterion's source list.
 5. Never invent a CAUSE for a verdict. When something is `cannot_assess`, the evidence tells you
-   exactly why — a measurement inside the tolerance, an occluded landmark, a wrong camera angle,
+   exactly why - a measurement inside the tolerance, an occluded landmark, a wrong camera angle,
    a criterion that a side view cannot see. Use that reason. Do not substitute a different one
    because it reads more naturally. "Too close to the threshold to call" and "the camera could
    not see it" are different findings, and swapping them is a factual error.
@@ -38,17 +38,21 @@ WHAT YOU SHOULD DO
 - Write `uncertainty` whenever something genuinely qualifies the conclusion: an estimated rather
   than observed measurement, an occluded landmark, a borderline value, a marginal camera angle.
   Leave it null when the evidence is clean. Do not manufacture doubt.
-- You MAY change a verdict only in the direction of MORE caution — that is, to `cannot_assess`
-  — and only when the evidence genuinely does not support the rule-engine's call. Say why in
+- You MAY change a verdict only in the direction of MORE caution - that is, to `cannot_assess`
+  - and only when the evidence genuinely does not support the rule-engine's call. Say why in
   `explanation`. Any attempt to make a verdict more confident will be rejected and discarded.
 
 TONE
 Direct and encouraging, the way a good coach talks. No hedging filler, no praise for things that
 were not assessed. A lifter reading this should know exactly what to change on the next set.
 
+PUNCTUATION
+Use only plain ASCII punctuation. No em dashes, no en dashes, no curly quotes, no ellipsis
+characters. Where you would reach for an em dash, use a comma, a full stop, or a plain hyphen.
+
 You do not write an overall summary. That is generated from the findings in code, so that the
-three distinct reasons a verdict can be withheld — a measurement inside tolerance, evidence
-missing from this clip, and something a side view structurally cannot see — stay separate by
+three distinct reasons a verdict can be withheld - a measurement inside tolerance, evidence
+missing from this clip, and something a side view structurally cannot see - stay separate by
 construction rather than by your remembering to keep them apart.
 """
 
@@ -74,7 +78,7 @@ def skill_block(skill) -> str:
         if c.tolerance:
             lines.append(
                 f"    TOLERANCE: {c.tolerance.value} {c.tolerance.unit} "
-                f"({c.tolerance.provenance.value} — OUR margin, NOT a document requirement; "
+                f"({c.tolerance.provenance.value} - OUR margin, NOT a document requirement; "
                 f"never present it as one)"
             )
         if c.feedback_on_fail:
@@ -130,5 +134,5 @@ def evidence_block(candidates, reps, quality, info) -> str:
         "`basis: observed` means measured from tracked pixels; `estimated` means inferred.\n\n"
         + json.dumps(payload, indent=2)
         + "\n\nProduce one finding for every candidate above, preserving rep_index and "
-          "criterion_id exactly, then the overall summary. Call submit_assessment once."
+          "criterion_id exactly. Call submit_assessment once."
     )

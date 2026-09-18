@@ -70,7 +70,7 @@ export default function Home() {
         <h2>Is your squat actually deep enough?</h2>
         <p>
           Upload a side-view video of a set. Squat&nbsp;Coach tracks your hips, knees, ankles and
-          the barbell, then assesses every repetition against a strength-training reference text —
+          the barbell, then assesses every repetition against a strength-training reference text -
           citing the page behind each verdict.
         </p>
         <p className="faint">
@@ -173,8 +173,8 @@ export default function Home() {
                   </tbody>
                 </table>
                 <p className="faint" style={{ marginTop: 12, marginBottom: 0 }}>
-                  Three of the reference text&rsquo;s own eight headline faults — knees-out, stance
-                  and rack height — are invisible to a sagittal camera. Squat&nbsp;Coach reports
+                  Three of the reference text&rsquo;s own eight headline faults - knees-out, stance
+                  and rack height - are invisible to a sagittal camera. Squat&nbsp;Coach reports
                   them as <em>cannot assess</em> rather than guessing.
                 </p>
               </div>

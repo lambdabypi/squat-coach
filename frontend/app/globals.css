@@ -100,8 +100,101 @@ p { margin: 0 0 12px; }
 .stages li.done .dot { background: var(--pass); }
 
 /* ---------- report ---------- */
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 22px; align-items: start; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 24px; align-items: start; }
 @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+
+/* The video stays put while findings scroll against it, so evidence and claim are on
+   screen together. */
+.sticky-col { position: sticky; top: 18px; }
+@media (max-width: 1000px) { .sticky-col { position: static; } }
+
+/* ---------- repetition bar ---------- */
+.repbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+}
+.repbar-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint);
+  margin-right: 4px;
+}
+.repchip {
+  width: 34px; height: 34px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.repchip.on { background: var(--accent); border-color: var(--accent); color: #05080d; }
+.repchip:hover:not(.on) { color: var(--text); border-color: var(--accent); }
+
+/* ---------- hero ---------- */
+.hero-line {
+  font-size: 27px; line-height: 1.25; letter-spacing: -0.02em;
+  margin: 4px 0 18px; max-width: 24ch;
+}
+
+.fixfirst {
+  border: 1px solid #6a4a1f; border-radius: 12px;
+  background: linear-gradient(180deg, rgba(240,136,62,.10), rgba(240,136,62,.03));
+  padding: 18px 20px; margin-bottom: 24px;
+}
+.fixfirst-tag {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--fail); margin-bottom: 6px;
+}
+.fixfirst h3 { font-size: 19px; margin: 0 0 8px; letter-spacing: -0.01em; }
+.fixfirst-what { color: var(--muted); margin-bottom: 10px; }
+.fixfirst-do {
+  background: rgba(88,166,255,.08); border-radius: 8px; padding: 10px 13px;
+  font-size: 14px; margin-bottom: 14px;
+}
+.fixfirst-foot { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+
+/* ---------- grouped findings ---------- */
+.group {
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface); margin-bottom: 10px; overflow: hidden;
+}
+.group > summary {
+  cursor: pointer; padding: 13px 15px; font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 9px; list-style: none;
+}
+.group > summary::-webkit-details-marker { display: none; }
+.group > summary::after {
+  content: "\203a"; margin-left: auto; color: var(--faint);
+  transform: rotate(90deg); transition: transform .15s; font-size: 18px;
+}
+.group[open] > summary::after { transform: rotate(-90deg); }
+.group > summary:hover { background: var(--surface-2); }
+.group-dot { width: 9px; height: 9px; border-radius: 99px; flex: none; }
+.group-pass .group-dot { background: var(--pass); }
+.group-fail .group-dot { background: var(--fail); }
+.group-unknown .group-dot { background: var(--unknown); }
+.group-body { padding: 4px 12px 12px; }
+.group-blurb { margin: 0 2px 10px; }
+
+/* ---------- collapsible reference drawers ---------- */
+.drawer {
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface); margin-bottom: 10px;
+}
+.drawer > summary {
+  cursor: pointer; padding: 13px 16px; font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 10px; list-style: none;
+}
+.drawer > summary::-webkit-details-marker { display: none; }
+.drawer > summary::after {
+  content: "\203a"; margin-left: auto; color: var(--faint);
+  transform: rotate(90deg); transition: transform .15s; font-size: 18px;
+}
+.drawer[open] > summary::after { transform: rotate(-90deg); }
+.drawer > summary:hover { background: var(--surface-2); }
+.drawer-body { padding: 0 16px 16px; }
+.drawer-badge {
+  background: rgba(240,136,62,.18); color: var(--fail);
+  border-radius: 99px; padding: 1px 8px; font-size: 12px;
+}
+.qualityrow { display: flex; gap: 10px; margin-bottom: 9px; font-size: 13px; align-items: start; }
+
+.pill-sub { opacity: .6; }
 
 .stage-wrap { position: relative; background: #000; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
 .stage-wrap video { display: block; width: 100%; height: auto; }

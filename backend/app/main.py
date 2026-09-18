@@ -67,7 +67,7 @@ def requirements() -> dict:
         "min_fps": MIN_FPS,
         "min_short_side_px": MIN_SHORT_SIDE_PX,
         "recording": [
-            "Film from directly to one side, level with the lifter — this is a side-view analysis.",
+            "Film from directly to one side, level with the lifter - this is a side-view analysis.",
             "Keep the whole body and the barbell in frame for the entire set, feet included.",
             "One set per clip. A few repetitions is plenty.",
             "Good, even light. A dark gym makes the barbell hard to track.",
@@ -185,5 +185,5 @@ def _validate_skill_at_startup() -> None:
           f"({len(skill.assessable)} assessable, {len(skill.unassessable)} not from a side view)")
     print(f"[cors]  allowed origins: {', '.join(ALLOWED_ORIGINS)}")
     if not env("ANTHROPIC_API_KEY"):
-        print("[agent] ANTHROPIC_API_KEY is not set — running with the deterministic rule "
+        print("[agent] ANTHROPIC_API_KEY is not set - running with the deterministic rule "
               "engine only. Findings and measurements are unaffected; wording is plainer.")

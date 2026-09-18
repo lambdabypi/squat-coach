@@ -2,13 +2,13 @@
 
 One helper, because the same mistake bit three settings at once.
 
-`.env` files carry keys with empty values — ours ships that way, so every variable a user has
+`.env` files carry keys with empty values - ours ships that way, so every variable a user has
 not filled in is present-but-empty. `os.environ.get(name, default)` returns that empty string
 rather than the default, so `ALLOWED_ORIGINS=` became an allowlist of `[""]`, `ANTHROPIC_MODEL=`
 became a model id of `""`, and `ANTHROPIC_WORKSPACE_ID=` would have sent an empty header.
 
 The CORS one was the expensive failure: the API answered every request correctly but without
-CORS headers, and the browser reported only "Failed to fetch" — a symptom that points at the
+CORS headers, and the browser reported only "Failed to fetch" - a symptom that points at the
 server being down, which it wasn't.
 
 Empty means unset. Always read environment variables through `env()`.

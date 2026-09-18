@@ -5,7 +5,7 @@ judge and explain them; it may not compute them. That separation is what makes a
 checkable against the video.
 
 Two fields carry the honesty requirements:
-  * `basis`  - 'observed' (measured from tracked pixels) vs 'estimated' (derived or inferred).
+  * `basis` - 'observed' (measured from tracked pixels) vs 'estimated' (derived or inferred).
   * `available` / `reason` - an unavailable measurement names the occluded landmark rather
     than returning a number nobody should trust.
 """
@@ -206,7 +206,7 @@ def head_pitch_proxy(track: PoseTrack, rep: Rep, bar: BarTrack | None) -> Measur
     ear, nose = track.joint("ear")[f], track.joint("nose")[f]
 
     # MediaPipe reports full visibility for head landmarks even when the head is entirely
-    # hidden behind the plate — it is in the common sample, and the first version of this
+    # hidden behind the plate - it is in the common sample, and the first version of this
     # returned a confident "looking down" from landmarks nobody can see. If the head falls
     # inside the detected plate, the pose model is inferring, not observing.
     if bar is not None and bar.any_tracked and np.isfinite(bar.median_radius):

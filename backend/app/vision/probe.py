@@ -131,7 +131,7 @@ def probe(path: str | Path) -> VideoInfo:
         raise ProbeError("The video duration could not be determined; the file may be truncated.")
     if duration_s > MAX_DURATION_S:
         raise ProbeError(
-            f"The video is {duration_s:.0f}s. Please trim it to {MAX_DURATION_S:.0f}s or less — "
+            f"The video is {duration_s:.0f}s. Please trim it to {MAX_DURATION_S:.0f}s or less - "
             "a few repetitions is enough."
         )
     if duration_s < MIN_DURATION_S:

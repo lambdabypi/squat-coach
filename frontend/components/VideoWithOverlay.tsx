@@ -242,7 +242,7 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
           const actualHip = f.joints.hip;
 
           // One idea per annotation. The headline is depth, so the headline mark is a single
-          // horizontal band from where the hip finished to where it needed to be — the
+          // horizontal band from where the hip finished to where it needed to be - the
           // earlier full-skeleton ghost drew four bright segments over four existing ones and
           // read as noise rather than as an instruction.
           if (actualHip?.x != null) {
@@ -465,7 +465,7 @@ function Readout({
         className="readout-value"
         style={{ color: value == null ? "var(--faint)" : ok === false ? "var(--fail)" : colour }}
       >
-        {value ?? "—"}
+        {value ?? "-"}
       </div>
       {target && <div className="readout-target">{target}</div>}
       {note && <div className="readout-note">{note}</div>}

@@ -44,7 +44,7 @@ def main() -> int:
     )
 
     print("=" * 78)
-    print("MEASURED — the shipped architecture (LLM sees numbers, never pixels)")
+    print("MEASURED - the shipped architecture (LLM sees numbers, never pixels)")
     print("=" * 78)
     if report_path.exists():
         cost = json.loads(report_path.read_text(encoding="utf-8")).get("cost")
@@ -59,7 +59,7 @@ def main() -> int:
         print(f"COST PER VIDEO    : {money(cost['estimated_usd'])}")
         measured = cost["estimated_usd"]
     else:
-        print("(no measured cost in report.json — run scripts/run_cli.py with a key first)")
+        print("(no measured cost in report.json - run scripts/run_cli.py with a key first)")
         measured = 0.0275
         print(f"using last known  : {money(measured)}")
 
@@ -68,7 +68,7 @@ def main() -> int:
 
     print()
     print("=" * 78)
-    print("MODELLED — if a VLM did the seeing instead")
+    print("MODELLED - if a VLM did the seeing instead")
     print("=" * 78)
     full = image_tokens(FRAME_W, FRAME_H)
     half = image_tokens(FRAME_W // 2, FRAME_H // 2)
@@ -107,17 +107,17 @@ def main() -> int:
           f"{cheapest_vlm / measured:.2f}x")
     print()
     print("But cost is the smaller argument. A VLM looking at 4 frames cannot:")
-    print("  - give a per-landmark visibility score, which is what drives observed-vs-estimated")
+    print(" - give a per-landmark visibility score, which is what drives observed-vs-estimated")
     print("    and every cannot_assess verdict in this system;")
-    print("  - locate a joint to the pixel, so 'hip 0.019 shin-lengths below knee' becomes")
+    print(" - locate a joint to the pixel, so 'hip 0.019 shin-lengths below knee' becomes")
     print("    'looks about parallel';")
-    print("  - track the bar across 236 frames to produce a path;")
-    print("  - be checked. A landmark can be drawn on the frame and verified by eye. A claim")
+    print(" - track the bar across 236 frames to produce a path;")
+    print(" - be checked. A landmark can be drawn on the frame and verified by eye. A claim")
     print("    cannot.")
     print()
     print("Sending ALL frames so it could do those things costs "
           f"{money((CLIP_FRAMES * full + 2000) / 1e6 * 1.00 + 3000 / 1e6 * 5.00)} on the cheapest")
-    print("model — two orders of magnitude more than the shipped design — and still yields")
+    print("model - two orders of magnitude more than the shipped design - and still yields")
     print("estimates rather than measurements.")
     print()
     print("Per 1,000 videos:")

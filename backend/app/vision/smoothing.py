@@ -1,7 +1,7 @@
 """Signal conditioning for landmark series.
 
 Pose landmarks jitter by a few pixels frame to frame. Every measurement in the report is taken
-from a smoothed series, and the smoothing window is deliberately short — long enough to kill
+from a smoothed series, and the smoothing window is deliberately short - long enough to kill
 jitter, short enough not to round off the bottom of the rep, which is the single frame most of
 the criteria are measured at.
 """

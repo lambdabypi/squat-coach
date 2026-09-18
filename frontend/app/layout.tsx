@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Squat Coach — side-view squat analysis",
+  title: "Squat Coach - side-view squat analysis",
   description:
     "Upload a side-view barbell squat and get repetition-by-repetition feedback assessed against a strength-training reference text.",
 };

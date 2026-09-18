@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { Finding } from "@/lib/types";
+import { presentMeasurement } from "@/lib/present";
+import type { Finding, Report } from "@/lib/types";
 
 const LABEL: Record<string, string> = {
   meets_standard: "meets standard",
@@ -9,23 +10,17 @@ const LABEL: Record<string, string> = {
   cannot_assess: "cannot assess",
 };
 
-function formatValue(f: Finding): string | null {
-  const m = f.measurement;
-  if (!m || m.value == null) return null;
-  const unit = m.unit === "shin_lengths" ? "shin" : m.unit === "degrees" ? "°" : "";
-  const v = m.unit === "degrees" ? m.value.toFixed(0) : m.value.toFixed(2);
-  return `${v}${unit === "°" ? "" : " "}${unit}`;
-}
-
 export default function FindingCard({
   finding,
+  report,
   onSeek,
 }: {
   finding: Finding;
-  onSeek: (t: number, frame: number | null) => void;
+  report: Report;
+  onSeek: (t: number | null, frame: number | null) => void;
 }) {
   const [showQuote, setShowQuote] = useState(false);
-  const value = formatValue(finding);
+  const presented = presentMeasurement(finding, report);
   const m = finding.measurement;
 
   return (
@@ -38,11 +33,22 @@ export default function FindingCard({
       <p className="exp">{finding.explanation}</p>
 
       <div className="meta">
-        {value && (
-          <span className={`pill ${m?.basis === "estimated" ? "est" : "obs"}`}>
-            {value} · {m?.basis === "estimated" ? "estimated" : "observed"}
+        {presented && (
+          <span
+            className={`pill ${m?.basis === "estimated" ? "est" : "obs"}`}
+            title={
+              presented.secondary
+                ? `${presented.secondary}${presented.scaled ? ", converted using the barbell plate as a scale reference" : ""}`
+                : undefined
+            }
+          >
+            {presented.primary}
+            {presented.secondary && (
+              <span className="pill-sub"> ({presented.secondary})</span>
+            )}
           </span>
         )}
+        {m?.basis === "estimated" && <span className="pill est">estimated</span>}
 
         {finding.threshold_value != null && (
           <span
@@ -61,13 +67,11 @@ export default function FindingCard({
         {finding.timestamp_s != null && (
           <span
             className="pill time"
-            onClick={() => onSeek(finding.timestamp_s!, finding.frame_index)}
+            onClick={() => onSeek(finding.timestamp_s, finding.frame_index)}
           >
-            ▸ {finding.timestamp_s.toFixed(2)}s
+            {finding.timestamp_s.toFixed(2)}s
           </span>
         )}
-
-        <span className="pill">{finding.confidence} confidence</span>
 
         <span
           className="pill"

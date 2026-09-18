@@ -14,14 +14,14 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from ..config import env
 from ..skill.rules import FAILS, MEETS, UNKNOWN, Candidate
 from .prompts import SYSTEM, evidence_block, skill_block
 
-# Haiku 4.5 by default: this stage does constrained work — judge a supplied measurement against
-# a supplied rule, then write two sentences — so the cheapest current model is the right default.
+# Haiku 4.5 by default: this stage does constrained work - judge a supplied measurement against
+# a supplied rule, then write two sentences - so the cheapest current model is the right default.
 # Override with ANTHROPIC_MODEL to compare quality against a larger model.
 MODEL = env("ANTHROPIC_MODEL", "claude-haiku-4-5")
 MAX_TOKENS = 8000
@@ -77,6 +77,27 @@ TOOL = {
 }
 
 
+# Typographic characters the model reaches for unprompted. The prompt asks it not to; this
+# guarantees it, because a style rule enforced only by instruction is a style rule that drifts.
+# Keyed by codepoint so this file contains none of the characters it is stripping, which would
+# otherwise make it the one file the repository-wide sweep can never clean.
+_ASCII_PUNCT = {
+    0x2014: "-",      # em dash
+    0x2013: "-",      # en dash
+    0x2212: "-",      # minus sign
+    0x2018: "'",      # left single quote
+    0x2019: "'",      # right single quote
+    0x201C: '"',      # left double quote
+    0x201D: '"',      # right double quote
+    0x2026: "...",    # ellipsis
+    0x00A0: " ",      # non-breaking space
+}
+
+
+def to_ascii_punctuation(text: str | None) -> str | None:
+    return None if text is None else text.translate(_ASCII_PUNCT)
+
+
 class AgentFinding(BaseModel):
     rep_index: int
     criterion_id: str
@@ -85,10 +106,15 @@ class AgentFinding(BaseModel):
     feedback: str | None = None
     uncertainty: str | None = None
 
+    @field_validator("explanation", "feedback", "uncertainty", mode="after")
+    @classmethod
+    def plain_punctuation(cls, v: str | None) -> str | None:
+        return to_ascii_punctuation(v)
+
 
 class AgentOutput(BaseModel):
     findings: list[AgentFinding]
-    # No summary. The overall roll-up is generated deterministically in skill/summary.py —
+    # No summary. The overall roll-up is generated deterministically in skill/summary.py -
     # see the note there on why it was taken away from the model.
 
 
@@ -99,7 +125,7 @@ _CONFIDENCE_RANK = {UNKNOWN: 0, MEETS: 1, FAILS: 1}
 def merge_verdict(rule_verdict: str, agent_verdict: str) -> tuple[str, bool]:
     """Decide the final verdict. Returns (verdict, was_the_agent_overridden).
 
-    The agent may abstain — move a verdict to `cannot_assess` — and nothing else. It may not
+    The agent may abstain - move a verdict to `cannot_assess` - and nothing else. It may not
     upgrade an abstention into a verdict, and it may not flip meets <-> does-not-meet: those
     two come from arithmetic on a measurement and a declared threshold, and the model has no
     information the rule engine lacks. Letting it disagree there would mean a language model
@@ -131,7 +157,7 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
 
     # An organisation-scoped key must name the workspace it is acting for; a workspace-scoped
     # key must not. Which one a given key needs is not discoverable from the key itself, and
-    # swapping keys flips the requirement — that cost a debugging round here, with the whole
+    # swapping keys flips the requirement - that cost a debugging round here, with the whole
     # agent stage silently falling back to the rule engine over one stale header.
     #
     # So: send the header when configured, and if the workspace turns out not to exist for this
@@ -149,7 +175,7 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
         "content": [
             # Identical for every video, so it carries the cache breakpoint. Note that on
             # claude-haiku-4-5 this block (~2.1k tokens) is BELOW the minimum cacheable prefix,
-            # so the breakpoint is silently ignored and cache_read stays 0 — verified in
+            # so the breakpoint is silently ignored and cache_read stays 0 - verified in
             # scripts/test_cache.py. Harmless, and it starts paying off if the skill grows or a
             # larger model is configured.
             {"type": "text", "text": skill_block(skill), "cache_control": {"type": "ephemeral"}},
@@ -174,14 +200,14 @@ def assess_with_agent(skill, candidates: list[Candidate], reps, quality, info) -
         stale_workspace = workspace and "not_found" in text and "orkspace" in text
         if not stale_workspace:
             raise
-        # The configured workspace does not exist for this key — most likely the key was
+        # The configured workspace does not exist for this key - most likely the key was
         # replaced with a workspace-scoped one. Retry without the header.
         client = build_client(None)
         resp = call(client)
         workspace_note = (
             f"ANTHROPIC_WORKSPACE_ID is set to a workspace this API key cannot see, so the "
             f"header was dropped and the request retried without it. Blank that variable in "
-            f".env — this key is workspace-scoped and does not need it."
+            f".env - this key is workspace-scoped and does not need it."
         )
 
     block = next((b for b in resp.content if b.type == "tool_use"), None)

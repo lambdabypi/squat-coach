@@ -10,7 +10,7 @@ type Pt = [number, number];
  * document describes, drawn from the same data at the same scale.
  *
  * Overlaying both on the video is good for "is the tracking right?", but poor for "what do I
- * change?" — the two chains sit on top of each other and neither reads cleanly. Separating
+ * change?" - the two chains sit on top of each other and neither reads cleanly. Separating
  * them answers the second question, which is the one the user has after they trust the first.
  */
 export default function PoseCompare({
@@ -47,7 +47,7 @@ export default function PoseCompare({
 
   useEffect(() => {
     if (!actual) return;
-    // One shared transform so the two figures are directly comparable — different scales would
+    // One shared transform so the two figures are directly comparable - different scales would
     // make a deeper squat look like a smaller person.
     const all = [...Object.values(actual), ...Object.values(wanted)];
     const xs = all.map((p) => p[0]);
@@ -88,7 +88,7 @@ export default function PoseCompare({
       ctx.lineTo(W - 8, ground);
       ctx.stroke();
 
-      // Hip and knee height guides — the depth standard, made visible.
+      // Hip and knee height guides - the depth standard, made visible.
       const hip = T(pts.hip);
       const knee = T(pts.knee);
       ctx.setLineDash([4, 5]);
@@ -160,7 +160,7 @@ export default function PoseCompare({
         <figcaption>
           <strong style={{ color: "#58a6ff" }}>Where you were</strong>
           <span className="faint">
-            hip {gotDepth >= 0 ? "" : "−"}
+            hip {gotDepth >= 0 ? "" : "-"}
             {Math.abs(gotDepth).toFixed(2)} shin {gotDepth >= 0 ? "below" : "above"} knee
           </span>
         </figcaption>

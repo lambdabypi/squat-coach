@@ -84,6 +84,12 @@ export interface Report {
     detection_fraction: number;
   };
   bar: { observed_fraction: number; median_radius_px: number | null; note: string | null };
+  scale: {
+    mm_per_px: number;
+    basis: string;
+    assumption: string;
+    confidence: string;
+  } | null;
   quality: {
     gates: Gate[];
     view_ratio: number;

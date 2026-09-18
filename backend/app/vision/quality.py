@@ -83,7 +83,7 @@ def assess_quality(track: PoseTrack, seg: RepSegmentation, bar: BarTrack | None)
     # Detection quality is computed first: the camera-angle test is derived from landmark
     # positions, so when the person is barely detected the angle estimate is meaningless.
     # An earlier version asserted "this is not a side view" for a video that was simply too
-    # dark and badly cropped — a confident diagnosis from unreliable inputs, which is exactly
+    # dark and badly cropped - a confident diagnosis from unreliable inputs, which is exactly
     # the failure this gate exists to prevent.
     det = float(track.detected.mean()) if track.detected is not None else 0.0
 

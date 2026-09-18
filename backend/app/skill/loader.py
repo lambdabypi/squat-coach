@@ -2,7 +2,7 @@
 
 The skill is the contract between the reference document and the assessment. It is validated
 strictly at startup so that a malformed edit fails loudly at load time rather than quietly
-producing ungrounded findings at assessment time — the reviewer is expected to edit this file
+producing ungrounded findings at assessment time - the reviewer is expected to edit this file
 live, so a typo must be an error, not a silent behaviour change.
 """
 
@@ -71,7 +71,7 @@ class Tolerance(BaseModel):
     @model_validator(mode="after")
     def tolerances_are_ours(self):
         # A tolerance is a measurement margin. The document states none, so a tolerance claiming
-        # document provenance is always a mistake — most likely a bad edit. Fail loudly.
+        # document provenance is always a mistake - most likely a bad edit. Fail loudly.
         if self.provenance is Provenance.DOCUMENT:
             raise ValueError(
                 "A tolerance may not claim document_stated provenance. The reference document "
@@ -184,7 +184,7 @@ class Skill(BaseModel):
         return [c for c in self.criteria if not c.is_assessable]
 
     def coverage_rows(self) -> list[dict]:
-        """Feeds the UI's coverage table — stated up front, not buried."""
+        """Feeds the UI's coverage table - stated up front, not buried."""
         return [
             {
                 "id": c.id,
@@ -206,7 +206,7 @@ def load_skill(path: Path | str = SKILL_PATH) -> Skill:
 
 if __name__ == "__main__":
     s = load_skill()
-    print(f"skill v{s.meta.skill_version} — {s.meta.document_title}")
+    print(f"skill v{s.meta.skill_version} - {s.meta.document_title}")
     print(f"{len(s.criteria)} criteria, {len(s.global_gates)} global gates\n")
     for c in s.criteria:
         rule_p = c.rule.provenance.value if c.rule else "-"

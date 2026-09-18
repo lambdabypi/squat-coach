@@ -27,7 +27,7 @@ from .reps import Rep
 from .smoothing import interpolate_gaps, smooth
 
 # How far below the knee the target hip sits, in shin-lengths. The document's standard is
-# geometric — hip below the top of the patella — and states no margin. This is ours: far enough
+# geometric - hip below the top of the patella - and states no margin. This is ours: far enough
 # past the measurement tolerance that the target is unambiguously compliant rather than
 # borderline. Labelled engineering_tolerance everywhere it surfaces.
 TARGET_DEPTH_MARGIN_SHIN = 0.06
@@ -94,7 +94,7 @@ def solve_target_pose(
     facing = float(np.sign(P["toe"][0] - P["heel"][0])) or 1.0
 
     # Current angles as the starting guess, so the solver returns the *nearest* compliant pose
-    # rather than an arbitrary one — the correction shown is the smallest one that works.
+    # rather than an arbitrary one - the correction shown is the smallest one that works.
     theta0 = float(np.arctan2(P["knee"][1] - ankle[1], P["knee"][0] - ankle[0]))
     phi0 = float(np.arctan2(P["hip"][1] - P["knee"][1], P["hip"][0] - P["knee"][0]))
 
@@ -163,7 +163,7 @@ def solve_target_pose(
             "criterion_id": "depth",
             "label": "Sit lower",
             "detail": (
-                f"At the bottom your hip was {abs(got):.2f} shin-lengths {where} your knee — "
+                f"At the bottom your hip was {abs(got):.2f} shin-lengths {where} your knee - "
                 f"close enough to level that we could not call it either way. The ghost shows "
                 f"the hip {want:.2f} below the knee, clearly past parallel. Because your foot "
                 f"stays planted and your bones do not change length, reaching it means the whole "

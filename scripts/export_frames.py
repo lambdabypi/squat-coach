@@ -1,7 +1,7 @@
 """Export annotated still frames at each repetition's bottom position.
 
 Draws from the same overlay.json the browser uses, so what lands on disk is exactly what the UI
-renders — which makes these stills usable as evidence rather than a separate rendering path that
+renders - which makes these stills usable as evidence rather than a separate rendering path that
 might disagree with the product.
 
     python scripts/export_frames.py <video> <out_dir>
