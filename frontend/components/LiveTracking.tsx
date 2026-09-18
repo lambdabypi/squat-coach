@@ -73,6 +73,11 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
   }, [jobId]);
 
   // Draw the most recent landmarks and keep the playhead on that frame.
+  //
+  // `url` MUST stay in the dependency list. This component returns null until the object URL
+  // exists, so on first mount there is no <video> and no <canvas> and the refs are null. With
+  // only [fps] here the effect bailed on that first run and never fired again once the elements
+  // appeared — landmarks streamed in correctly and nothing was ever painted.
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -134,7 +139,7 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
     };
     rafRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [fps]);
+  }, [fps, url]);
 
   if (!url) return null;
 
@@ -149,6 +154,14 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
           preload="auto"
           onLoadedMetadata={(e) => {
             const v = e.currentTarget;
+            // Size the canvas as soon as the real dimensions are known, rather than waiting for
+            // the draw loop to notice — otherwise the first frames paint into a 300x150 default
+            // and appear stretched.
+            const c = canvasRef.current;
+            if (c && v.videoWidth) {
+              c.width = v.videoWidth;
+              c.height = v.videoHeight;
+            }
             // No frame-rate API in the browser; 30fps covers the overwhelming majority of
             // phone footage and this view only needs to land near the right frame.
             setFps(30);
@@ -158,9 +171,9 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
         <canvas ref={canvasRef} />
       </div>
       <p className="faint" style={{ marginTop: 8, marginBottom: 0 }}>
-        Landmarks found in {analysed} frames so far. Green means the joint was seen, orange means
-        the model is inferring it. Your video is playing from this device — it is not being
-        streamed back.
+        Landmarks streamed back for {analysed} frames so far, drawn as they arrive. Green means the
+        joint was seen, orange means the model is inferring it. The video itself plays from your
+        own device — only the landmark coordinates travel back over the network.
       </p>
     </div>
   );
