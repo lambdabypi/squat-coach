@@ -60,6 +60,9 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
   const ov = overlay;
   const topFix = groups.fix[0] ?? null;
   const targetPose = ov.target_poses?.[String(activeRep)];
+  const anyTargetPose = Object.values(ov.target_poses ?? {}).some(
+    (p) => p.corrections.length > 0,
+  );
   const issues = rep.quality.gates.filter((g) => g.severity !== "ok");
 
   const card = (f: Finding) => (
@@ -135,6 +138,7 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
             src={localVideoUrl(jobId) ?? videoUrl(jobId)}
             overlay={ov}
             highlightFrame={highlight}
+            activeRep={activeRep}
           />
         </div>
 
@@ -185,9 +189,23 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
         </aside>
       </div>
 
-      {targetPose && targetPose.corrections.length > 0 && (
+      {/* Renders whenever ANY repetition produced a correction, and says plainly when the
+          selected one did not. Previously the video toggle appeared if any rep had a target
+          pose while this panel required the *current* rep to have one, so selecting a clean
+          repetition left a visible toggle and no explanation. A UI state with no output and no
+          message is indistinguishable from a bug, which is how this was reported. */}
+      {anyTargetPose && (
         <section>
           <h2>What to change</h2>
+          {!targetPose || targetPose.corrections.length === 0 ? (
+            <div className="card">
+              <p className="muted" style={{ marginBottom: 0 }}>
+                Nothing to correct on repetition {activeRep}: depth and back angle were either
+                within the standard or could not be measured, so there is no target position to
+                show. Other repetitions in this set do have one.
+              </p>
+            </div>
+          ) : (
           <div className="card">
             <PoseCompare
               frame={ov.frames[targetPose.frame]}
@@ -217,6 +235,7 @@ export default function ReportPage({ params }: { params: Promise<{ jobId: string
               depth and do not draw it.
             </p>
           </div>
+          )}
         </section>
       )}
 

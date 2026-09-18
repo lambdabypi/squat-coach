@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LiveTracking from "@/components/LiveTracking";
 import { getRequirements, subscribeToJob, uploadVideo, type PreviewFrame } from "@/lib/api";
-import { submitClientAnalysis, trackInBrowser } from "@/lib/clientPose";
+import { submitClientAnalysis, toPreviewFrame, trackInBrowser } from "@/lib/clientPose";
 import { rememberLocalVideo } from "@/lib/localVideo";
 import type { JobStatus, Requirements } from "@/lib/types";
 
@@ -29,6 +29,7 @@ export default function Home() {
   const [preview, setPreview] = useState<PreviewFrame[]>([]);
   const [tracking, setTracking] = useState<{ frame: number; total: number } | null>(null);
   const [fellBack, setFellBack] = useState<string | null>(null);
+  const [trackedLocally, setTrackedLocally] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -67,10 +68,17 @@ export default function Home() {
       const result = await trackInBrowser(file, (p) => {
         setTracking({ frame: p.frame, total: p.total });
         if (p.landmarks) {
-          setPreview((prev) => [...prev, { frame: p.frame, joints: p.landmarks! }]);
+          // The live view addresses joints by name; the wire format uses BlazePose indices.
+          // Feeding it the raw indexed form drew every dot but no bones, because each bone
+          // looked up a name that was not there.
+          setPreview((prev) => [
+            ...prev,
+            toPreviewFrame({ i: p.frame, lm: p.landmarks! }),
+          ]);
         }
       });
       setTracking(null);
+      setTrackedLocally(true);
       const created = await submitClientAnalysis(result);
       // The server has no copy of this video, so the report has to play it from here.
       rememberLocalVideo(created.job_id, file);
@@ -279,8 +287,18 @@ export default function Home() {
             assessment adds about half a minute. An 8-second video takes around 90 seconds.
           </p>
 
-          {job.stage === "Tracking the movement" && (
+          {/* Only while the SERVER is doing the tracking. On the browser path that work is
+              already finished, and leaving the live view up showed a frozen frame for the whole
+              barbell-detection stage, which read as a stall rather than as progress. */}
+          {job.stage === "Tracking the movement" && !trackedLocally && (
             <LiveTracking frames={preview} file={localFile} />
+          )}
+
+          {trackedLocally && (
+            <p className="faint" style={{ marginTop: 10, marginBottom: 0 }}>
+              Tracking is done. The server is locating the barbell in the frames that were sent
+              and measuring against the standards, which takes a few seconds.
+            </p>
           )}
         </div>
       )}

@@ -11,6 +11,8 @@ interface Props {
   src: string;
   overlay: Overlay;
   highlightFrame?: number | null;
+  /** Which repetition the report is showing, so the target-pose toggle matches it. */
+  activeRep?: number;
 }
 
 const COL = {
@@ -55,9 +57,13 @@ function label(
  * The brief accepts "playable annotated video or synchronized video overlays".
  */
 const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverlay(
-  { src, overlay, highlightFrame },
+  { src, overlay, highlightFrame, activeRep },
   ref,
 ) {
+  const activeTarget =
+    activeRep != null ? overlay.target_poses?.[String(activeRep)] : undefined;
+  const hasTargetForActiveRep = !!activeTarget && activeTarget.corrections.length > 0;
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
@@ -340,7 +346,9 @@ const VideoWithOverlay = forwardRef<PlayerHandle, Props>(function VideoWithOverl
         >
           Angles
         </button>
-        {Object.keys(overlay.target_poses ?? {}).length > 0 && (
+        {/* Scoped to the repetition on screen. Showing it whenever ANY rep had a target pose
+            meant selecting a clean repetition left a toggle that drew nothing. */}
+        {hasTargetForActiveRep && (
           <button
             className={`chip${showGhost ? " on" : ""}`}
             onClick={() => setShowGhost((v) => !v)}

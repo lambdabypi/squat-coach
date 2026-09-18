@@ -25,7 +25,11 @@ export default function PoseCompare({
   const yourRef = useRef<HTMLCanvasElement>(null);
   const targetRef = useRef<HTMLCanvasElement>(null);
 
-  const j = frame.joints;
+  // `frame` is looked up by index from the overlay, so a mismatch between the solved frame and
+  // the overlay's length would throw here and take the whole section down with it. Guarding
+  // rather than trusting the index: a silently missing panel is exactly the failure this
+  // component was reported for.
+  const j = frame?.joints ?? {};
   const actual: Record<string, Pt> | null =
     j.ankle?.x != null && j.knee?.x != null && j.hip?.x != null && j.shoulder?.x != null
       ? {
