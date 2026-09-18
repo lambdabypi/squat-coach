@@ -32,8 +32,27 @@ than hand-writing it, and by cutting the rendered-MP4 stage (below).
   original video. The brief accepts "playable annotated video *or* synchronized video overlays",
   and the overlay is strictly better here: instantly available, sharp at any size, scrubbable, and
   it costs no encode time per video. A downloadable MP4 was cut at the 20:28 boundary.
-- **Hosting.** Reproducible local launch only, which the brief explicitly permits. Two services
-  and a 31 MB model made a same-day deploy a poor use of the remaining budget.
+- **Auth, a database, and a result cache.** None appear anywhere in the brief, and it asks for
+  "the smallest implementation that proves the complete experience" (p.1) while stating that "a
+  simpler application with verified results will score above a polished one" (p.3). Each was
+  considered and declined on that basis:
+  - *Auth.* The submission requirement is a working link with any access instructions. There is
+    no multi-user or privacy requirement to serve, so a public link satisfies it.
+  - *A database.* Reports live in an in-memory job map plus the container filesystem. The
+    consequence is real and is documented under Known limitations rather than engineered away:
+    Cloud Run scales to zero, so a report link does not survive the instance.
+  - *A result cache.* The measurement core is deterministic - `scripts/check_determinism.py`
+    confirms three runs of the common sample agree on every verdict, measurement and confidence
+    level - so re-uploading a file cannot change the answer, only spend the compute again. A
+    content-hash cache would therefore be pure savings, and cost *is* an evaluation axis (p.3).
+    It was still declined: the demo includes "show how a change to the skill affects the
+    assessment", and a cache puts a staleness risk directly on the path of that demonstration.
+    Keyed correctly it would be `hash(video) + skill version`, which is the note worth having
+    rather than the code.
+- **Hosting was cut, then reinstated.** Originally a reproducible local launch only, which the
+  brief explicitly permits. It is now deployed: Vercel for the frontend, Cloud Run for the API.
+  The browser-pose path is what made this viable, since server-side analysis on Cloud Run's
+  shared vCPUs takes 302s against 88.6s locally.
 
 ## Architecture
 
@@ -429,6 +448,23 @@ Stated precisely, so it can be held against us:
 - Rep segmentation assumes a continuous set in frame. Walk-outs and re-racks can still produce
   phantom repetitions; the boundary contamination described below is fixed, the phantom-rep case
   is not.
+
+**Determinism and persistence**
+
+- The measurement core is deterministic: `scripts/check_determinism.py` runs the common sample
+  three times and compares every verdict, measurement and confidence level, and they are
+  identical. Re-uploading a file cannot change the result.
+- **The narration is not.** Nothing in this codebase sets `temperature`, so the Anthropic default
+  of 1.0 applies and the summary *wording* varies between runs even when the verdicts it describes
+  do not. The deployed backend runs with no key, so the deterministic summary writer produces the
+  text there, but this would want `temperature=0` the moment a key is set.
+- **A report does not outlive the instance.** Job state is an in-memory map, and the report page
+  fetches `/jobs/{id}/report` and `/jobs/{id}/overlay` as separate requests after navigation.
+  Cloud Run runs with `min-instances 0`, so an older report link 404s once the instance is gone.
+  This also forced `--max-instances 1`: with two instances those follow-up fetches could land on
+  the instance that never saw the job, 404ing a report that had just been generated. There is no
+  concurrency requirement here, so pinning to one instance is free. Surviving a restart would
+  need the reports persisted, which is the database decision recorded above.
 
 **Coverage**
 

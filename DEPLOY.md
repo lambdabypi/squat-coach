@@ -28,15 +28,21 @@ calculator runs on the CPU, so `python:3.12-slim` fails at the first frame with
 `libgles2`, `libgl1`, `libglib2.0-0` and `libgomp1` for that reason. A container that passes
 `/health` and fails on upload is the easy mistake here.
 
-The image also bakes in the 29 MB pose model so cold starts do not fetch it, installs `ffmpeg` for
-the upload gate, and swaps `opencv-contrib-python` for `opencv-python-headless` (about 75 MB
-smaller; this project uses no contrib-only calls). It listens on `$PORT`, defaulting to 7860.
+The image also bakes in the 29 MB pose model so cold starts do not fetch it and installs `ffmpeg`
+for the upload gate. It deliberately **keeps** `opencv-contrib-python` pinned and asserts
+`cv2.__version__` at build time. Swapping it for `opencv-python-headless` to save 75 MB was tried
+and reverted: `mediapipe` declares `opencv-contrib-python` unpinned as its own dependency, so the
+image ended up carrying both wheels (a net size *increase*) and contrib shadowed headless in the
+shared `cv2` namespace. The resulting OpenCV 5 in the container returned verdict counts of 12/6/4
+where the verified build returns 13/6/3. It listens on `$PORT`, defaulting to 7860.
 Built size is roughly 2 GB, which is fine for a container host and is the reason this cannot be a
 Vercel function.
 
-### Option A: Hugging Face Spaces (no card required) - recommended
+### Option A: Hugging Face Spaces (no card required) - tried, and it no longer works
 
-The most genuinely free option, and the right audience.
+Kept because the scripting is sound and the paywall may move again, but **Docker Spaces now
+require a PRO subscription**, so this route was abandoned mid-deploy in favour of Option B. Read it
+as a record of the attempt rather than a recommendation.
 
 **Activate the project venv first.** Both `hf` and `huggingface_hub` install into it, not onto the
 system PATH, so without this you get `hf: not recognized` and then `ModuleNotFoundError`:
@@ -85,7 +91,7 @@ gcloud run deploy squat-coach-backend \
   --cpu 2 \
   --timeout 900 \
   --min-instances 0 \
-  --max-instances 2 \
+  --max-instances 1 \
   --set-env-vars "^@^ALLOWED_ORIGINS=https://YOUR-FRONTEND.vercel.app@STREAM_DEADLINE_SECONDS=870"
 ```
 
@@ -102,7 +108,7 @@ Every flag above is load-bearing for staying free:
 | Flag | Why |
 |---|---|
 | `--min-instances 0` | Scale to zero. A warm instance is billed continuously and would drain the free tier while doing nothing. |
-| `--max-instances 2` | Hard cap. Without it, traffic or a retry loop can scale out and bill you. |
+| `--max-instances 1` | Hard cap, and required for correctness here rather than only for cost: job state is in-memory, so with two instances the report fetch can land on the instance that never saw the job. There is no concurrency requirement. |
 | `--timeout 900` | Must exceed the SSE stream's own deadline (`STREAM_DEADLINE_SECONDS=870`) so the stream ends itself rather than being cut off mid-analysis. 300s was not enough: server-side analysis of the sample takes **302s** on 2 vCPU here, against 88.6s locally. Raising the CPU to 4 made it *worse*, not better. |
 | `--cpu 2` | Analysis is CPU-bound. At ~302s server-side that is ~600 vCPU-seconds per video, so roughly **300 videos per month free**. The browser-pose path costs a fraction of that, since only the assessment runs here. |
 | default CPU allocation | **Do not** pass `--no-cpu-throttling`. See below. |
