@@ -97,6 +97,11 @@ Other scripts:
 | `scripts/test_vision.py` | Vision core only: pose, bar, reps, view geometry. |
 | `scripts/gen_skill_docs.py` | Regenerate `skill/coverage.md` and `skill/CITATIONS.md`. |
 | `scripts/check_video_serving.py` | Confirm byte-range streaming works. |
+| `scripts/check_agent.py` | Sub-cent check that the agent can reach the API. |
+| `scripts/bench_speed.py` | Measure where the analysis time goes and what each speed-up buys. |
+| `scripts/bench_accuracy.py` | Check whether a faster pose model changes the verdicts. |
+| `scripts/cost_model.py` | Compare measured API spend against a modelled VLM architecture. |
+| `scripts/strip_emdashes.py` | Keep punctuation plain ASCII across the repository. |
 
 ---
 
@@ -134,9 +139,21 @@ scripts/          headless tools
 
 ---
 
+## Documents
+
+| File | What it covers |
+|---|---|
+| [`BUILD_NOTES.md`](BUILD_NOTES.md) | Architecture, model and tool choices, time, costs, trade-offs, limitations, and an explicit statement of what is and is not mocked |
+| [`AI_USAGE.md`](AI_USAGE.md) | What was delegated, what was inspected, and the mistakes caught |
+| [`FUTURE_SPEC.md`](FUTURE_SPEC.md) | Measured performance analysis, edge-deployment and VLM costings, and the work this build did not reach |
+| [`EVIDENCE/README.md`](EVIDENCE/README.md) | Runs on the common sample and two difficult recordings |
+| [`DEMO.md`](DEMO.md) | 15-minute walkthrough script |
+| [`skill/SKILL.md`](skill/SKILL.md) | The document-derived assessment standard |
+
 ## Known limitations
 
-Stated at greater length in [`BUILD_NOTES.md`](BUILD_NOTES.md):
+Stated at greater length in [`BUILD_NOTES.md`](BUILD_NOTES.md), with the performance work in
+[`FUTURE_SPEC.md`](FUTURE_SPEC.md):
 
 - 2D monocular pose. The document's depth landmark is the hip **crease**; the model gives a hip
   **joint centre**, which sits higher and biases depth toward "not deep enough".

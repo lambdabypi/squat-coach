@@ -11,6 +11,7 @@ Two decisions here carry the rest of the pipeline:
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterator
@@ -25,7 +26,13 @@ from mediapipe.tasks.python.vision import (
     RunningMode,
 )
 
-MODEL_PATH = Path(__file__).resolve().parents[2] / "models" / "pose_landmarker_heavy.task"
+MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
+
+# `heavy` is the default because this application trades latency for landmark accuracy, and the
+# accuracy is what every measurement rests on. POSE_MODEL lets that trade be re-measured rather
+# than argued about: see scripts/bench_speed.py and scripts/bench_accuracy.py.
+POSE_VARIANT = os.environ.get("POSE_MODEL", "heavy").strip().lower() or "heavy"
+MODEL_PATH = MODELS_DIR / f"pose_landmarker_{POSE_VARIANT}.task"
 
 # BlazePose indices, per side.
 LEFT = {"shoulder": 11, "elbow": 13, "hip": 23, "knee": 25, "ankle": 27, "heel": 29, "toe": 31, "ear": 7}

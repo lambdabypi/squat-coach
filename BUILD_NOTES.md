@@ -129,6 +129,12 @@ $0.06. At consumer volume the obvious reductions are batching reps into one find
 or skipping narration for `cannot_assess` findings where the rule engine's wording is already
 adequate. The figure is measured per run and reported in `report.cost`, never estimated.
 
+**Cost to build.** Under **$1** in Anthropic API charges across the whole session: roughly 20 full
+pipeline runs with the agent enabled at $0.026 each, plus a handful of sub-cent connectivity
+checks. Everything else in the build is free: MediaPipe, OpenCV, FastAPI and Next.js are
+open-source, the pose model is a 31 MB download, and all compute ran locally on a laptop CPU. The
+assistant time used to write the code is not metered per video and is not included in that figure.
+
 **On model choice.** Haiku 4.5 costs a third of Sonnet 5 here and produced identical verdicts -
 unsurprising, since it does not decide verdicts. It did need one prompt rule the larger model did
 not: its first summary said depth was *"too close to the camera to call"* when the evidence said
@@ -304,6 +310,31 @@ render path**, and no amount of further scripted checking would have caught it -
 opening the page. That is the real gap in this project's verification, and the argument for one
 headless-browser smoke test over more unit coverage.
 
+## Mocked components and manual steps
+
+**There are none.** Every stage runs for real on a newly uploaded file: probe, pose, barbell
+detection, repetition segmentation, quality gates, measurement, rule evaluation, agent narration,
+overlay. `scripts/e2e_test.py` exercises that path against the running API and is the check behind
+this claim.
+
+Stated precisely, so it can be held against us:
+
+- **No canned results.** Nothing is read from a fixture. Deleting `EVIDENCE/` changes nothing
+  about what the application does.
+- **No manual steps inside the flow.** Upload to report is one user action. The only manual setup
+  is the documented install: create the venv, install requirements, download the pose model, start
+  two servers.
+- **No hand-tuning per video.** No parameter is adjusted for the common sample. The two difficult
+  recordings were run through the identical code path and refused by it.
+- **The agent is real and optional.** It calls the Anthropic API. Without a key the deterministic
+  rule engine produces every verdict, measurement, citation and uncertainty note on its own, and
+  the interface says so.
+- **Two things are computed rather than observed, and both are labelled.** Bar position falls back
+  to a shoulder-offset estimate when the plate is not detected, marked `estimated` everywhere it
+  appears. Centimetre figures assume a 450 mm plate, stated in the report.
+- **Not implemented, and not pretended otherwise:** hosting (local launch only), persistence
+  (jobs are in memory), authentication, and any criterion marked `cannot_assess`.
+
 ## Known limitations
 
 **Measurement**
@@ -334,6 +365,30 @@ headless-browser smoke test over more unit coverage.
 - No automated test suite. Verification was scripted and manual - `scripts/test_vision.py`,
   `scripts/e2e_test.py`, `scripts/check_video_serving.py` - which is a real gap rather than a
   deliberate trade-off I would defend in a longer build.
+
+## Performance, and why it is not simply fixable
+
+The pipeline spends **51% of its time in a classical circle detector**, not in a neural network.
+Pose alone runs at 16.3 fps; per-frame HoughCircles drops the pass to 4.1 fps.
+
+Measured options, and the reason the obvious one is not taken:
+
+| Change | Speed-up | Verdicts changed (of 22) |
+|---|---:|---:|
+| Detect the plate every 5th frame, track between | **2.5x** | **0** (pose untouched) |
+| Lighter pose model (`full`) | 1.6x | 4 |
+| Lighter pose model (`lite`) | 1.4x | 9 |
+| `lite` + every 5th frame + half resolution | 13.2x | not safely measurable |
+
+The 13x configuration runs **faster than real time** on this laptop. It also changes 41% of the
+verdicts, and we have no ground truth to say which set is correct. Worse, the disagreement between
+pose models on depth is 0.16-0.23 shin-lengths while our depth tolerance is 0.03 - the tolerance
+was calibrated against jitter within one model and says nothing about uncertainty across models.
+
+So the shipped configuration keeps the heavy model, and the honest next step is a labelled clip
+set rather than a faster one. Full analysis, including the Jetson edge-deployment and VLM costings,
+is in [FUTURE_SPEC.md](FUTURE_SPEC.md). Reproduce with `scripts/bench_speed.py` and
+`scripts/bench_accuracy.py`.
 
 ## If I had the next four hours
 
