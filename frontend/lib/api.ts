@@ -71,3 +71,52 @@ export async function getOverlay(id: string): Promise<Overlay> {
 export function videoUrl(id: string): string {
   return `${API}/jobs/${id}/video`;
 }
+
+export interface PreviewFrame {
+  frame: number;
+  joints: Record<string, [number, number, number]>;
+}
+
+/**
+ * Subscribe to job progress and landmark previews over one held-open connection.
+ *
+ * Replaces interval polling. On Cloud Run, CPU is allocated only while a request is being
+ * processed, and a detached worker thread is not that: short polls would give the analysis
+ * roughly a 1% duty cycle. A streaming response keeps the request in flight, so the instance
+ * keeps its CPU for the whole analysis and is billed for exactly that window.
+ *
+ * Returns an unsubscribe function.
+ */
+export function subscribeToJob(
+  jobId: string,
+  handlers: {
+    onStatus?: (s: JobStatus) => void;
+    onPreview?: (frames: PreviewFrame[], total: number) => void;
+    onEnd?: (status: string, error: string | null) => void;
+    onError?: (message: string) => void;
+  },
+): () => void {
+  const es = new EventSource(`${API}/jobs/${jobId}/events`);
+
+  es.addEventListener("status", (e) => {
+    handlers.onStatus?.(JSON.parse((e as MessageEvent).data));
+  });
+  es.addEventListener("preview", (e) => {
+    const d = JSON.parse((e as MessageEvent).data);
+    handlers.onPreview?.(d.frames, d.total);
+  });
+  es.addEventListener("end", (e) => {
+    const d = JSON.parse((e as MessageEvent).data);
+    handlers.onEnd?.(d.status, d.error ?? null);
+    es.close();
+  });
+  // EventSource reconnects automatically, which is usually right. Here the server closes the
+  // stream when the job ends, so a genuine transport failure is the only reason to surface this.
+  es.onerror = () => {
+    if (es.readyState === EventSource.CLOSED) {
+      handlers.onError?.("The connection to the analysis service was lost.");
+    }
+  };
+
+  return () => es.close();
+}

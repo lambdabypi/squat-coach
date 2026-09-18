@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LiveTracking from "@/components/LiveTracking";
-import { getJob, getRequirements, uploadVideo } from "@/lib/api";
+import { getRequirements, subscribeToJob, uploadVideo, type PreviewFrame } from "@/lib/api";
 import type { JobStatus, Requirements } from "@/lib/types";
 
 const STAGE_ORDER = [
@@ -24,6 +24,7 @@ export default function Home() {
   const [job, setJob] = useState<JobStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [localFile, setLocalFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<PreviewFrame[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -32,21 +33,22 @@ export default function Home() {
       .catch((e) => setReqError(e.message));
   }, []);
 
-  // Poll while the job runs.
+  // One held-open stream for the whole analysis, rather than an interval poll. See
+  // subscribeToJob for why this matters on Cloud Run as well as in the browser.
+  const jobId = job?.job_id;
   useEffect(() => {
-    if (!job || job.status === "done" || job.status === "failed") return;
-    const id = setInterval(async () => {
-      try {
-        const next = await getJob(job.job_id);
-        setJob(next);
-        if (next.status === "done") router.push(`/report/${next.job_id}`);
-        if (next.status === "failed") setError(next.error ?? "Analysis failed.");
-      } catch (e) {
-        setError((e as Error).message);
-      }
-    }, 700);
-    return () => clearInterval(id);
-  }, [job, router]);
+    if (!jobId) return;
+    setPreview([]);
+    return subscribeToJob(jobId, {
+      onStatus: (s) => setJob(s),
+      onPreview: (frames) => setPreview((prev) => [...prev, ...frames]),
+      onEnd: (status, err) => {
+        if (status === "done") router.push(`/report/${jobId}`);
+        else setError(err ?? "Analysis failed.");
+      },
+      onError: (msg) => setError(msg),
+    });
+  }, [jobId, router]);
 
   const start = useCallback(async (file: File) => {
     setError(null);
@@ -220,7 +222,7 @@ export default function Home() {
           </p>
 
           {job.stage === "Tracking the movement" && (
-            <LiveTracking jobId={job.job_id} file={localFile} />
+            <LiveTracking frames={preview} file={localFile} />
           )}
         </div>
       )}

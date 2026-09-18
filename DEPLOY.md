@@ -69,11 +69,11 @@ Spaces serve on port 7860, which the Dockerfile already defaults to. After the f
 
 Free Spaces sleep when idle and take a moment to wake. For a demo, open it a minute early.
 
-### Option B: Google Cloud Run
+### Option B: Google Cloud Run - what this project actually uses
 
-Always-free allowance of roughly 2M requests and 360k vCPU-seconds per month, scales to zero.
-**Billing must be enabled on the project even to use the free tier**, so confirm which project you
-are deploying into before running this.
+Always-free allowance of roughly 2M requests, 180k vCPU-seconds and 360k GiB-seconds per month,
+scaling to zero when idle. **A billing account must be attached even to use the free tier**
+(tightened in February 2026), so confirm which project you are deploying into first.
 
 ```bash
 gcloud config set project YOUR_PROJECT
@@ -84,11 +84,49 @@ gcloud run deploy squat-coach-backend \
   --memory 2Gi \
   --cpu 2 \
   --timeout 300 \
+  --min-instances 0 \
+  --max-instances 2 \
   --set-env-vars ALLOWED_ORIGINS=https://YOUR-FRONTEND.vercel.app
 ```
 
-`--source .` builds with Cloud Build, so no local Docker is needed. Give it 2 vCPU: analysis is
-CPU-bound and a single core roughly doubles the wall time.
+`--source .` builds with Cloud Build, so **no local Docker is needed**, which also means a broken
+Docker Desktop does not block a deploy.
+
+Every flag above is load-bearing for staying free:
+
+| Flag | Why |
+|---|---|
+| `--min-instances 0` | Scale to zero. A warm instance is billed continuously and would drain the free tier while doing nothing. |
+| `--max-instances 2` | Hard cap. Without it, traffic or a retry loop can scale out and bill you. |
+| `--timeout 300` | Matches the SSE stream's own 290s deadline, so the stream ends itself rather than being cut off. |
+| `--cpu 2` | Analysis is CPU-bound; one core roughly doubles wall time. Two cores at ~90s is ~180 vCPU-seconds per video, so about **1,000 videos per month free**. |
+| default CPU allocation | **Do not** pass `--no-cpu-throttling`. See below. |
+
+**Why the default CPU setting is correct here, which is not obvious.** Cloud Run allocates CPU
+only while a request is being processed. This backend analyses in a worker thread, and a detached
+thread is not request processing, so short status polls would have given it roughly a 1% duty
+cycle and a 90-second analysis would have taken over an hour.
+
+The fix is not instance-based billing. It is that **a streaming response is still an in-flight
+request**: the `GET /jobs/{id}/events` SSE endpoint holds one connection open for the whole
+analysis, so the instance keeps CPU throughout and is billed for exactly that window. Switching to
+`--no-cpu-throttling` would also work but bills for the instance's entire lifetime rather than the
+analysis, which is how a free tier quietly becomes a bill.
+
+`scripts/test_sse.py` asserts that property: one request, preview events arriving during the run
+rather than after it, and a clean terminating event.
+
+**The one charge that is not free.** The image is about 1.84 GB and Artifact Registry gives 0.5 GB
+free, so expect roughly **$0.13 per month** in storage. Delete the service and the image after a
+review if you do not want even that:
+
+```bash
+gcloud run services delete squat-coach-backend --region us-central1
+gcloud artifacts repositories delete cloud-run-source-deploy --location us-central1
+```
+
+Set a budget alert regardless. Free tier quotas are per billing account and aggregate across
+projects, so another project's usage can consume the allowance this one relies on.
 
 ### Option C: Render or Fly.io
 

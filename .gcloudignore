@@ -1,0 +1,31 @@
+# What NOT to upload to Cloud Build.
+#
+# Without this file gcloud falls back to .gitignore, which is close but not the same thing: the
+# build context only needs what the Dockerfile copies. Uploading the venv, node_modules and the
+# evidence videos makes every deploy slower for no benefit.
+#
+# Note this does not override .dockerignore; both apply, at different stages.
+
+.git
+.gitignore
+
+# Python environments and caches
+**/.venv
+**/__pycache__
+**/*.pyc
+
+# Frontend: deployed separately to Vercel, not part of this image
+frontend
+
+# Local runtime artifacts
+backend/storage
+backend/models
+
+# Evidence, docs and tooling: not needed to run the service
+EVIDENCE
+scripts
+*.md
+
+# Never
+.env
+.env.*

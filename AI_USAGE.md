@@ -99,6 +99,44 @@ That is the behaviour the design is for: the agent improves phrasing and writes 
 losing it costs polish, not correctness. It also meant the degradation path was verified under a
 genuine failure rather than a simulated one.
 
+## A second mistake, in the deployment
+
+Worth adding because it is the same shape as the first: an optimisation that looked like it
+worked, reported success, and was wrong.
+
+Building the deployment container, I swapped `opencv-contrib-python` for the smaller
+`opencv-python-headless` to save about 75 MB, reasoning that this project uses only base OpenCV
+calls. The container built, passed its health check, and analysed the common sample end to end.
+
+Then the verdict counts came back **12 / 6 / 4** where the verified host build gives
+**13 / 6 / 3**. One finding had silently changed: back angle flipped from `meets_standard` to
+`does_not_meet_standard` on a repetition.
+
+The cause took two attempts to find.
+
+**First attempt.** My `sed` had replaced the package name *and dropped the version pin*, so pip
+resolved OpenCV **5.0** against the **4.12** everything was verified on. A major version of the
+library that both decodes the video and runs `HoughCircles` had changed underneath the
+measurements. I pinned the headless package and rebuilt.
+
+**Still 5.0.** The real reason is that **mediapipe 1.0.1 declares `opencv-contrib-python` as its
+own dependency, unpinned**. pip honoured my headless pin *and* pulled contrib 5.0.0.93 to satisfy
+mediapipe. Both packages install into the same `cv2` namespace, contrib shadowed headless, and
+the image ran OpenCV 5 while its own requirements claimed 4.12. It also shipped both wheels, 54 MB
+plus 82 MB, so the saving the swap existed for was *negative*.
+
+The fix is to not do the clever thing: keep the pin on `opencv-contrib-python`, which satisfies
+mediapipe at the verified version and installs one copy. The Dockerfile now asserts
+`cv2.__version__` starts with `4.12` at build time, so the build fails rather than the verdicts
+drifting.
+
+**What I take from it.** Pinning a package does not pin the library it provides when something
+else in the tree can install a different distribution into the same namespace. And a container
+that agrees with your build on everything except the answers is the worst possible outcome:
+health checks pass, the pipeline runs, the numbers are subtly different. The only reason this was
+caught is that the end-to-end test prints verdict counts and I had the host's numbers memorised
+from earlier runs. A test that asserted "22 findings returned" would have passed.
+
 ## Corrections still open
 
 - Pose gives a hip *centre*, not the hip *crease* the document's depth standard refers to. This is a

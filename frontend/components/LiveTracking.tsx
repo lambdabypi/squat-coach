@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { API } from "@/lib/api";
-
-interface PreviewFrame {
-  frame: number;
-  joints: Record<string, [number, number, number]>; // normalised x, y, visibility
-}
+import type { PreviewFrame } from "@/lib/api";
 
 const BONES: [string, string][] = [
   ["shoulder", "hip"],
@@ -28,14 +23,23 @@ const BONES: [string, string][] = [
  * the whole clip has been read, so this always draws the left chain. The report redraws
  * everything from the finished analysis.
  */
-export default function LiveTracking({ jobId, file }: { jobId: string; file: File | null }) {
+export default function LiveTracking({
+  frames,
+  file,
+}: {
+  frames: PreviewFrame[];
+  file: File | null;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // The draw loop reads from a ref so it does not re-subscribe on every new batch.
   const framesRef = useRef<PreviewFrame[]>([]);
   const rafRef = useRef(0);
   const [url, setUrl] = useState<string | null>(null);
-  const [analysed, setAnalysed] = useState(0);
   const [fps, setFps] = useState(30);
+  const analysed = frames.length;
+
+  framesRef.current = frames;
 
   useEffect(() => {
     if (!file) return;
@@ -43,34 +47,6 @@ export default function LiveTracking({ jobId, file }: { jobId: string; file: Fil
     setUrl(u);
     return () => URL.revokeObjectURL(u);
   }, [file]);
-
-  // Poll for newly analysed frames.
-  useEffect(() => {
-    let alive = true;
-    let since = 0;
-    const tick = async () => {
-      try {
-        const r = await fetch(`${API}/jobs/${jobId}/preview?since=${since}`, {
-          cache: "no-store",
-        });
-        if (r.ok) {
-          const d = await r.json();
-          if (d.frames?.length) {
-            framesRef.current.push(...d.frames);
-            since = d.total;
-            setAnalysed(d.total);
-          }
-        }
-      } catch {
-        /* the status poll on the parent surfaces real failures */
-      }
-      if (alive) setTimeout(tick, 400);
-    };
-    tick();
-    return () => {
-      alive = false;
-    };
-  }, [jobId]);
 
   // Draw the most recent landmarks and keep the playhead on that frame.
   //

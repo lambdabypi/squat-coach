@@ -6,14 +6,15 @@ original video. The Next.js frontend holds no secrets and runs no inference.
 
 from __future__ import annotations
 
+import asyncio
+import json
 import os
-import shutil
 from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 # Load squat-coach/.env before anything reads the environment, so the key never has to be
 # exported by hand or pasted into a shell. The file is gitignored.
@@ -35,6 +36,14 @@ MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 
 DEFAULT_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
 ALLOWED_ORIGINS = env_list("ALLOWED_ORIGINS", DEFAULT_ORIGINS)
+
+# Upper bound on how long one SSE connection may stay open. Cloud Run's own request timeout is
+# 300s, so this sits just under it: the stream should end itself rather than be cut off.
+MAX_STREAM_SECONDS = 290.0
+
+
+def _sse(event: str, payload: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(payload)}\n\n"
 
 app = FastAPI(title="Squat Coach API", version="1.0.0")
 app.add_middleware(
@@ -147,6 +156,63 @@ def job_preview(job_id: str, since: int = 0) -> dict:
         "status": job.status,
         "stage": job.stage,
     }
+
+
+@app.get("/jobs/{job_id}/events")
+async def job_events(job_id: str):
+    """Server-sent events: job progress and landmark previews on one held-open connection.
+
+    This exists for Cloud Run as much as for the browser. Under request-based billing CPU is
+    allocated only while a request is being processed, and a detached background thread is not
+    request processing, so the analysis would crawl between short polls. A streaming response is
+    still an in-flight request, so the instance keeps its CPU for the whole analysis and is
+    billed only for that time. Polling every 700ms would have given the worker roughly a 1%
+    duty cycle.
+
+    The polling endpoints are kept for the CLI and for clients that cannot hold a connection.
+    """
+    job = store.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Unknown job.")
+
+    async def stream():
+        sent_preview = 0
+        last_status: tuple | None = None
+        # A bound, so a wedged job cannot hold an instance open indefinitely.
+        deadline = asyncio.get_event_loop().time() + MAX_STREAM_SECONDS
+
+        while True:
+            current = (job.status, job.stage, round(job.progress, 3))
+            if current != last_status:
+                yield _sse("status", job.public())
+                last_status = current
+
+            if len(job.preview) > sent_preview:
+                batch = job.preview[sent_preview:]
+                sent_preview = len(job.preview)
+                yield _sse("preview", {"frames": batch, "total": sent_preview})
+
+            if job.status in ("done", "failed"):
+                yield _sse("end", {"status": job.status, "error": job.error})
+                return
+
+            if asyncio.get_event_loop().time() > deadline:
+                yield _sse("end", {"status": "timeout",
+                                   "error": "The analysis exceeded the streaming deadline."})
+                return
+
+            await asyncio.sleep(0.25)
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            # Proxies that buffer would defeat the point of streaming.
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.get("/jobs/{job_id}/report")

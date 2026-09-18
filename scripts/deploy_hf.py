@@ -134,6 +134,11 @@ def main() -> int:
     ap.add_argument("--gh-user", default="lambdabypi")
     ap.add_argument("--private", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--token",
+        default=None,
+        help="Hugging Face write token. Falls back to a stored login or HF_TOKEN.",
+    )
     args = ap.parse_args()
 
     files = gather()
@@ -171,7 +176,8 @@ def main() -> int:
     repo_id = f"{user}/{args.name}"
     print(f"\ndeploying to https://huggingface.co/spaces/{repo_id}")
 
-    api = HfApi()
+    # Bind the token to the client once, so every call uses the same credential as whoami did.
+    api = HfApi(token=token)
     api.create_repo(
         repo_id=repo_id, repo_type="space", space_sdk="docker",
         private=args.private, exist_ok=True,
@@ -183,16 +189,21 @@ def main() -> int:
         encoding="utf-8", newline="\n",
     )
     try:
+        # One commit for the whole tree rather than a request per file: 30 sequential uploads
+        # is 30 commits in the Space history and 30 build triggers.
+        api.upload_folder(
+            folder_path=str(ROOT),
+            repo_id=repo_id,
+            repo_type="space",
+            allow_patterns=[rel for _, rel in files],
+            commit_message="Deploy squat-coach backend",
+        )
         api.upload_file(
             path_or_fileobj=str(readme), path_in_repo="README.md",
             repo_id=repo_id, repo_type="space",
+            commit_message="Space configuration",
         )
-        for path, rel in files:
-            api.upload_file(
-                path_or_fileobj=str(path), path_in_repo=rel,
-                repo_id=repo_id, repo_type="space",
-            )
-            print(f"  uploaded {rel}")
+        print(f"  uploaded {len(files)} files plus the Space README")
     finally:
         readme.unlink(missing_ok=True)
 
