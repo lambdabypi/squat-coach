@@ -23,6 +23,23 @@ MIN_PROMINENCE_FRAC = 0.25   # of total hip travel
 MIN_REP_SEPARATION_S = 0.6
 MIN_DESCENT_TRAVEL_FRAC = 0.20
 
+# Where a repetition really begins and ends, as a fraction of its own descent below standing.
+#
+# Taking the bounding hip-height troughs was wrong on any clip that shows the un-rack. Lifting a
+# loaded bar off the pins raises the hips *above* standing, so the un-rack is a trough, and so is
+# the re-rack. On a real gym clip that made repetition 1 start 5 seconds early: a 156-frame
+# "descent" that was mostly the walk-out and setup, and a 34-frame ascent. Metrics measured over
+# that window picked up the walk-out - bar path is a max-deviation measurement, so walking
+# sideways out of the rack guaranteed a large one, and the heels-flat reference frame was taken
+# while the heel was still raised from the un-rack.
+#
+# The tightened boundary is the frame where the hip has descended this far past standing, which is
+# unambiguously the lift rather than the setup.
+MOVEMENT_ONSET_FRAC = 0.15
+# Percentile of hip height taken as the athlete's standing level. Not the minimum: a few frames of
+# un-rack sit above standing and would drag the reference with them.
+STANDING_PERCENTILE = 15.0
+
 
 @dataclass
 class Rep:
@@ -101,16 +118,39 @@ def segment_reps(track: PoseTrack) -> RepSegmentation:
     troughs, _ = find_peaks(-work, prominence=MIN_PROMINENCE_FRAC * travel * 0.5)
     troughs = np.concatenate(([0], troughs, [len(work) - 1]))
 
+    # The athlete's standing hip height, used to tell the lift apart from the setup around it.
+    standing = float(np.nanpercentile(finite, STANDING_PERCENTILE))
+
     reps: list[Rep] = []
     for k, p in enumerate(peaks):
         before = troughs[troughs < p]
         after = troughs[troughs > p]
         start = int(before[-1]) if before.size else 0
         end = int(after[0]) if after.size else len(work) - 1
+        # Kept for the clipped-at-the-edges check below: tightening moves start and end inward,
+        # which would otherwise disguise a repetition running off the end of the clip as a
+        # comfortably bounded one.
+        raw_start, raw_end = start, end
 
         descent = float(work[p] - work[start])
         if descent < MIN_DESCENT_TRAVEL_FRAC * travel:
             continue  # a wobble, not a rep
+
+        # Pull the boundaries in to where the hip is actually descending or rising, so the
+        # un-rack, the setup and the re-rack are not measured as part of the repetition.
+        onset = standing + MOVEMENT_ONSET_FRAC * max(0.0, float(work[p]) - standing)
+        above = np.flatnonzero(work[start:p + 1] <= onset)
+        if above.size:
+            start = int(start + above[-1])
+        below = np.flatnonzero(work[p:end + 1] <= onset)
+        if below.size:
+            end = int(p + below[0])
+
+        # Recompute against the tightened start: depth_travel_px feeds rep confidence and the
+        # overlay, and measuring it from a walk-out would overstate how far the hips travelled.
+        descent = float(work[p] - work[start])
+        if descent < MIN_DESCENT_TRAVEL_FRAC * travel:
+            continue
 
         prom = float(props["prominences"][k])
         if prom > 0.6 * travel:
@@ -121,7 +161,7 @@ def segment_reps(track: PoseTrack) -> RepSegmentation:
             conf = "low"
 
         # A rep whose boundaries touch the clip edges may be clipped.
-        if start == 0 or end == len(work) - 1:
+        if raw_start == 0 or raw_end == len(work) - 1:
             conf = "medium" if conf == "high" else "low"
 
         reps.append(Rep(

@@ -17026,22 +17026,22 @@
   "reps": [
     {
       "index": 1,
-      "start_frame": 0,
+      "start_frame": 21,
       "bottom_frame": 65,
-      "end_frame": 120,
-      "start_t": 0.0,
+      "end_frame": 98,
+      "start_t": 0.7,
       "bottom_t": 2.166,
-      "end_t": 4.0,
+      "end_t": 3.266,
       "confidence": "medium"
     },
     {
       "index": 2,
-      "start_frame": 120,
+      "start_frame": 141,
       "bottom_frame": 188,
-      "end_frame": 235,
-      "start_t": 4.0,
+      "end_frame": 223,
+      "start_t": 4.7,
       "bottom_t": 6.266,
-      "end_t": 7.833,
+      "end_t": 7.433,
       "confidence": "medium"
     }
   ],

@@ -38,6 +38,18 @@ L_HIP, R_HIP = 23, 24
 ROI_HALF_TORSO_MULT = 1.15      # search box half-width, in torso lengths
 MIN_R_TORSO = 0.22              # plate radius bounds, in torso lengths
 MAX_R_TORSO = 0.95
+# Hard cutoff on how far a candidate's *centre* may sit from the shoulder midpoint, in torso
+# lengths. Distinct from the ROI, which has to stay wide enough for Hough to see a whole plate
+# whose radius may be 0.95 torso; this constrains where the centre of that plate may be.
+#
+# Without it, proximity was only ever a *score* term, capped at `min(dist, 2.0)`. Whenever Hough
+# missed the real plate - occluded by the athlete's own head, or a weak gradient against a dark
+# gym - the best remaining candidate won by default, however far away it was. On a rack-mounted
+# gym clip that meant the stored plates on the uprights, which sit at almost exactly bar height
+# and bar radius, so neither the radius-consistency check nor the darkness term could reject them.
+# The bar rests on the back: 0.55 torso is generous for a plate centre, and the measured values on
+# real footage are 0.0 at the bottom and 0.29 at the top of a repetition.
+MAX_BAR_DIST_TORSO = 0.55
 DARK_MAX_INTENSITY = 110        # a loaded plate is dark
 RADIUS_CONSISTENCY_TOL = 0.22   # reject detections this far from the clip median radius
 BAR_ABOVE_SHOULDER_PX = 0.0     # the bar sits essentially at the shoulder landmark height
@@ -174,8 +186,13 @@ class BarDetector:
             mean_i = cv2.mean(gray, mask=mask)[0]
             if mean_i > DARK_MAX_INTENSITY:
                 continue
-            # Closer to the shoulder and darker is better; both normalised to ~[0,1].
             dist = np.hypot(gx - sx, gy - sy) / torso
+            # Reject, do not merely penalise. A candidate this far from the shoulder is not the
+            # bar regardless of how dark and circular it is, and leaving it in the running let
+            # background plates win in every frame where the real one was not found.
+            if dist > MAX_BAR_DIST_TORSO:
+                continue
+            # Closer to the shoulder and darker is better; both normalised to ~[0,1].
             score = (1.0 - min(dist, 2.0) / 2.0) * 1.5 + (1.0 - mean_i / 255.0)
             if score > best_score:
                 best, best_score = (float(gx), float(gy), float(cr)), score

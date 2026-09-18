@@ -24,3 +24,8 @@ next-env.d.ts
 EVIDENCE/**/*.mp4
 EVIDENCE/**/*.webm
 EVIDENCE/**/smoke/
+
+# test footage fetched by scripts/fetch_test_clip.py. Third-party video, and this repository is
+# public: the script records how to obtain a clip, which is the reproducible part. The URL and the
+# measurements it produced belong in BUILD_NOTES.md, the file itself does not belong in git.
+samples/

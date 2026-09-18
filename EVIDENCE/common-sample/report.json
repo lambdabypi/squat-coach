@@ -79,22 +79,22 @@
   "reps": [
     {
       "index": 1,
-      "start_frame": 0,
+      "start_frame": 21,
       "bottom_frame": 65,
-      "end_frame": 120,
-      "start_t": 0.0,
+      "end_frame": 98,
+      "start_t": 0.7,
       "bottom_t": 2.166,
-      "end_t": 4.0,
+      "end_t": 3.266,
       "confidence": "medium"
     },
     {
       "index": 2,
-      "start_frame": 120,
+      "start_frame": 141,
       "bottom_frame": 188,
-      "end_frame": 235,
-      "start_t": 4.0,
+      "end_frame": 223,
+      "start_t": 4.7,
       "bottom_t": 6.266,
-      "end_t": 7.833,
+      "end_t": 7.433,
       "confidence": "medium"
     }
   ],
@@ -298,7 +298,7 @@
         "reason": null,
         "detail": {
           "tracked_fraction": 1.0,
-          "detected_fraction": 0.74,
+          "detected_fraction": 0.72,
           "worst_deviation_shin": 0.2654,
           "note": "Midfoot is the midpoint between heel and toe landmarks. tracked_fraction counts frames whose bar position is measured or bracketed by measurements; detected_fraction counts measured only."
         }
@@ -412,7 +412,7 @@
       "verdict": "meets_standard",
       "measurement": {
         "measure_id": "heel_vertical_displacement",
-        "value": -0.0068,
+        "value": 0.0122,
         "unit": "shin_lengths",
         "basis": "observed",
         "frame": 65,
@@ -421,14 +421,14 @@
         "confidence": "medium",
         "reason": "Heel landmarks are easily confused by footwear and by the far foot.",
         "detail": {
-          "standing_heel_y_px": 1813.4,
+          "standing_heel_y_px": 1818.4,
           "bottom_heel_y_px": 1815.2
         }
       },
       "threshold_value": 0.08,
       "threshold_provenance": "engineering_tolerance",
       "confidence": "medium",
-      "reason": "The heel stayed down; it moved -0.01 shin-lengths from its standing height.",
+      "reason": "The heel stayed down; it moved 0.01 shin-lengths from its standing height.",
       "citation": "ref p. 23 \u00b7 Fig 2-13",
       "source_pages": [
         23
@@ -436,7 +436,7 @@
       "quote": "The femurs are parallel to the feet, the feet are flat on the ground at the correct angle",
       "feedback_source": null,
       "uncertainty": "Heel landmarks are easily confused by footwear and by the far foot.",
-      "explanation": "The heel stayed down; it moved -0.01 shin-lengths from its standing height.",
+      "explanation": "The heel stayed down; it moved 0.01 shin-lengths from its standing height.",
       "feedback": null,
       "timestamp_s": 2.1664830508474577,
       "frame_index": 65,
@@ -449,11 +449,11 @@
       "verdict": "cannot_assess",
       "measurement": {
         "measure_id": "bar_y_relative_to_shoulder",
-        "value": -0.5148,
+        "value": -0.4145,
         "unit": "shin_lengths",
         "basis": "observed",
-        "frame": 0,
-        "t": 0.0,
+        "frame": 21,
+        "t": 0.7,
         "available": true,
         "confidence": "low",
         "reason": "There is no scapular-spine landmark in pose estimation, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete.",
@@ -464,7 +464,7 @@
       "threshold_value": null,
       "threshold_provenance": null,
       "confidence": "low",
-      "reason": "The bar centre sits 0.51 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
+      "reason": "The bar centre sits 0.41 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
       "citation": "ref p. 13, 30, 31, 35 \u00b7 Fig 2-19",
       "source_pages": [
         13,
@@ -475,10 +475,10 @@
       "quote": "The bar should therefore be in the lowest secure position it can occupy on the back, right below the spine of the scapula",
       "feedback_source": null,
       "uncertainty": "There is no scapular-spine landmark in pose estimation, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete.",
-      "explanation": "The bar centre sits 0.51 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
+      "explanation": "The bar centre sits 0.41 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
       "feedback": null,
-      "timestamp_s": 0.0,
-      "frame_index": 0,
+      "timestamp_s": 0.6999406779661017,
+      "frame_index": 21,
       "narrated_by": "rules"
     },
     {
@@ -704,7 +704,7 @@
         "reason": null,
         "detail": {
           "tracked_fraction": 1.0,
-          "detected_fraction": 0.86,
+          "detected_fraction": 0.87,
           "worst_deviation_shin": 0.2381,
           "note": "Midfoot is the midpoint between heel and toe landmarks. tracked_fraction counts frames whose bar position is measured or bracketed by measurements; detected_fraction counts measured only."
         }
@@ -813,7 +813,7 @@
       "verdict": "meets_standard",
       "measurement": {
         "measure_id": "heel_vertical_displacement",
-        "value": 0.0307,
+        "value": 0.019,
         "unit": "shin_lengths",
         "basis": "observed",
         "frame": 188,
@@ -822,14 +822,14 @@
         "confidence": "medium",
         "reason": "Heel landmarks are easily confused by footwear and by the far foot.",
         "detail": {
-          "standing_heel_y_px": 1821.7,
+          "standing_heel_y_px": 1818.7,
           "bottom_heel_y_px": 1813.7
         }
       },
       "threshold_value": 0.08,
       "threshold_provenance": "engineering_tolerance",
       "confidence": "medium",
-      "reason": "The heel stayed down; it moved 0.03 shin-lengths from its standing height.",
+      "reason": "The heel stayed down; it moved 0.02 shin-lengths from its standing height.",
       "citation": "ref p. 23 \u00b7 Fig 2-13",
       "source_pages": [
         23
@@ -837,7 +837,7 @@
       "quote": "The femurs are parallel to the feet, the feet are flat on the ground at the correct angle",
       "feedback_source": null,
       "uncertainty": "Heel landmarks are easily confused by footwear and by the far foot.",
-      "explanation": "The heel stayed down; it moved 0.03 shin-lengths from its standing height.",
+      "explanation": "The heel stayed down; it moved 0.02 shin-lengths from its standing height.",
       "feedback": null,
       "timestamp_s": 6.266135593220339,
       "frame_index": 188,
@@ -850,11 +850,11 @@
       "verdict": "cannot_assess",
       "measurement": {
         "measure_id": "bar_y_relative_to_shoulder",
-        "value": -0.4745,
+        "value": -0.3931,
         "unit": "shin_lengths",
         "basis": "observed",
-        "frame": 120,
-        "t": 4.0,
+        "frame": 141,
+        "t": 4.7,
         "available": true,
         "confidence": "low",
         "reason": "There is no scapular-spine landmark in pose estimation, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete.",
@@ -865,7 +865,7 @@
       "threshold_value": null,
       "threshold_provenance": null,
       "confidence": "low",
-      "reason": "The bar centre sits 0.47 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
+      "reason": "The bar centre sits 0.39 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
       "citation": "ref p. 13, 30, 31, 35 \u00b7 Fig 2-19",
       "source_pages": [
         13,
@@ -876,10 +876,10 @@
       "quote": "The bar should therefore be in the lowest secure position it can occupy on the back, right below the spine of the scapula",
       "feedback_source": null,
       "uncertainty": "There is no scapular-spine landmark in pose estimation, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete.",
-      "explanation": "The bar centre sits 0.47 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
+      "explanation": "The bar centre sits 0.39 shin-lengths above the shoulder landmark. That measurement is real, but it cannot be turned into a verdict: pose estimation provides no scapular-spine landmark, and correct versus incorrect bar placement differs by roughly two centimetres on the athlete. We have no calibrated basis for a threshold here, so we decline to guess.",
       "feedback": null,
-      "timestamp_s": 3.9996610169491524,
-      "frame_index": 120,
+      "timestamp_s": 4.699601694915255,
+      "frame_index": 141,
       "narrated_by": "rules"
     },
     {

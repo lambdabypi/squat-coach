@@ -323,7 +323,7 @@ because `report.json` was written and `overlay.json` was not.
 
 ## Correctness problems I found and fixed
 
-All four were found by reading results that the code reported as successes.
+All of the first four were found by reading results that the code reported as successes.
 
 1. **Barbell detector reported 5/5 while being wrong on 3 of 5.** Search region was bounded
    vertically but not horizontally, so gym equipment competed with the plate. Fixed by anchoring
@@ -346,7 +346,43 @@ landmark positions, so it cannot be trusted when the person is barely detected. 
 the detection gate - a confident diagnosis from unreliable inputs being the exact thing these gates
 exist to prevent.
 
-A sixth, worth recording for what it says about the verification rather than about the code: the
+A sixth, and the only one found by testing a video other than the one this was built on. All the
+verification above ran against a single clip, tightly cropped to two repetitions with no un-rack in
+frame. Handed a real gym clip from a coaching channel, the assessment produced a confident
+`does_not_meet_standard` on bar path at 0.578 shin-lengths, which for a coaching demonstration was
+not credible.
+
+**Repetition boundaries were taking in the un-rack, the setup and the re-rack.** `segment_reps`
+bounded each repetition with the hip-height *troughs* either side of the bottom. Lifting a loaded
+bar off the pins raises the hips *above* standing, so the un-rack is a trough, and so is the
+re-rack. Measured on that clip: hip y of 522 at the chosen start against a standing level of about
+565, and repetition 1 handed frames 70 to 260 - a 156-frame "descent" that was mostly walking out
+of the rack, against a 34-frame ascent.
+
+Three metrics inherited it. Bar path is a maximum-deviation measurement over the repetition, so
+walking sideways out of a rack guarantees a large one. Heels-flat takes its standing reference from
+`rep.start_frame`, which was the un-rack frame with the heel *already raised*, which is why it
+reported the heel travelling *downward* (-0.055 shin-lengths). Bar height relative to the shoulder
+uses the same frame. Fixed at the segmenter rather than in each metric: boundaries now pull in to
+where the hip has descended 15% past a robust standing level, taken as the 15th percentile of hip
+height rather than the minimum, because the un-rack frames sit above standing and would drag the
+reference with them. Bar path fell to 0.270 and 0.338, heels-flat to -0.030, and the common
+sample's verdict counts did not move (13/6/3), with bar path and depth identical to the digit.
+
+Two things about how this was found are worth more than the fix. First, `BUILD_NOTES.md` already
+listed "walk-outs and re-racks can produce phantom repetitions" as a known limitation, written
+before there was a second clip to test: the limitation was real and the consequence was
+under-estimated, because a phantom repetition is easy to notice and a *contaminated* one is not.
+Second, two wrong diagnoses came first. The exported frame showed the bar-path trail wandering onto
+the gym's rack, so the first hypothesis was background plates outscoring the real one; the second
+was that pose had switched to a bystander standing in shot. Measurement refuted both - shoulder x
+travels 915 to 1383 with no frame-to-frame jump above 200px, and every worst-case deviation is
+`observed=True` within 55px of the athlete's own shoulder. The trail was the athlete's own walk-out,
+drawn from the shoulder fallback. The proximity cutoff added in `bar.py` on the strength of the
+first hypothesis is defensible physics and is kept, but it changed this clip's outcome by 0.001
+shin-lengths and there is no case on hand where it changes a verdict.
+
+A seventh, worth recording for what it says about the verification rather than about the code: the
 live tracking view streamed landmarks back correctly and never painted
 them. A React effect guarded on refs that are null while the component renders `null`, with a
 dependency list that never changed, so the render loop never started. TypeScript passed. The
@@ -390,8 +426,9 @@ Stated precisely, so it can be held against us:
   systematic bias on the criterion rather than absorbed into a tolerance - which is why both
   repetitions of the common sample return `cannot_assess` for depth at ±0.02 shin-lengths.
 - Bar detection assumes a visible plate.
-- Rep segmentation assumes a continuous set in frame; walk-outs and re-racks can produce phantom
-  repetitions.
+- Rep segmentation assumes a continuous set in frame. Walk-outs and re-racks can still produce
+  phantom repetitions; the boundary contamination described below is fixed, the phantom-rep case
+  is not.
 
 **Coverage**
 
