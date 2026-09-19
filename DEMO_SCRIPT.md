@@ -51,18 +51,30 @@ short is the correct failure mode: a walkthrough that overruns cannot be rescued
 
 > "A tool that tells you what it cannot see is one you can trust about what it can."
 
+> "And who pays for that? Gyms and remote coaching platforms. A coach going through thirty form
+> checks a week doesn't need a score, they need something to point at, with a page number, that
+> the client can go read themselves. That's the wedge. The consumer app is how it gets found."
+
 ## 2:00 - 3:15  Run it live on a new file
 
 [Start the upload NOW so it processes while you talk. Narrate over the progress.]
 
 > "I'm uploading a clip it hasn't seen in this session, so this is a real run, not a replay.
 >
-> What's happening right now is worth a sentence. The pose estimation is running **in this
-> browser**, frame by frame. The video never leaves the laptop - what goes to the server is a few
-> hundred landmark coordinates and a handful of small frames for the barbell detector.
+> While that goes, here's the whole path through the system, because it's short. The browser reads
+> the video frame by frame and runs pose estimation on it locally. It sends up landmark
+> coordinates and a handful of small frames. The server finds the barbell in those frames, works
+> out where each repetition starts and bottoms out, measures about a dozen quantities off the
+> smoothed landmark series, and a rule engine compares each measurement against the skill and
+> produces a verdict.
 >
-> Server-side, this same analysis took about five minutes on the free tier. In the browser it's
-> under a minute, and the file staying local is a privacy answer I get for free."
+> Notice where the language model isn't. It never sees a frame and it never produces a number. It
+> gets the measurements as JSON and writes the explanation. Every verdict on this screen would
+> exist without it, and the deployed version runs with no API key at all.
+>
+> One more thing while we wait. Server-side this took about five minutes on the free tier. In the
+> browser it's under a minute, and the video never leaving the laptop is a privacy answer I get
+> for free."
 
 [Land on the report.]
 
@@ -72,12 +84,12 @@ short is the correct failure mode: a walkthrough that overruns cannot be rescued
 
 [Toggle the skeleton and bar path.]
 
-> "Green landmarks were actually seen by the model. Orange ones were inferred - the model's best
-> guess at a joint it couldn't observe. The barbell marker is solid where the plate was genuinely
-> detected in pixels, and dashed where its position is estimated from the shoulder.
+> "Green landmarks were actually seen. Orange ones the model inferred, its best guess at a joint it
+> couldn't observe. The bar marker is solid where the plate was genuinely found in pixels, dashed
+> where the position is estimated off the shoulder.
 >
-> That distinction isn't decoration. It runs all the way through to the findings: a measurement
-> built on an estimated bar position is labelled as such and its confidence is capped."
+> That distinction isn't decoration. It runs through to the findings: a measurement resting on an
+> estimated bar position is labelled that way and its confidence is capped."
 
 [Click a finding's timestamp.]
 
@@ -119,7 +131,13 @@ short is the correct failure mode: a walkthrough that overruns cannot be rescued
 
 > "You said you might want to change a rule during the review. Let's do it."
 
-[Editor, `skill/squat_standards.yaml`, `back_angle` tolerance. Change `15` to `5`. Save.]
+[Editor, `skill/squat_standards.yaml`, `back_angle` tolerance. Change `15` to `5`. Save.
+
+If they ask to change a rule themselves, two things are editable and they behave differently.
+`tolerance.value` is mine, so changing it is ordinary. `rule.reference_value: 45` is the
+document's own number, so changing that is changing what the book is taken to say. Offer them
+either. The second is the more interesting one to be asked for, and the loader accepts it because
+the provenance stays truthful.]
 
 > "Back angle: the document says about forty-five degrees. My tolerance around that is plus or
 > minus fifteen. This lifter measured fifty-nine and fifty-eight degrees - inside it, so both
@@ -162,43 +180,48 @@ short is the correct failure mode: a walkthrough that overruns cannot be rescued
 > collapses them onto each other. This one's at point five three; past point four, nothing is
 > assessed."
 
-## 8:30 - 9:30  What I verified, and what broke
+## 8:30 - 9:30  What I verified, and an incorrect result investigated
+
+[This is the brief's "investigate an incorrect result". If they would rather see one investigated
+**live**, drop this narration and take whichever verdict they point at: open the finding, click its
+timestamp to jump to the source frame, open the citation, then read the measurement's `detail`
+block in the report JSON. Say out loud what would have to be true for the verdict to be wrong. Do
+not defend a number you cannot see the frame for.]
 
 > "A minute on how I know any of this works.
 >
-> Everything was verified through Python, and it all passed. Then I wrote one test that drives a
-> real browser - uploads a real file, lets the browser's own WebAssembly build do the pose work,
-> and compares every verdict to the verified baseline.
+> Everything was verified in Python and all of it passed. Then I wrote one test that drives a real
+> browser: uploads a real file, lets the browser's own WebAssembly build do the pose, compares
+> every verdict against the baseline.
 >
-> It failed on the first run. The browser published a confident 'you did this wrong' on hip drive
-> where the server abstained. Same video, same rules.
+> It failed first run. The browser called hip drive a confident failure where the server abstained.
+> Same video, same rules.
 >
-> My first diagnosis was wrong. I decided it was pixel noise near a threshold, raised the
-> threshold, re-ran, and got the identical number back - which disproved my own explanation. So I
-> reverted it.
+> I chased the wrong cause first. Figured it was pixel noise near a threshold, raised the
+> threshold, re-ran, got back the identical number. That killed my own explanation, so I reverted
+> it.
 >
-> The real cause: the bottom of a squat is the peak of a nearly flat curve, so which frame *is*
-> the bottom is only good to a frame or two, and that metric read a fixed window starting there. A
-> two-frame shift changed the measurement ninefold.
+> Real cause: the bottom of a squat is the peak of a flat curve, so which frame *is* the bottom is
+> only good to a frame or two, and that metric read a fixed window starting there. Two frames moved
+> the measurement ninefold.
 >
-> Checking properly, the other repetition ranged from zero point three six to one point eight five
-> depending on that frame - straddling the pass/fail line. It had been shipping as a confident
-> failure. It now abstains."
+> Then I checked the other repetition. It ranged from zero point three six to one point eight five
+> depending on that frame, straddling the pass and fail line, and it had been shipping as a
+> confident failure the whole time. It abstains now."
 
-> "That's the one I'd want you to judge me on. Not that it was broken - that using the product
-> found what the test suite couldn't, and the fix made the tool quieter rather than louder."
+> "That's the one I'd want judged. Using the product found what the tests couldn't, and the fix
+> made it quieter."
 
 ## 9:30 - 10:00  Close
 
-> "Five and a half hours, deployed, with the reference document parsed into a skill you can edit
-> without touching a line of application code.
+> "Five and a half hours, deployed, with the document parsed into a skill you can edit without
+> touching application code.
 >
-> What I'd do next, in order: a labelled set of clips so those tolerances stop being my judgement
-> and start being measured; anchor that hip-drive window by displacement so the criterion can
-> report again instead of abstaining; and a front-camera pass to pick up the three criteria this
-> one honestly can't see.
+> Three things next, in order. A labelled clip set, so those tolerances stop being my judgement.
+> Anchor the hip-drive window by displacement so it can report again instead of abstaining. And a
+> front camera, for the three criteria this one can't see.
 >
-> Happy to take it anywhere you want - a new video, a different rule, or into the code."
+> Take it anywhere you want. New video, different rule, or into the code."
 
 ---
 
@@ -225,6 +248,24 @@ Then narrate whatever comes back honestly, including a refusal. **A refusal on t
 good demo, not a failed one** - it is the behaviour the whole design is for. If a verdict looks
 wrong, say so and open the frame it came from; investigating an incorrect result live is on their
 list of things to see.
+
+## Objections
+
+`DEMO.md` has the prepared answers under "Likely questions" - read them the morning of, do not
+read them live. The four most likely, in a line each:
+
+- **"Is the LLM looking at the video?"** No. It gets measurements as JSON. MediaPipe and OpenCV do
+  the seeing.
+- **"Why not a VLM?"** Not a cost argument, it's actually cheaper at four frames. It loses on
+  capability: no per-landmark visibility score, and that score is what every `cannot_assess` rests
+  on. Offer to run `scripts/cost_model.py` live.
+- **"What if the model is wrong?"** It can't be wrong about a measurement, it doesn't make them.
+  It's barred in code from making any verdict more confident than the rule engine's.
+- **"Isn't a minute slow?"** For asynchronous form review, no. And the fix is known: detect the
+  plate every N frames instead of every frame.
+
+If an objection lands and you don't have the answer, say that, and say what you'd measure to find
+out. That is the same move the whole product makes.
 
 ## Numbers you may be asked for
 
